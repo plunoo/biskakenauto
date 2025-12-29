@@ -253,14 +253,13 @@ export const useStore = create<AppState>((set, get) => ({
     }));
     
     const updatedState = get();
-    if (updatedState.user?.role !== 'ADMIN') {
-      updatedState.addNotification({
-        type: 'user',
-        message: `${updatedState.user?.name} added new customer: ${customer.name}`,
-        userId: updatedState.user?.id,
-        userName: updatedState.user?.name
-      });
-    }
+    // Create notification for all user actions (including admin for demo purposes)
+    updatedState.addNotification({
+      type: 'user',
+      message: `${updatedState.user?.name} added new customer: ${customer.name}`,
+      userId: updatedState.user?.id,
+      userName: updatedState.user?.name
+    });
   },
   updateCustomer: (customerId, updates) => {
     const state = get();
@@ -270,7 +269,7 @@ export const useStore = create<AppState>((set, get) => ({
     }));
     
     const updatedState = get();
-    if (updatedState.user?.role !== 'ADMIN' && customer) {
+    if (customer) {
       updatedState.addNotification({
         type: 'user',
         message: `${updatedState.user?.name} updated customer: ${customer.name}`,
@@ -289,7 +288,7 @@ export const useStore = create<AppState>((set, get) => ({
     }));
     
     const updatedState = get();
-    if (updatedState.user?.role !== 'ADMIN' && customer) {
+    if (customer) {
       updatedState.addNotification({
         type: 'user',
         message: `${updatedState.user?.name} deleted customer: ${customer.name}`,
@@ -388,14 +387,13 @@ export const useStore = create<AppState>((set, get) => ({
     }));
     
     const updatedState = get();
-    if (updatedState.user?.role !== 'ADMIN') {
-      updatedState.addNotification({
-        type: 'inventory',
-        message: `${updatedState.user?.name} added new inventory item: ${item.name}`,
-        userId: updatedState.user?.id,
-        userName: updatedState.user?.name
-      });
-    }
+    // Create notification for all user actions (including admin for demo purposes)
+    updatedState.addNotification({
+      type: 'inventory',
+      message: `${updatedState.user?.name} added new inventory item: ${item.name}`,
+      userId: updatedState.user?.id,
+      userName: updatedState.user?.name
+    });
   },
   updateInventory: (itemId, updates) => {
     const state = get();
@@ -405,7 +403,7 @@ export const useStore = create<AppState>((set, get) => ({
     }));
     
     const updatedState = get();
-    if (updatedState.user?.role !== 'ADMIN' && item) {
+    if (item) {
       updatedState.addNotification({
         type: 'inventory',
         message: `${updatedState.user?.name} updated inventory item: ${item.name}`,
@@ -422,7 +420,7 @@ export const useStore = create<AppState>((set, get) => ({
     }));
     
     const updatedState = get();
-    if (updatedState.user?.role !== 'ADMIN' && item) {
+    if (item) {
       updatedState.addNotification({
         type: 'inventory',
         message: `${updatedState.user?.name} updated stock for ${item.name}: ${newStock} units`,
@@ -439,7 +437,7 @@ export const useStore = create<AppState>((set, get) => ({
     }));
     
     const updatedState = get();
-    if (updatedState.user?.role !== 'ADMIN' && item) {
+    if (item) {
       updatedState.addNotification({
         type: 'inventory',
         message: `${updatedState.user?.name} deleted inventory item: ${item.name}`,

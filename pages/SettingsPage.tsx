@@ -370,11 +370,11 @@ const SettingsPage: React.FC = () => {
           <div className="mt-4 p-3 bg-green-50 border border-green-200 rounded-md">
             <h4 className="font-medium text-green-800 mb-2">SMS Templates Preview</h4>
             <div className="text-xs text-green-700 space-y-2">
-              <div><strong>Job Created:</strong> "Hello {customer}, we've received your vehicle ({vehicle}) for repair. Job ID: {jobId}. We'll keep you updated. - Biskaken Auto"</div>
-              <div><strong>Job Started:</strong> "Hello {customer}, your vehicle repair has started. Job ID: {jobId}. We'll update you when it's ready. - Biskaken Auto"</div>
-              <div><strong>Job Completed:</strong> "Good news {customer}! Your vehicle is ready for pickup. Job ID: {jobId}. Please visit us at your convenience. - Biskaken Auto"</div>
-              <div><strong>Invoice Ready:</strong> "Hi {customer}, your invoice #{invoiceId} for ₵{amount} is ready. You can pay via Mobile Money or Cash. - Biskaken Auto"</div>
-              <div><strong>Payment Received:</strong> "Thank you {customer}! Payment of ₵{amount} received via {method}. Your receipt has been generated. - Biskaken Auto"</div>
+              <div><strong>Job Created:</strong> "Hello {'{customer}'}, we've received your vehicle ({'{vehicle}'}) for repair. Job ID: {'{jobId}'}. We'll keep you updated. - Biskaken Auto"</div>
+              <div><strong>Job Started:</strong> "Hello {'{customer}'}, your vehicle repair has started. Job ID: {'{jobId}'}. We'll update you when it's ready. - Biskaken Auto"</div>
+              <div><strong>Job Completed:</strong> "Good news {'{customer}'}! Your vehicle is ready for pickup. Job ID: {'{jobId}'}. Please visit us at your convenience. - Biskaken Auto"</div>
+              <div><strong>Invoice Ready:</strong> "Hi {'{customer}'}, your invoice #{'{invoiceId}'} for ₵{'{amount}'} is ready. You can pay via Mobile Money or Cash. - Biskaken Auto"</div>
+              <div><strong>Payment Received:</strong> "Thank you {'{customer}'}! Payment of ₵{'{amount}'} received via {'{method}'}. Your receipt has been generated. - Biskaken Auto"</div>
             </div>
           </div>
           
