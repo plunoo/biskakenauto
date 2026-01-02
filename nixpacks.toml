@@ -1,16 +1,8 @@
 [variables]
 NODE_VERSION = "18"
-NPM_CONFIG_PRODUCTION = false
 
 [providers]
 nodejs = "18"
-
-[phases.build]
-dependsOn = ["install"]
-cmds = [
-    "npm run build",
-    "cd biskaken-auto-api && npm ci && npm run build"
-]
 
 [phases.install]
 cmds = [
@@ -18,8 +10,14 @@ cmds = [
     "cd biskaken-auto-api && npm ci"
 ]
 
+[phases.build]
+dependsOn = ["install"]
+cmds = [
+    "npm run build",
+    "cd biskaken-auto-api && npm run build",
+    "mkdir -p biskaken-auto-api/public",
+    "cp -r dist/* biskaken-auto-api/public/"
+]
+
 [start]
 cmd = "cd biskaken-auto-api && npm start"
-
-[staticAssets]
-"/static" = "dist"
