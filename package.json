@@ -3,12 +3,13 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "main": "biskaken-auto-api/dist/server.js",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && cd biskaken-auto-api && npm run build && mkdir -p biskaken-auto-api/public && cp -r dist/* biskaken-auto-api/public/",
     "preview": "vite preview",
-    "start": "npm run build && cd biskaken-auto-api && npm run build && npm start",
-    "deploy:build": "npm run build && cd biskaken-auto-api && npm run build",
+    "start": "cd biskaken-auto-api && npm start",
+    "deploy:build": "npm run build",
     "postinstall": "cd biskaken-auto-api && npm install"
   },
   "dependencies": {
