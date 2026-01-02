@@ -1327,6 +1327,234 @@ app.get('/api/test/endpoints', (req, res) => {
   });
 });
 
+// Landing Page Endpoints
+app.get('/api/test/landing/hero', (req, res) => {
+  const heroData = {
+    title: 'Professional Auto Services in Ghana',
+    subtitle: 'Expert car repair and maintenance services you can trust',
+    features: [
+      'Certified Mechanics',
+      '24/7 Emergency Service', 
+      'Quality Parts',
+      'Affordable Pricing'
+    ],
+    stats: [
+      { label: 'Years Experience', value: '15+' },
+      { label: 'Satisfied Customers', value: '2,500+' },
+      { label: 'Vehicles Serviced', value: '8,000+' },
+      { label: 'Expert Mechanics', value: '12' }
+    ]
+  };
+
+  res.json({
+    success: true,
+    data: heroData,
+    message: 'Hero section data retrieved successfully'
+  });
+});
+
+app.get('/api/test/landing/services', (req, res) => {
+  const services = [
+    {
+      id: 'engine-repair',
+      name: 'Engine Repair',
+      description: 'Complete engine diagnostics and repair services',
+      icon: 'wrench',
+      price: 'From ₵300',
+      duration: '2-5 hours',
+      popular: true
+    },
+    {
+      id: 'brake-service',
+      name: 'Brake Service',
+      description: 'Brake pad replacement, brake fluid change, and safety checks',
+      icon: 'disc-brake',
+      price: 'From ₵150',
+      duration: '1-2 hours',
+      popular: false
+    },
+    {
+      id: 'oil-change',
+      name: 'Oil Change',
+      description: 'Quick engine oil and filter replacement service',
+      icon: 'droplets',
+      price: 'From ₵80',
+      duration: '30 min',
+      popular: true
+    },
+    {
+      id: 'tire-service',
+      name: 'Tire Service',
+      description: 'Tire mounting, balancing, alignment, and replacement',
+      icon: 'wheel',
+      price: 'From ₵120',
+      duration: '1 hour',
+      popular: false
+    },
+    {
+      id: 'ac-service',
+      name: 'AC Service',
+      description: 'Air conditioning repair and maintenance for Ghana\'s climate',
+      icon: 'air-conditioning',
+      price: 'From ₵200',
+      duration: '2-3 hours',
+      popular: true
+    },
+    {
+      id: 'diagnostic',
+      name: 'Vehicle Diagnostics',
+      description: 'Advanced computer diagnostics to identify issues',
+      icon: 'scan',
+      price: 'From ₵100',
+      duration: '1 hour',
+      popular: false
+    }
+  ];
+
+  res.json({
+    success: true,
+    data: services,
+    message: 'Services retrieved successfully'
+  });
+});
+
+app.get('/api/test/landing/testimonials', (req, res) => {
+  const testimonials = [
+    {
+      id: 1,
+      name: 'Kwame Asante',
+      location: 'Accra',
+      rating: 5,
+      comment: 'Excellent service! They fixed my engine problem quickly and the price was very fair. Highly recommend Biskaken Auto.',
+      avatar: 'KA',
+      date: '2024-05-15'
+    },
+    {
+      id: 2,
+      name: 'Ama Serwaa',
+      location: 'Kumasi',
+      rating: 5,
+      comment: 'Professional mechanics and honest pricing. My car has been running perfectly since the brake service.',
+      avatar: 'AS',
+      date: '2024-05-10'
+    },
+    {
+      id: 3,
+      name: 'Kojo Mensah',
+      location: 'Tema',
+      rating: 4,
+      comment: 'Fast and reliable service. The AC repair was done perfectly and now my car is cool even in the heat.',
+      avatar: 'KM',
+      date: '2024-05-08'
+    }
+  ];
+
+  res.json({
+    success: true,
+    data: testimonials,
+    message: 'Testimonials retrieved successfully'
+  });
+});
+
+app.get('/api/test/landing/contact', (req, res) => {
+  const contactInfo = {
+    phone: '+233 24 567 8910',
+    email: 'info@biskaken.com',
+    address: 'Ring Road Central, Accra, Ghana',
+    hours: {
+      weekdays: '8:00 AM - 6:00 PM',
+      saturday: '8:00 AM - 4:00 PM',
+      sunday: 'Emergency Only'
+    },
+    emergency: '+233 20 123 4567',
+    whatsapp: '+233 24 567 8910',
+    social: {
+      facebook: 'https://facebook.com/biskakengo',
+      instagram: 'https://instagram.com/biskaken_auto',
+      twitter: 'https://twitter.com/biskakengo'
+    }
+  };
+
+  res.json({
+    success: true,
+    data: contactInfo,
+    message: 'Contact information retrieved successfully'
+  });
+});
+
+app.post('/api/test/landing/contact', (req, res) => {
+  const { name, email, phone, message, service } = req.body;
+
+  if (!name || !email || !message) {
+    return res.status(400).json({
+      success: false,
+      error: 'Name, email, and message are required'
+    });
+  }
+
+  const inquiry = {
+    id: `inquiry_${Date.now()}`,
+    name,
+    email,
+    phone: phone || null,
+    message,
+    service: service || null,
+    status: 'new',
+    date: new Date().toISOString()
+  };
+
+  res.status(201).json({
+    success: true,
+    data: inquiry,
+    message: 'Contact inquiry submitted successfully. We will respond within 24 hours.'
+  });
+});
+
+// Get published blog posts for landing page
+app.get('/api/test/landing/blog', (req, res) => {
+  const publishedPosts = [
+    {
+      id: '1',
+      title: 'Essential Car Maintenance Tips for Ghana\'s Roads',
+      excerpt: 'Keep your vehicle running smoothly with these essential maintenance tips designed for Ghana\'s unique road conditions.',
+      author: 'Kwame Asante',
+      date: '2024-05-15T00:00:00Z',
+      category: 'Maintenance',
+      readTime: '4 min read',
+      image: '/images/blog/maintenance-tips.jpg',
+      slug: 'essential-car-maintenance-tips-ghana'
+    },
+    {
+      id: '2',
+      title: 'How to Choose the Right Auto Shop in Accra',
+      excerpt: 'A comprehensive guide to selecting a trustworthy auto repair service in Accra that provides quality work at fair prices.',
+      author: 'Ama Serwaa',
+      date: '2024-05-12T00:00:00Z',
+      category: 'Guide',
+      readTime: '6 min read',
+      image: '/images/blog/choosing-auto-shop.jpg',
+      slug: 'how-to-choose-right-auto-shop-accra'
+    },
+    {
+      id: '3',
+      title: 'Mobile Money Payments for Auto Services',
+      excerpt: 'Learn about convenient Mobile Money payment options for your vehicle repairs and maintenance services.',
+      author: 'Kofi Osei',
+      date: '2024-05-08T00:00:00Z',
+      category: 'Business',
+      readTime: '3 min read',
+      image: '/images/blog/mobile-money.jpg',
+      slug: 'mobile-money-payments-auto-services'
+    }
+  ];
+
+  res.json({
+    success: true,
+    data: publishedPosts,
+    message: 'Published blog posts retrieved successfully'
+  });
+});
+
 // Catch-all for unmatched routes
 app.use((req, res) => {
   res.status(404).json({

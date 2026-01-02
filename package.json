@@ -6,7 +6,10 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "start": "npm run build && cd biskaken-auto-api && npm run build && npm start",
+    "deploy:build": "npm run build && cd biskaken-auto-api && npm run build",
+    "postinstall": "cd biskaken-auto-api && npm install"
   },
   "dependencies": {
     "@google/genai": "^1.34.0",

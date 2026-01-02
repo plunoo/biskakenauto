@@ -1,5 +1,5 @@
 // API service to connect frontend with backend
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 class ApiService {
   private async request(endpoint: string, options: RequestInit = {}) {
@@ -114,6 +114,10 @@ class ApiService {
   // Blog Management API
   async getBlogPosts() {
     return this.request('/api/test/blog');
+  }
+
+  async getBlogPost(id: string) {
+    return this.request(`/api/test/blog/${id}`);
   }
 
   async createBlogPost(postData: any) {
@@ -287,6 +291,35 @@ class ApiService {
       body: JSON.stringify(smsData)
     });
   }
+
+  // Landing Page API
+  async getLandingHero() {
+    return this.request('/api/test/landing/hero');
+  }
+
+  async getLandingServices() {
+    return this.request('/api/test/landing/services');
+  }
+
+  async getLandingTestimonials() {
+    return this.request('/api/test/landing/testimonials');
+  }
+
+  async getLandingContact() {
+    return this.request('/api/test/landing/contact');
+  }
+
+  async submitContactInquiry(inquiryData: any) {
+    return this.request('/api/test/landing/contact', {
+      method: 'POST',
+      body: JSON.stringify(inquiryData)
+    });
+  }
+
+  async getLandingBlog() {
+    return this.request('/api/test/landing/blog');
+  }
+
 }
 
 export const apiService = new ApiService();

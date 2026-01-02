@@ -38,6 +38,8 @@ const corsOptions = {
     // Allow requests from the frontend URL and development
     const allowedOrigins = [
       process.env.APP_URL,
+      'https://rpnmore.biskakenauto.com',
+      'https://www.biskakenauto.com',
       'http://localhost:3000',
       'http://localhost:3001',
       'http://localhost:3002',
@@ -820,6 +822,21 @@ app.post('/api/callbacks/mobile-money',
     }
   })
 );
+
+// Serve static files in production
+if (process.env.NODE_ENV === 'production') {
+  // Serve static files from the built frontend
+  app.use(express.static(path.join(__dirname, '../../public')));
+  
+  // Handle React Router routes - send all non-API requests to index.html
+  app.get('*', (req, res, next) => {
+    // Skip API routes
+    if (req.path.startsWith('/api/')) {
+      return next();
+    }
+    res.sendFile(path.join(__dirname, '../../public/index.html'));
+  });
+}
 
 // Catch-all for unmatched API routes (must be last)
 app.use('/api', (req, res) => {

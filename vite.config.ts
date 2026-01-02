@@ -6,7 +6,11 @@ export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, '.', '');
     return {
       server: {
-        port: 3000,
+        port: 3003,
+        host: '0.0.0.0',
+      },
+      preview: {
+        port: 3003,
         host: '0.0.0.0',
       },
       plugins: [react()],
@@ -17,6 +21,20 @@ export default defineConfig(({ mode }) => {
       resolve: {
         alias: {
           '@': path.resolve(__dirname, '.'),
+        }
+      },
+      build: {
+        outDir: 'dist',
+        sourcemap: false,
+        rollupOptions: {
+          output: {
+            manualChunks: {
+              vendor: ['react', 'react-dom', 'react-router-dom'],
+              ui: ['lucide-react', 'zustand'],
+              charts: ['recharts'],
+              ai: ['@google/genai']
+            }
+          }
         }
       }
     };

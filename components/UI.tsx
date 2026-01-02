@@ -3,7 +3,7 @@ import React, { ReactNode } from 'react';
 import { LucideIcon, X } from 'lucide-react';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'danger' | 'ghost' | 'warning';
+  variant?: 'primary' | 'secondary' | 'danger' | 'ghost' | 'warning' | 'outline';
   size?: 'sm' | 'md' | 'lg';
   loading?: boolean;
   icon?: LucideIcon;
@@ -20,6 +20,7 @@ export const Button: React.FC<ButtonProps> = ({
     danger: "bg-red-500 text-white shadow-sm hover:bg-red-600",
     warning: "bg-amber-500 text-white shadow-sm hover:bg-amber-600",
     ghost: "bg-transparent hover:bg-gray-100 text-gray-700",
+    outline: "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50",
   };
 
   const sizes = {
@@ -58,8 +59,8 @@ export const Card: React.FC<{ children: ReactNode; title?: string; className?: s
   </div>
 );
 
-export const Badge: React.FC<{ children: ReactNode; variant?: 'success' | 'warning' | 'danger' | 'info' | 'gray' }> = ({ 
-  children, variant = 'info' 
+export const Badge: React.FC<{ children: ReactNode; variant?: 'success' | 'warning' | 'danger' | 'info' | 'gray' | 'outline'; className?: string }> = ({ 
+  children, variant = 'info', className = ''
 }) => {
   const styles = {
     success: "bg-emerald-100 text-emerald-700",
@@ -67,9 +68,10 @@ export const Badge: React.FC<{ children: ReactNode; variant?: 'success' | 'warni
     danger: "bg-red-100 text-red-700",
     info: "bg-blue-100 text-blue-700",
     gray: "bg-gray-100 text-gray-700",
+    outline: "bg-white border border-gray-300 text-gray-700",
   };
   return (
-    <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${styles[variant]}`}>
+    <span className={`px-2.5 py-0.5 rounded-full text-xs font-semibold ${styles[variant]} ${className}`}>
       {children}
     </span>
   );

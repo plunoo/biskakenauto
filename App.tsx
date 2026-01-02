@@ -2,12 +2,15 @@
 import React from 'react';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Layout } from './components/Layout';
+import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import JobsPage from './pages/JobsPage';
 import CustomersPage from './pages/CustomersPage';
 import InventoryPage from './pages/InventoryPage';
 import InvoicesPage from './pages/InvoicesPage';
+import BlogPage from './pages/BlogPage';
+import BlogManagementPage from './pages/BlogManagementPage';
 import ReportsPage from './pages/ReportsPage';
 import AdminPage from './pages/AdminPage';
 import SettingsPage from './pages/SettingsPage';
@@ -26,23 +29,97 @@ const App: React.FC = () => {
 
   return (
     <Router>
-      <Layout>
-        <Routes>
-          <Route path="/login" element={!user ? <LoginPage /> : <Navigate to="/dashboard" />} />
-          
-          <Route path="/dashboard" element={user ? <DashboardPage /> : <Navigate to="/login" />} />
-          <Route path="/jobs" element={user ? <JobsPage /> : <Navigate to="/login" />} />
-          
-          <Route path="/customers" element={user ? <CustomersPage /> : <Navigate to="/login" />} />
-          <Route path="/inventory" element={user ? <InventoryPage /> : <Navigate to="/login" />} />
-          <Route path="/invoices" element={user ? <InvoicesPage /> : <Navigate to="/login" />} />
-          <Route path="/reports" element={user ? <ReportsPage /> : <Navigate to="/login" />} />
-          <Route path="/admin" element={user?.role === 'ADMIN' ? <AdminPage /> : <Navigate to="/dashboard" />} />
-          <Route path="/settings" element={user ? <SettingsPage /> : <Navigate to="/login" />} />
-          
-          <Route path="/" element={<Navigate to="/dashboard" />} />
-        </Routes>
-      </Layout>
+      <Routes>
+        {/* Public routes without Layout */}
+        <Route path="/landing" element={<LandingPage />} />
+        <Route path="/login" element={!user ? <LoginPage /> : <Navigate to="/dashboard" />} />
+        
+        {/* Protected routes with Layout */}
+        <Route path="/dashboard" element={
+          user ? (
+            <Layout>
+              <DashboardPage />
+            </Layout>
+          ) : (
+            <Navigate to="/login" />
+          )
+        } />
+        <Route path="/jobs" element={
+          user ? (
+            <Layout>
+              <JobsPage />
+            </Layout>
+          ) : (
+            <Navigate to="/login" />
+          )
+        } />
+        <Route path="/customers" element={
+          user ? (
+            <Layout>
+              <CustomersPage />
+            </Layout>
+          ) : (
+            <Navigate to="/login" />
+          )
+        } />
+        <Route path="/inventory" element={
+          user ? (
+            <Layout>
+              <InventoryPage />
+            </Layout>
+          ) : (
+            <Navigate to="/login" />
+          )
+        } />
+        <Route path="/invoices" element={
+          user ? (
+            <Layout>
+              <InvoicesPage />
+            </Layout>
+          ) : (
+            <Navigate to="/login" />
+          )
+        } />
+        <Route path="/blog" element={
+          user ? (
+            <Layout>
+              <BlogManagementPage />
+            </Layout>
+          ) : (
+            <Navigate to="/login" />
+          )
+        } />
+        <Route path="/reports" element={
+          user ? (
+            <Layout>
+              <ReportsPage />
+            </Layout>
+          ) : (
+            <Navigate to="/login" />
+          )
+        } />
+        <Route path="/admin" element={
+          user?.role === 'ADMIN' ? (
+            <Layout>
+              <AdminPage />
+            </Layout>
+          ) : (
+            <Navigate to="/dashboard" />
+          )
+        } />
+        <Route path="/settings" element={
+          user ? (
+            <Layout>
+              <SettingsPage />
+            </Layout>
+          ) : (
+            <Navigate to="/login" />
+          )
+        } />
+        
+        {/* Default redirect */}
+        <Route path="/" element={user ? <Navigate to="/dashboard" /> : <Navigate to="/landing" />} />
+      </Routes>
     </Router>
   );
 };

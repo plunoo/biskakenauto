@@ -13,7 +13,13 @@ import {
   Menu, 
   X, 
   Bell,
-  ChevronDown
+  ChevronDown,
+  BookOpen,
+  Car,
+  Calendar,
+  CreditCard,
+  Search,
+  PlusCircle
 } from 'lucide-react';
 import { useStore } from '../store/useStore';
 import { UserRole } from '../types';
@@ -24,12 +30,14 @@ const SidebarItem: React.FC<{ icon: any; label: string; to: string; active?: boo
   <Link 
     to={to} 
     onClick={onClick}
-    className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
-      active ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-blue-50 hover:text-blue-600'
+    className={`group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 ${
+      active 
+        ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg' 
+        : 'text-gray-700 hover:bg-gray-100 hover:text-orange-600'
     }`}
   >
-    <Icon size={20} />
-    <span className="font-medium">{label}</span>
+    <Icon size={20} className={active ? 'text-white' : 'text-gray-500 group-hover:text-orange-500'} />
+    <span className="font-semibold text-sm">{label}</span>
   </Link>
 );
 
@@ -68,10 +76,11 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
   const navItems = [
     { label: 'Dashboard', icon: LayoutDashboard, to: '/dashboard', roles: [UserRole.ADMIN, UserRole.SUB_ADMIN, UserRole.STAFF] },
-    { label: 'Customers', icon: Users, to: '/customers', roles: [UserRole.ADMIN, UserRole.SUB_ADMIN, UserRole.STAFF] },
-    { label: 'Jobs', icon: Wrench, to: '/jobs', roles: [UserRole.ADMIN, UserRole.SUB_ADMIN, UserRole.STAFF] },
-    { label: 'Inventory', icon: Package, to: '/inventory', roles: [UserRole.ADMIN, UserRole.SUB_ADMIN] },
-    { label: 'Invoices', icon: FileText, to: '/invoices', roles: [UserRole.ADMIN, UserRole.SUB_ADMIN, UserRole.STAFF] },
+    { label: 'Vehicles', icon: Car, to: '/customers', roles: [UserRole.ADMIN, UserRole.SUB_ADMIN, UserRole.STAFF] },
+    { label: 'Work Orders', icon: Wrench, to: '/jobs', roles: [UserRole.ADMIN, UserRole.SUB_ADMIN, UserRole.STAFF] },
+    { label: 'Parts & Stock', icon: Package, to: '/inventory', roles: [UserRole.ADMIN, UserRole.SUB_ADMIN] },
+    { label: 'Billing', icon: CreditCard, to: '/invoices', roles: [UserRole.ADMIN, UserRole.SUB_ADMIN, UserRole.STAFF] },
+    { label: 'Blog', icon: BookOpen, to: '/blog', roles: [UserRole.ADMIN, UserRole.SUB_ADMIN] },
     { label: 'Reports', icon: BarChart3, to: '/reports', roles: [UserRole.ADMIN, UserRole.SUB_ADMIN] },
     { label: 'Settings', icon: Settings, to: '/settings', roles: [UserRole.ADMIN] },
   ];
@@ -93,15 +102,27 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
   const unreadCount = notifications.filter(n => n.unread).length;
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex">
       {/* Sidebar - Desktop */}
-      <aside className="hidden lg:flex w-64 flex-col bg-white border-r border-gray-200 fixed h-full z-30">
-        <div className="p-6 flex items-center gap-2">
-          <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center text-white font-bold text-xl">B</div>
-          <span className="text-xl font-bold text-gray-900 tracking-tight">BISKAKEN</span>
+      <aside className="hidden lg:flex w-72 flex-col bg-white border-r border-gray-200 fixed h-full z-30 shadow-xl">
+        <div className="p-6 flex items-center gap-3 border-b border-gray-100">
+          <div className="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg">
+            <Wrench size={24} />
+          </div>
+          <div>
+            <span className="text-xl font-bold text-gray-900 tracking-tight">BISKAKEN</span>
+            <p className="text-xs text-gray-500 font-medium">Auto Repair Management</p>
+          </div>
         </div>
         
-        <nav className="flex-1 px-4 py-4 space-y-1">
+        <div className="px-4 py-6 border-b border-gray-100">
+          <button className="w-full flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl hover:from-orange-600 hover:to-red-600 transition-all duration-200 shadow-lg hover:shadow-xl group">
+            <PlusCircle size={20} className="group-hover:scale-110 transition-transform" />
+            <span className="font-semibold">New Work Order</span>
+          </button>
+        </div>
+        
+        <nav className="flex-1 px-4 py-6 space-y-2">
           {filteredNavItems.map((item) => (
             <SidebarItem 
               key={item.to} 
@@ -114,7 +135,7 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
         <div className="p-4 border-t border-gray-100">
           <button 
             onClick={handleLogout}
-            className="flex items-center gap-3 w-full px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors font-medium"
+            className="flex items-center gap-3 w-full px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-colors font-semibold text-sm"
           >
             <LogOut size={20} />
             <span>Sign Out</span>
@@ -123,31 +144,40 @@ export const Layout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
       </aside>
 
       {/* Main Content Area */}
-      <div className="flex-1 lg:ml-64 flex flex-col min-w-0">
+      <div className="flex-1 lg:ml-72 flex flex-col min-w-0">
         {/* Top Header */}
-        <header className="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-gray-200 h-16 flex items-center justify-between px-4 lg:px-8">
-          <button 
-            className="lg:hidden p-2 text-gray-600"
-            onClick={() => setIsSidebarOpen(true)}
-          >
-            <Menu size={24} />
-          </button>
-
-          <div className="flex-1 lg:flex-none">
-            <h2 className="text-lg font-semibold text-gray-900 lg:hidden">
-              {navItems.find(i => location.pathname.startsWith(i.to))?.label || 'Dashboard'}
-            </h2>
+        <header className="sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-gray-200 h-20 flex items-center justify-between px-6 lg:px-8 shadow-sm">
+          <div className="flex items-center gap-4">
+            <button 
+              className="lg:hidden p-2 text-gray-600 hover:bg-gray-100 rounded-lg"
+              onClick={() => setIsSidebarOpen(true)}
+            >
+              <Menu size={24} />
+            </button>
+            
+            <div className="hidden lg:flex items-center gap-4">
+              <div className="relative">
+                <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <input 
+                  type="text" 
+                  placeholder="Search vehicles, customers, work orders..."
+                  className="w-80 pl-10 pr-4 py-2 border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:border-orange-300 focus:ring-2 focus:ring-orange-100 transition-all"
+                />
+              </div>
+            </div>
           </div>
 
           <div className="flex items-center gap-4">
             <div className="relative" ref={notificationRef}>
               <button 
-                className="relative p-2 text-gray-500 hover:bg-gray-100 rounded-full transition-colors"
+                className="relative p-3 text-gray-500 hover:bg-gray-100 rounded-xl transition-colors"
                 onClick={() => setIsNotificationOpen(!isNotificationOpen)}
               >
-                <Bell size={20} />
+                <Bell size={22} />
                 {unreadCount > 0 && (
-                  <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+                  <span className="absolute top-2 right-2 w-3 h-3 bg-red-500 rounded-full border-2 border-white text-xs flex items-center justify-center text-white font-bold">
+                    {unreadCount > 9 ? '9+' : unreadCount}
+                  </span>
                 )}
               </button>
 
