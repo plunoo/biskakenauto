@@ -1,11 +1,11 @@
 # 🚀 Biskaken Auto Shop Management - Deployment Guide
 
-This guide covers deploying the Biskaken Auto Shop Management system to **Dokploy** with the domain `rpnmore.biskakenauto.com`.
+This guide covers deploying the Biskaken Auto Shop Management system to **Dokploy** with the domain `biskakenauto.rpnmore.com`.
 
 ## 📋 Prerequisites
 
 - Git repository: `https://github.com/plunoo/biskakenauto.git`
-- Domain: `rpnmore.biskakenauto.com`
+- Domain: `biskakenauto.rpnmore.com`
 - PostgreSQL database
 - Required API keys (see Environment Variables section)
 
@@ -25,7 +25,7 @@ Create these environment variables in Dokploy:
 ```bash
 NODE_ENV=production
 PORT=5000
-APP_URL=https://rpnmore.biskakenauto.com
+APP_URL=https://biskakenauto.rpnmore.com
 DATABASE_URL=postgresql://username:password@host:port/database?schema=public
 JWT_SECRET=your-super-secure-jwt-secret-here
 ```
@@ -54,7 +54,7 @@ TWILIO_PHONE_NUMBER=+233XXXXXXXXX
 CLOUDINARY_CLOUD_NAME=your-cloud-name
 CLOUDINARY_API_KEY=your-api-key
 CLOUDINARY_API_SECRET=your-api-secret
-CORS_ORIGINS=https://rpnmore.biskakenauto.com
+CORS_ORIGINS=https://biskakenauto.rpnmore.com
 ```
 
 ## 🐳 Dokploy Deployment Steps
@@ -86,7 +86,7 @@ Add all required environment variables in Dokploy's environment section:
 # Copy from .env.example and update with production values
 NODE_ENV=production
 PORT=5000
-APP_URL=https://rpnmore.biskakenauto.com
+APP_URL=https://biskakenauto.rpnmore.com
 DATABASE_URL=postgresql://user:pass@host:5432/dbname
 JWT_SECRET=generate-strong-secret
 GEMINI_API_KEY=your-actual-key
@@ -96,7 +96,7 @@ GEMINI_API_KEY=your-actual-key
 ### 4. Domain Configuration
 
 1. In Dokploy, go to your app's domain settings
-2. Add domain: `rpnmore.biskakenauto.com`
+2. Add domain: `biskakenauto.rpnmore.com`
 3. Enable SSL (Let's Encrypt)
 4. Configure DNS to point to Dokploy's IP
 
@@ -137,22 +137,22 @@ After deployment, test these endpoints:
 ### Health Checks
 ```bash
 # API Health
-curl https://rpnmore.biskakenauto.com/health
+curl https://biskakenauto.rpnmore.com/health
 
 # Service Status
-curl https://rpnmore.biskakenauto.com/api/status
+curl https://biskakenauto.rpnmore.com/api/status
 ```
 
 ### Frontend Routes
-- Landing page: `https://rpnmore.biskakenauto.com/`
-- Login: `https://rpnmore.biskakenauto.com/login`
-- Dashboard: `https://rpnmore.biskakenauto.com/dashboard`
+- Landing page: `https://biskakenauto.rpnmore.com/`
+- Login: `https://biskakenauto.rpnmore.com/login`
+- Dashboard: `https://biskakenauto.rpnmore.com/dashboard`
 
 ### API Endpoints
 ```bash
 # Test endpoints (requires auth token)
-curl https://rpnmore.biskakenauto.com/api/test/customers
-curl https://rpnmore.biskakenauto.com/api/test/jobs
+curl https://biskakenauto.rpnmore.com/api/test/customers
+curl https://biskakenauto.rpnmore.com/api/test/jobs
 ```
 
 ## 🐛 Troubleshooting

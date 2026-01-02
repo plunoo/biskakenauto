@@ -38,7 +38,7 @@ const corsOptions = {
     // Allow requests from the frontend URL and development
     const allowedOrigins = [
       process.env.APP_URL,
-      'https://rpnmore.biskakenauto.com',
+      'https://biskakenauto.rpnmore.com',
       'https://www.biskakenauto.com',
       'http://localhost:3000',
       'http://localhost:3001',

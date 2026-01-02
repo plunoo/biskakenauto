@@ -8,14 +8,14 @@
     "buildPath": "."
   },
   "domain": {
-    "host": "rpnmore.biskakenauto.com",
+    "host": "biskakenauto.rpnmore.com",
     "ssl": true
   },
   "environment": {
     "NODE_ENV": "production",
     "PORT": "5000",
-    "APP_URL": "https://rpnmore.biskakenauto.com",
-    "VITE_API_URL": "https://rpnmore.biskakenauto.com"
+    "APP_URL": "https://biskakenauto.rpnmore.com",
+    "VITE_API_URL": "https://biskakenauto.rpnmore.com"
   },
   "build": {
     "command": "npm run deploy:build",

@@ -69,7 +69,7 @@ Copy `.env.example` to `.env` and configure:
 
 ## 🌐 Live Demo
 
-**Production URL**: https://rpnmore.biskakenauto.com
+**Production URL**: https://biskakenauto.rpnmore.com
 
 **Test Credentials:**
 - Email: `admin@biskaken.com`
@@ -146,7 +146,7 @@ npm run db:studio    # Open Prisma Studio
 
 ### Dokploy Deployment
 1. **Repository**: `https://github.com/plunoo/biskakenauto.git`
-2. **Domain**: `rpnmore.biskakenauto.com`
+2. **Domain**: `biskakenauto.rpnmore.com`
 3. **Build**: Nixpacks (recommended)
 4. **Environment**: See `.env.example`
 
