@@ -1,7 +1,7 @@
 {
   "name": "biskaken-auto-shop",
   "type": "application",
-  "buildType": "nixpacks",
+  "buildType": "docker",
   "repository": {
     "url": "https://github.com/plunoo/biskakenauto.git",
     "branch": "main",

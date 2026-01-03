@@ -12,9 +12,9 @@ WORKDIR /app
 COPY package*.json ./
 COPY biskaken-auto-api/package*.json ./biskaken-auto-api/
 
-# Install dependencies
-RUN npm ci --frozen-lockfile
-RUN cd biskaken-auto-api && npm ci --frozen-lockfile
+# Install dependencies (including dev dependencies for build)
+RUN npm ci
+RUN cd biskaken-auto-api && npm ci
 
 # Build the source code
 FROM base AS builder
@@ -49,9 +49,6 @@ COPY --from=deps --chown=nextjs:nodejs /app/biskaken-auto-api/node_modules ./nod
 
 # Copy prisma if exists
 COPY --from=builder --chown=nextjs:nodejs /app/biskaken-auto-api/prisma ./prisma
-
-# Copy start script
-COPY --from=builder --chown=nextjs:nodejs /app/start.sh ./start.sh
 
 USER nextjs
 
