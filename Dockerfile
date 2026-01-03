@@ -27,11 +27,18 @@ COPY --from=deps /app/biskaken-auto-api/node_modules ./biskaken-auto-api/node_mo
 # Copy source code
 COPY . .
 
-# Build frontend and backend
-RUN npm run build
+# Build frontend only
+RUN npm run build:frontend
 
-# Production image, copy all the files and run the server
-FROM base AS runner
+# Frontend-only nginx image
+FROM nginx:alpine AS frontend
+COPY --from=builder /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]
+
+# Full-stack production image (default)
+FROM base AS fullstack
 WORKDIR /app
 
 ENV NODE_ENV=production
@@ -40,6 +47,13 @@ ENV PORT=5000
 # Don't run production as root
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
+
+# Build backend for fullstack
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/biskaken-auto-api/node_modules ./biskaken-auto-api/node_modules
+COPY . .
+RUN cd biskaken-auto-api && npm run build
+RUN mkdir -p biskaken-auto-api/public && cp -r dist/* biskaken-auto-api/public/
 
 # Copy built application
 COPY --from=builder --chown=nextjs:nodejs /app/biskaken-auto-api/dist ./dist
