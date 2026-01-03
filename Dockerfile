@@ -1,55 +1,32 @@
-# Backend-Only Dockerfile - Clean API Server
+# Clean Backend-Only Dockerfile
 FROM node:20-alpine
 
 WORKDIR /app
 
-# Install runtime dependencies
-RUN apk add --no-cache bash curl libc6-compat
+# Install system dependencies
+RUN apk add --no-cache bash curl
 
-# Copy ONLY backend package files first (for better caching)
+# Copy backend package files
 COPY biskaken-auto-api/package*.json ./
 
 # Install dependencies
-RUN npm ci --only=production
+RUN npm install
 
-# Copy ONLY backend source code (no frontend files)
+# Copy backend source
 COPY biskaken-auto-api/src ./src
 COPY biskaken-auto-api/tsconfig.json ./
-COPY biskaken-auto-api/.env* ./
 
-# Build TypeScript to JavaScript
+# Build backend
 RUN npm run build
-
-# Remove source files and dev dependencies to keep image small
-RUN rm -rf src tsconfig.json node_modules
-RUN npm ci --only=production
-
-# Create non-root user
-RUN addgroup --system --gid 1001 nodejs && \
-    adduser --system --uid 1001 backend
-
-# Set permissions
-RUN chown -R backend:nodejs /app
 
 # Environment variables
 ENV NODE_ENV=production
 ENV PORT=5000
-ENV HOSTNAME="0.0.0.0"
-
-# Test credentials
 ENV ADMIN_EMAIL="admin@biskaken.com"
 ENV ADMIN_PASSWORD="admin123"
-ENV JWT_SECRET="backend-api-only-secret"
-
-# Skip database for test endpoints
-ENV SKIP_DATABASE="true"
+ENV JWT_SECRET="clean-backend-secret"
 
 EXPOSE 5000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-    CMD curl -f http://localhost:5000/health || exit 1
-
-# Start backend server
-USER backend
-CMD ["node", "dist/server.js"]
+# Start server
+CMD ["npm", "start"]
