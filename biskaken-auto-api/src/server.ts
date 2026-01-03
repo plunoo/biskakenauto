@@ -43,8 +43,10 @@ const corsOptions = {
       'https://www.biskakenauto.rpnmore.com',
       'https://api.biskakenauto.rpnmore.com',
       
-      // Dokploy preview domains
+      // Dokploy domains (wildcard patterns)
       'https://biskaken-auto-preview.dokploy.com',
+      'https://biskakenaut-biskakenaut-back.dokploy.com',
+      'https://biskakenaut-back.dokploy.com',
       
       // Custom domains (if any)
       'https://www.biskaken.com',
@@ -85,8 +87,12 @@ const corsOptions = {
     
     if (allowedOrigins.includes(origin)) {
       callback(null, true);
+    } else if (origin && origin.includes('.dokploy.com')) {
+      // Allow any Dokploy subdomain
+      console.log(`✅ CORS allowing Dokploy domain: ${origin}`);
+      callback(null, true);
     } else {
-      console.warn(`CORS blocked request from origin: ${origin}`);
+      console.warn(`❌ CORS blocked request from origin: ${origin}`);
       callback(new Error('Not allowed by CORS'), false);
     }
   },
