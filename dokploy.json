@@ -2,6 +2,7 @@
   "name": "biskaken-auto-shop",
   "type": "application",
   "buildType": "docker",
+  "dockerfile": "Dockerfile.fullstack-unified",
   "repository": {
     "url": "https://github.com/plunoo/biskakenauto.git",
     "branch": "main",
@@ -13,15 +14,19 @@
   },
   "environment": {
     "NODE_ENV": "production",
-    "VITE_API_URL": "https://api.biskakenauto.rpnmore.com"
+    "PORT": "5000",
+    "APP_URL": "https://biskakenauto.rpnmore.com",
+    "VITE_API_URL": "https://biskakenauto.rpnmore.com",
+    "DATABASE_URL": "file:./dev.db",
+    "JWT_SECRET": "default-insecure-secret-change-in-production"
   },
   "healthcheck": {
     "enabled": true,
-    "path": "/",
+    "path": "/health",
     "interval": 30000
   },
   "resources": {
-    "memory": "512MB",
-    "cpu": "0.25"
+    "memory": "1024MB",
+    "cpu": "0.5"
   }
 }

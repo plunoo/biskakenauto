@@ -8,9 +8,8 @@
     "branch": "main",
     "buildPath": "."
   },
-  "domain": {
-    "host": "api.biskakenauto.rpnmore.com",
-    "ssl": true
+  "network": {
+    "mode": "internal"
   },
   "environment": {
     "NODE_ENV": "production",
