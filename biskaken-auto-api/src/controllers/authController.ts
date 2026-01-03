@@ -183,6 +183,63 @@ export const authController = {
   },
 
   /**
+   * Admin login using environment variables
+   */
+  async adminLogin(req: AuthRequest, res: Response<ApiResponse>) {
+    try {
+      const { email, password }: LoginCredentials = req.body;
+
+      // Check for default admin login from environment variables
+      const adminEmail = process.env.ADMIN_EMAIL || 'admin@biskaken.com';
+      const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
+      const adminName = process.env.ADMIN_NAME || 'Admin User';
+
+      if (email !== adminEmail || password !== adminPassword) {
+        return res.status(401).json({
+          success: false,
+          error: 'Invalid admin credentials'
+        });
+      }
+
+      // Generate JWT token for admin
+      if (!process.env.JWT_SECRET) {
+        console.warn('JWT_SECRET is not configured - using default secret (INSECURE)');
+        process.env.JWT_SECRET = 'default-insecure-secret-change-in-production';
+      }
+
+      const adminUser = {
+        id: 'admin-env',
+        name: adminName,
+        email: adminEmail,
+        phone: null,
+        role: UserRole.ADMIN,
+        status: 'ACTIVE',
+        createdAt: new Date()
+      };
+
+      const payload = { userId: adminUser.id, role: adminUser.role };
+      const secret = process.env.JWT_SECRET as string;
+      const options: SignOptions = { expiresIn: (process.env.JWT_EXPIRES_IN || '7d') as any };
+      const token = jwt.sign(payload, secret, options);
+
+      res.json({
+        success: true,
+        data: {
+          user: adminUser,
+          token
+        },
+        message: 'Admin login successful'
+      });
+    } catch (error: any) {
+      console.error('Admin login error:', error);
+      res.status(500).json({
+        success: false,
+        error: error.message
+      });
+    }
+  },
+
+  /**
    * Get current user profile
    */
   async me(req: AuthRequest, res: Response<ApiResponse>) {

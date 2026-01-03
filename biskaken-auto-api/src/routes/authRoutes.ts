@@ -23,6 +23,12 @@ router.post('/login',
   asyncHandler(authController.login)
 );
 
+// POST /api/auth/admin-login - Admin override login (environment-based)
+router.post('/admin-login', 
+  validate(schemas.login),
+  asyncHandler(authController.adminLogin)
+);
+
 // GET /api/auth/me - Get current user profile (protected)
 router.get('/me', 
   authenticate,
