@@ -41,10 +41,36 @@ class ApiService {
 
   // Authentication endpoints
   async login(data: { email: string; password: string }) {
-    return this.request('/api/test/auth/login', {
-      method: 'POST',
-      body: JSON.stringify(data),
-    });
+    // Try admin login first (for environment-based admin access)
+    try {
+      console.log('🔐 Trying admin login...');
+      const adminResponse = await this.request('/api/auth/admin-login', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      });
+      console.log('✅ Admin login successful');
+      return adminResponse;
+    } catch (adminError) {
+      console.log('⏭️ Admin login failed, trying production login...');
+      
+      // Try production login
+      try {
+        const prodResponse = await this.request('/api/auth/login', {
+          method: 'POST',
+          body: JSON.stringify(data),
+        });
+        console.log('✅ Production login successful');
+        return prodResponse;
+      } catch (prodError) {
+        console.log('⏭️ Production login failed, falling back to test login...');
+        
+        // Fallback to test endpoint
+        return this.request('/api/test/auth/login', {
+          method: 'POST',
+          body: JSON.stringify(data),
+        });
+      }
+    }
   }
 
   async getCurrentUser(token: string) {
