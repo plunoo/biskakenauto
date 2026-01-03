@@ -64,7 +64,8 @@ export const authController = {
 
       // Generate JWT token
       if (!process.env.JWT_SECRET) {
-        throw new Error('JWT_SECRET is not configured');
+        console.warn('JWT_SECRET is not configured - using default secret (INSECURE)');
+        process.env.JWT_SECRET = 'default-insecure-secret-change-in-production';
       }
 
       const payload = { userId: user.id, role: user.role };
@@ -137,7 +138,8 @@ export const authController = {
 
       // Generate JWT token
       if (!process.env.JWT_SECRET) {
-        throw new Error('JWT_SECRET is not configured');
+        console.warn('JWT_SECRET is not configured - using default secret (INSECURE)');
+        process.env.JWT_SECRET = 'default-insecure-secret-change-in-production';
       }
 
       const payload = { userId: user.id, role: user.role };
