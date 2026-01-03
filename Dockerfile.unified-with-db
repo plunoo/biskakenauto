@@ -1,10 +1,11 @@
-# Unified Dockerfile with PostgreSQL, Backend API, and Frontend
+# Unified Dockerfile - Backend API Only (No Database)
+# Simplified version for production deployment
 FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Install PostgreSQL dependencies for building
-RUN apk add --no-cache postgresql-dev python3 make g++
+# Install build dependencies
+RUN apk add --no-cache python3 make g++
 
 # Copy source code
 COPY . .
@@ -22,25 +23,16 @@ RUN cd biskaken-auto-api && npm run build
 # Copy frontend build to backend public directory
 RUN mkdir -p biskaken-auto-api/public && cp -r dist/* biskaken-auto-api/public/
 
-# Production stage with PostgreSQL
+# Production stage
 FROM node:20-alpine
 
 WORKDIR /app
 
-# Install system dependencies including PostgreSQL
+# Install runtime dependencies
 RUN apk add --no-cache \
-    postgresql \
-    postgresql-contrib \
-    su-exec \
     bash \
     curl \
     libc6-compat
-
-# Create postgres user and initialize database
-RUN adduser -D -s /bin/sh postgres
-RUN mkdir -p /var/lib/postgresql/data /run/postgresql
-RUN chown -R postgres:postgres /var/lib/postgresql /run/postgresql
-RUN chmod 777 /run/postgresql
 
 # Copy built application
 COPY --from=builder /app/biskaken-auto-api ./
@@ -57,54 +49,28 @@ COPY --chown=backend:nodejs <<'EOF' /app/start-unified.sh
 #!/bin/bash
 set -e
 
-# Database configuration
-export PGUSER=postgres
-export POSTGRES_DB=biskaken_auto
-export POSTGRES_PASSWORD=postgres_password_$(date +%s | sha256sum | head -c 16)
+echo "🚀 Starting Biskaken Auto Services..."
+echo "📦 Backend API + Frontend in Unified Container"
 
-echo "🚀 Starting Unified Biskaken Auto Services..."
-echo "📦 Initializing PostgreSQL database..."
+# Set production environment
+export NODE_ENV="production"
+export UNIFIED_CONTAINER="true"
 
-# Initialize PostgreSQL
-su-exec postgres initdb -D /var/lib/postgresql/data
+echo "✅ Production configuration ready"
+echo "🔧 Mode: API server with test endpoints"
 
-# Start PostgreSQL in background
-su-exec postgres pg_ctl -D /var/lib/postgresql/data -l /var/lib/postgresql/logfile start
-
-# Wait for PostgreSQL to be ready
-echo "⏳ Waiting for PostgreSQL to start..."
-while ! su-exec postgres pg_isready; do
-    sleep 1
-done
-
-# Create database and user
-su-exec postgres psql -c "CREATE DATABASE ${POSTGRES_DB};" || true
-su-exec postgres psql -c "CREATE USER backend WITH PASSWORD '${POSTGRES_PASSWORD}';" || true
-su-exec postgres psql -c "GRANT ALL PRIVILEGES ON DATABASE ${POSTGRES_DB} TO backend;" || true
-su-exec postgres psql -c "ALTER USER backend CREATEDB;" || true
-
-# Set database URL for the application
-export DATABASE_URL="postgresql://backend:${POSTGRES_PASSWORD}@localhost:5432/${POSTGRES_DB}"
-
-echo "✅ PostgreSQL initialized successfully"
-echo "🔧 Database URL: postgresql://backend:****@localhost:5432/${POSTGRES_DB}"
-
-# Run database migrations
-echo "📊 Running database migrations..."
+# Generate Prisma client
+echo "📊 Generating Prisma client..."
 npx prisma generate
-npx prisma migrate deploy || npx prisma db push
 
-# Create admin user if environment variables are set
-if [ -n "$ADMIN_EMAIL" ] && [ -n "$ADMIN_PASSWORD" ]; then
-    echo "👤 Admin credentials configured via environment variables"
-fi
-
+echo "👤 Admin credentials configured via environment variables"
 echo "🌐 Starting Node.js server..."
-echo "🔗 Server URL: http://0.0.0.0:${PORT:-3000}"
-echo "🏠 Frontend: http://0.0.0.0:${PORT:-3000}"
-echo "📡 API: http://0.0.0.0:${PORT:-3000}/api"
+echo "🔗 Server URL: http://0.0.0.0:${PORT:-5000}"
+echo "🏠 Frontend: http://0.0.0.0:${PORT:-5000}"
+echo "📡 API: http://0.0.0.0:${PORT:-5000}/api"
 
 # Start the application
+echo "🚀 Executing: node dist/server.js"
 exec node dist/server.js
 EOF
 
@@ -116,21 +82,23 @@ RUN chown -R backend:nodejs /app
 
 # Environment variables
 ENV NODE_ENV=production
-ENV PORT=3000
+ENV PORT=5000
 ENV HOSTNAME="0.0.0.0"
-ENV DATABASE_URL="postgresql://backend:password@localhost:5432/biskaken_auto"
 
-# Default admin credentials (can be overridden)
+# Default admin credentials (override in production)
 ENV ADMIN_EMAIL="admin@biskaken.com"
 ENV ADMIN_PASSWORD="admin123"
 ENV ADMIN_NAME="Admin User"
 ENV JWT_SECRET="unified-container-default-jwt-secret-change-in-production"
 
-EXPOSE 3000
+# Default database URL (can be overridden)
+ENV DATABASE_URL="postgresql://backend:password@localhost:5432/biskaken_auto"
+
+EXPOSE 5000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-    CMD curl -f http://localhost:3000/health || exit 1
+    CMD curl -f http://localhost:5000/health || exit 1
 
 # Start everything
 USER backend
