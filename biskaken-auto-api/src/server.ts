@@ -37,21 +37,47 @@ const corsOptions = {
   origin: function (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
     // Allow requests from the frontend URL and development
     const allowedOrigins = [
+      // Production domains
       process.env.APP_URL,
       'https://biskakenauto.rpnmore.com',
-      'https://www.biskakenauto.com',
+      'https://www.biskakenauto.rpnmore.com',
+      'https://api.biskakenauto.rpnmore.com',
+      
+      // Dokploy preview domains
+      'https://biskaken-auto-preview.dokploy.com',
+      
+      // Custom domains (if any)
+      'https://www.biskaken.com',
+      'https://biskaken.com',
+      
+      // Development - localhost
       'http://localhost:3000',
       'http://localhost:3001',
       'http://localhost:3002',
       'http://localhost:3003',
+      'http://localhost:3004',  // ✅ CRITICAL - Fixed login issue
+      'http://localhost:3005',
+      'http://localhost:3006',
+      
+      // Development - Vite default ports
       'http://localhost:5173',
       'http://localhost:5174',
+      'http://localhost:5175',
+      
+      // Development - 127.0.0.1
       'http://127.0.0.1:3000',
       'http://127.0.0.1:3001',
       'http://127.0.0.1:3002',
       'http://127.0.0.1:3003',
+      'http://127.0.0.1:3004',
+      'http://127.0.0.1:3005',
+      'http://127.0.0.1:3006',
       'http://127.0.0.1:5173',
-      'http://127.0.0.1:5174'
+      'http://127.0.0.1:5174',
+      'http://127.0.0.1:5175',
+      
+      // Split CORS_ORIGINS env var if provided
+      ...(process.env.CORS_ORIGINS ? process.env.CORS_ORIGINS.split(',').map(origin => origin.trim()) : [])
     ].filter(Boolean); // Remove undefined values
 
     // Allow requests with no origin (mobile apps, Postman, etc.)
@@ -129,8 +155,8 @@ app.get('/api/database/status', asyncHandler(async (req, res) => {
         responseTime: `${responseTime}ms`,
         timestamp: new Date().toISOString(),
         database: {
-          type: 'PostgreSQL',
-          host: 'Internal Container Database',
+          type: process.env.DATABASE_URL?.includes('postgresql') ? 'PostgreSQL' : 'SQLite',
+          host: process.env.DATABASE_URL?.includes('postgresql') ? 'Internal Container Database' : 'Local SQLite File',
           connected: true,
           tables: Array.isArray(tables) ? tables.length : 0
         },
@@ -147,8 +173,8 @@ app.get('/api/database/status', asyncHandler(async (req, res) => {
         error: error.message,
         timestamp: new Date().toISOString(),
         database: {
-          type: 'PostgreSQL',
-          host: 'Internal Container Database',
+          type: process.env.DATABASE_URL?.includes('postgresql') ? 'PostgreSQL' : 'SQLite',
+          host: process.env.DATABASE_URL?.includes('postgresql') ? 'Internal Container Database' : 'Local SQLite File',
           connected: false
         }
       },

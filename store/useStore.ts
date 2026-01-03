@@ -80,8 +80,37 @@ interface AppState {
   updateReorderStatus: (reorderId: string, status: ReorderRequest['status']) => void;
 }
 
+const initializeStore = () => {
+  if (typeof window === 'undefined') return { user: null };
+  
+  const token = localStorage.getItem('authToken');
+  const userStr = localStorage.getItem('user');
+  
+  if (token && userStr) {
+    try {
+      const user = JSON.parse(userStr);
+      console.log('🔄 Restoring user session:', user);
+      
+      // Load data after session restoration
+      setTimeout(() => {
+        const store = useStore.getState();
+        console.log('📊 Loading data after session restoration...');
+        store.loadAllData();
+      }, 100);
+      
+      return { user };
+    } catch (error) {
+      console.error('❌ Failed to restore user session:', error);
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('user');
+    }
+  }
+  
+  return { user: null };
+};
+
 export const useStore = create<AppState>((set, get) => ({
-  user: null,
+  ...initializeStore(),
   customers: [],
   jobs: [],
   inventory: [],
@@ -107,6 +136,7 @@ export const useStore = create<AppState>((set, get) => ({
         // Store user and token
         set({ user, loading: false });
         localStorage.setItem('authToken', token);
+        localStorage.setItem('user', JSON.stringify(user));
         
         // Load all data after successful login
         console.log('📊 Loading all data...');
@@ -128,6 +158,7 @@ export const useStore = create<AppState>((set, get) => ({
   logout: () => {
     set({ user: null, customers: [], jobs: [], inventory: [], invoices: [] });
     localStorage.removeItem('authToken');
+    localStorage.removeItem('user');
   },
 
   // Data loading functions
