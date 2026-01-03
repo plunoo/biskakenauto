@@ -108,7 +108,7 @@ model Job {
   vehicleId           String
   complaint           String
   diagnosis           String?
-  aiDiagnosis         Json?       // Store AI diagnosis results
+  aiDiagnosis         String?     // Store AI diagnosis results as JSON string
   status              JobStatus   @default(PENDING)
   priority            JobPriority @default(MEDIUM)
   assignedTo          String?
@@ -213,7 +213,7 @@ model ActivityLog {
   action     String
   entityType String
   entityId   String
-  details    Json?
+  details    String? // Store details as JSON string
   createdAt  DateTime @default(now())
   
   user       User     @relation(fields: [userId], references: [id])

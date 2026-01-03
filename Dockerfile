@@ -37,8 +37,8 @@ ENV ADMIN_EMAIL="admin@biskaken.com"
 ENV ADMIN_PASSWORD="admin123"
 ENV JWT_SECRET="backend-only-jwt-secret-change-in-production"
 
-# Default database URL (will use test endpoints if not connected)
-ENV DATABASE_URL="postgresql://backend:password@localhost:5432/biskaken_auto"
+# Default database URL using SQLite for backend-only deployment
+ENV DATABASE_URL="file:./dev.db"
 
 EXPOSE 5000
 
