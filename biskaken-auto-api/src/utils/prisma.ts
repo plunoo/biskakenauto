@@ -7,8 +7,14 @@ declare global {
 
 // Set default DATABASE_URL if not provided
 if (!process.env.DATABASE_URL) {
-  console.warn('DATABASE_URL is not configured - using default SQLite database (DEVELOPMENT ONLY)');
-  process.env.DATABASE_URL = 'file:./dev.db';
+  // Check if we're in the unified container (internal PostgreSQL)
+  if (process.env.NODE_ENV === 'production' && process.env.UNIFIED_CONTAINER) {
+    console.log('🐘 Using unified container internal PostgreSQL database');
+    process.env.DATABASE_URL = 'postgresql://backend:password@localhost:5432/biskaken_auto';
+  } else {
+    console.warn('DATABASE_URL is not configured - using default SQLite database (DEVELOPMENT ONLY)');
+    process.env.DATABASE_URL = 'file:./dev.db';
+  }
 }
 
 export const prisma = global.__prisma || new PrismaClient({

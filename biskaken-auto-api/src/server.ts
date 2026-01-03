@@ -101,6 +101,62 @@ app.get('/health', (req, res) => {
   });
 });
 
+// Database status endpoint
+app.get('/api/database/status', asyncHandler(async (req, res) => {
+  try {
+    const start = Date.now();
+    
+    // Test database connection
+    await prisma.$connect();
+    
+    // Try a simple query to verify database works
+    const result = await prisma.$queryRaw`SELECT 1 as test`;
+    
+    const responseTime = Date.now() - start;
+    
+    // Get some basic stats
+    const tables = await prisma.$queryRaw`
+      SELECT table_name 
+      FROM information_schema.tables 
+      WHERE table_schema = 'public' 
+      ORDER BY table_name;
+    `;
+    
+    res.json({
+      success: true,
+      data: {
+        status: 'connected',
+        responseTime: `${responseTime}ms`,
+        timestamp: new Date().toISOString(),
+        database: {
+          type: 'PostgreSQL',
+          host: 'Internal Container Database',
+          connected: true,
+          tables: Array.isArray(tables) ? tables.length : 0
+        },
+        environment: process.env.NODE_ENV || 'development'
+      },
+      message: 'Database connection healthy'
+    });
+  } catch (error: any) {
+    console.error('Database status check failed:', error);
+    res.status(500).json({
+      success: false,
+      data: {
+        status: 'disconnected',
+        error: error.message,
+        timestamp: new Date().toISOString(),
+        database: {
+          type: 'PostgreSQL',
+          host: 'Internal Container Database',
+          connected: false
+        }
+      },
+      message: 'Database connection failed'
+    });
+  }
+}));
+
 // Service status endpoint (useful for monitoring)
 app.get('/api/status', 
   optionalAuth,

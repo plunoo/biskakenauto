@@ -51,5 +51,8 @@ HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
 # Install production dependencies for the backend
 RUN npm ci --production
 
+# Make startup script executable
+RUN chmod +x start.sh
+
 # Start the server (serves both API and frontend)
-CMD ["node", "dist/server.js"]
+CMD ["./start.sh"]

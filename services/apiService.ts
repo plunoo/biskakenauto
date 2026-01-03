@@ -39,6 +39,10 @@ class ApiService {
     return this.request('/api/status');
   }
 
+  async getDatabaseStatus() {
+    return this.request('/api/database/status');
+  }
+
   // Authentication endpoints
   async login(data: { email: string; password: string }) {
     // Try admin login first (for environment-based admin access)

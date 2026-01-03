@@ -53,6 +53,7 @@ const DashboardPage: React.FC = () => {
   const [insights, setInsights] = useState<string[]>([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [backendStatus, setBackendStatus] = useState<any>(null);
+  const [databaseStatus, setDatabaseStatus] = useState<any>(null);
 
   const fetchInsights = async () => {
     setIsRefreshing(true);
@@ -92,9 +93,21 @@ const DashboardPage: React.FC = () => {
     }
   };
 
+  const checkDatabaseStatus = async () => {
+    try {
+      const status = await apiService.getDatabaseStatus();
+      setDatabaseStatus(status);
+      console.log('📊 Database status:', status);
+    } catch (error) {
+      console.log('Database status check failed');
+      setDatabaseStatus({ success: false, data: { status: 'disconnected' } });
+    }
+  };
+
   useEffect(() => {
     fetchInsights();
     checkBackendStatus();
+    checkDatabaseStatus();
     
     // Load all data when dashboard mounts
     console.log('📊 Dashboard mounted - loading all data...');
@@ -119,13 +132,35 @@ const DashboardPage: React.FC = () => {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Workshop Overview</h1>
           <p className="text-gray-500">Welcome back! Here's what's happening today.</p>
-          {backendStatus && (
-            <div className="flex items-center gap-2 mt-2">
-              <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-              <span className="text-xs text-green-600 font-medium">Backend Connected</span>
-              <span className="text-xs text-gray-400">• Mobile Money & AI Ready</span>
-            </div>
-          )}
+          <div className="flex flex-wrap items-center gap-4 mt-2">
+            {backendStatus && (
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span className="text-xs text-green-600 font-medium">API Connected</span>
+                <span className="text-xs text-gray-400">• Services Ready</span>
+              </div>
+            )}
+            
+            {databaseStatus && (
+              <div className="flex items-center gap-2">
+                <div className={`w-2 h-2 rounded-full ${
+                  databaseStatus.success && databaseStatus.data.status === 'connected' 
+                    ? 'bg-green-500' 
+                    : 'bg-red-500'
+                }`}></div>
+                <span className={`text-xs font-medium ${
+                  databaseStatus.success && databaseStatus.data.status === 'connected'
+                    ? 'text-green-600'
+                    : 'text-red-600'
+                }`}>
+                  Database {databaseStatus.data.status === 'connected' ? 'Connected' : 'Disconnected'}
+                </span>
+                {databaseStatus.success && databaseStatus.data.responseTime && (
+                  <span className="text-xs text-gray-400">• {databaseStatus.data.responseTime}</span>
+                )}
+              </div>
+            )}
+          </div>
         </div>
         <div className="flex gap-2 bg-white p-1 rounded-lg shadow-sm border">
           <Button variant="ghost" size="sm" className="bg-gray-100">Today</Button>
