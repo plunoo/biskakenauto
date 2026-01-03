@@ -1,18 +1,15 @@
 # Simple frontend-only Dockerfile for Dokploy
-FROM node:18-alpine AS builder
+FROM node:20-alpine AS builder
 
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
+# Copy source code first
+COPY . .
 
 # Install dependencies (including dev deps for build)
 RUN npm ci
 
-# Copy source code
-COPY . .
-
-# Build frontend
+# Build frontend only
 RUN npm run build:frontend
 
 # Production nginx stage

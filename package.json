@@ -12,8 +12,7 @@
     "build": "npm run build:frontend && npm run build:backend && npm run build:copy",
     "preview": "vite preview",
     "start": "cd biskaken-auto-api && npm start",
-    "deploy:build": "npm run build",
-    "postinstall": "cd biskaken-auto-api && npm install"
+    "deploy:build": "npm run build"
   },
   "dependencies": {
     "@google/genai": "^1.34.0",
