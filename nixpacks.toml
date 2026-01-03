@@ -1,0 +1,28 @@
+# Biskaken Auto Shop Management - Nixpacks Configuration
+# Dokploy deployment with Node.js 18 and PostgreSQL support
+
+[variables]
+NODE_ENV = "production"
+PORT = "5000"
+
+[phases.setup]
+nixPkgs = ["nodejs_18", "postgresql"]
+
+[phases.install]
+cmds = [
+    "npm ci --frozen-lockfile",
+    "cd biskaken-auto-api && npm ci --frozen-lockfile"
+]
+cacheDirectories = ["node_modules", "biskaken-auto-api/node_modules"]
+
+[phases.build]
+cmds = [
+    "npm run build",
+    "cd biskaken-auto-api && npm run build",
+    "mkdir -p biskaken-auto-api/public",
+    "cp -r dist/* biskaken-auto-api/public/"
+]
+cacheDirectories = ["dist", "biskaken-auto-api/dist"]
+
+[start]
+cmd = "cd biskaken-auto-api && npm start"

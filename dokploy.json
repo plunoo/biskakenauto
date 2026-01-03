@@ -17,13 +17,6 @@
     "APP_URL": "https://biskakenauto.rpnmore.com",
     "VITE_API_URL": "https://biskakenauto.rpnmore.com"
   },
-  "build": {
-    "command": "npm run deploy:build",
-    "outputDirectory": "."
-  },
-  "start": {
-    "command": "cd biskaken-auto-api && npm start"
-  },
   "healthcheck": {
     "enabled": true,
     "path": "/health",
