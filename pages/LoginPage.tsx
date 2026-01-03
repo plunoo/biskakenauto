@@ -36,6 +36,11 @@ const LoginPage: React.FC = () => {
           <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white font-bold text-3xl mx-auto mb-4">B</div>
           <h1 className="text-2xl font-bold text-gray-900">Biskaken Auto Shop</h1>
           <p className="text-gray-500">Sign in to manage your workshop</p>
+          <div className="mt-4 p-3 bg-blue-50 rounded-md text-sm">
+            <p className="font-medium text-blue-800">Demo Credentials:</p>
+            <p className="text-blue-600">admin@biskaken.com / admin123</p>
+            <p className="text-blue-600">staff@biskaken.com / staff123</p>
+          </div>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-4">
@@ -48,7 +53,7 @@ const LoginPage: React.FC = () => {
           />
           <Input 
             label="Password" 
-            placeholder="••••••••" 
+            placeholder="admin123" 
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
