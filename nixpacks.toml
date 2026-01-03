@@ -10,17 +10,16 @@ nixPkgs = ["nodejs_18", "postgresql"]
 
 [phases.install]
 cmds = [
-    "npm ci --frozen-lockfile",
-    "cd biskaken-auto-api && npm ci --frozen-lockfile"
+    "npm ci --include=dev",
+    "cd biskaken-auto-api && npm ci --include=dev"
 ]
 cacheDirectories = ["node_modules", "biskaken-auto-api/node_modules"]
 
 [phases.build]
 cmds = [
-    "npm run build",
-    "cd biskaken-auto-api && npm run build",
-    "mkdir -p biskaken-auto-api/public",
-    "cp -r dist/* biskaken-auto-api/public/"
+    "npm run build:frontend",
+    "npm run build:backend", 
+    "npm run build:copy"
 ]
 cacheDirectories = ["dist", "biskaken-auto-api/dist"]
 
