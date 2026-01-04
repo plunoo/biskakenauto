@@ -1,0 +1,155 @@
+# Production Docker Compose for Biskaken Auto
+# Optimized for reliable deployment with proper error handling
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.final
+      args:
+        - NODE_ENV=production
+    container_name: biskaken-auto-app
+    environment:
+      # Application Configuration
+      - NODE_ENV=production
+      - PORT=3000
+      - APP_URL=https://biskakenauto.rpnmore.com
+      
+      # Database Configuration
+      - DATABASE_URL=postgresql://postgres:${DB_PASSWORD:-postgres}@db:5432/biskaken_auto
+      
+      # Security Configuration
+      - JWT_SECRET=${JWT_SECRET:-your-super-secret-jwt-key-change-this-in-production-2024}
+      
+      # Admin Configuration
+      - ADMIN_EMAIL=${ADMIN_EMAIL:-admin@biskaken.com}
+      - ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin123}
+      - ADMIN_NAME=${ADMIN_NAME:-Admin User}
+      
+      # Optional Service Configuration
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - TWILIO_ACCOUNT_SID=${TWILIO_ACCOUNT_SID:-}
+      - TWILIO_AUTH_TOKEN=${TWILIO_AUTH_TOKEN:-}
+      - PAYSTACK_SECRET_KEY=${PAYSTACK_SECRET_KEY:-}
+      
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - dokploy-network
+    restart: unless-stopped
+    
+    # Resource limits for production
+    deploy:
+      resources:
+        limits:
+          memory: 1G
+          cpus: '0.5'
+        reservations:
+          memory: 512M
+          cpus: '0.25'
+    
+    # Health check
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 120s
+    
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    
+    # Traefik labels for routing
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.biskaken.rule=Host(`biskakenauto.rpnmore.com`)"
+      - "traefik.http.routers.biskaken.tls=true"
+      - "traefik.http.routers.biskaken.tls.certresolver=letsencrypt"
+      - "traefik.http.services.biskaken.loadbalancer.server.port=3000"
+      
+      # Security headers
+      - "traefik.http.middlewares.biskaken-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.middlewares.biskaken-headers.headers.customresponseheaders.X-Frame-Options=DENY"
+      - "traefik.http.middlewares.biskaken-headers.headers.customresponseheaders.X-Content-Type-Options=nosniff"
+      - "traefik.http.routers.biskaken.middlewares=biskaken-headers"
+
+  db:
+    image: postgres:16-alpine
+    container_name: biskaken-auto-db
+    environment:
+      - POSTGRES_DB=biskaken_auto
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${DB_PASSWORD:-postgres}
+      - POSTGRES_INITDB_ARGS=--encoding=UTF-8 --lc-collate=C --lc-ctype=C
+      - PGDATA=/var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      # Optional: Add custom initialization scripts
+      # - ./init-scripts:/docker-entrypoint-initdb.d
+    networks:
+      - dokploy-network
+    restart: unless-stopped
+    
+    # Resource limits
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.3'
+        reservations:
+          memory: 256M
+          cpus: '0.1'
+    
+    # Health check with better timing
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d biskaken_auto"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    
+    # Logging configuration
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+    
+    # Security: Run as non-root user
+    user: "999:999"
+
+volumes:
+  postgres_data:
+    driver: local
+    labels:
+      - "description=Biskaken Auto PostgreSQL Data"
+
+networks:
+  dokploy-network:
+    external: true
+    labels:
+      - "description=Dokploy managed network"
+
+# Optional: Add backup service
+# services:
+#   backup:
+#     image: prodrigestivill/postgres-backup-local
+#     environment:
+#       - POSTGRES_HOST=db
+#       - POSTGRES_DB=biskaken_auto
+#       - POSTGRES_USER=postgres
+#       - POSTGRES_PASSWORD=${DB_PASSWORD:-postgres}
+#       - BACKUP_KEEP_DAYS=7
+#       - BACKUP_KEEP_WEEKS=4
+#       - BACKUP_KEEP_MONTHS=6
+#     volumes:
+#       - ./backups:/backups
+#     depends_on:
+#       - db
+#     networks:
+#       - dokploy-network

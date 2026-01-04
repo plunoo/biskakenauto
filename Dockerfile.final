@@ -1,0 +1,127 @@
+# Final Production Dockerfile for Biskaken Auto
+# Multi-stage build optimized for production deployment
+
+FROM node:20-alpine AS base
+
+# Install system dependencies
+RUN apk add --no-cache \
+    bash \
+    curl \
+    postgresql-client \
+    git
+
+# Set working directory
+WORKDIR /app
+
+# Copy package files first for better caching
+COPY package*.json ./
+COPY biskaken-auto-api/package*.json ./biskaken-auto-api/
+
+# Install all dependencies
+RUN npm ci --only=production --silent
+RUN cd biskaken-auto-api && npm ci --only=production --silent
+
+# Copy source code
+COPY . .
+
+# Build frontend
+RUN npm run build:frontend
+
+# Build backend
+WORKDIR /app/biskaken-auto-api
+RUN npx prisma generate
+RUN npx tsc --skipLibCheck
+
+# Copy built frontend to backend public directory
+RUN mkdir -p public && cp -r /app/dist/* ./public/
+
+# Create optimized startup script
+RUN cat > /app/start-final.sh << 'EOF'
+#!/bin/bash
+set -euo pipefail
+
+echo "🚀 Starting Biskaken Auto Production Server..."
+echo "⏰ $(date)"
+
+# Navigate to backend directory
+cd /app/biskaken-auto-api
+
+# Database connection with retry logic
+echo "⏳ Waiting for database connection..."
+MAX_RETRIES=30
+RETRY_COUNT=0
+
+while ! pg_isready -h ${DB_HOST:-db} -p ${DB_PORT:-5432} -U ${DB_USER:-postgres} -q; do
+    RETRY_COUNT=$((RETRY_COUNT+1))
+    if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
+        echo "❌ Database connection failed after $MAX_RETRIES attempts"
+        exit 1
+    fi
+    echo "Database not ready (attempt $RETRY_COUNT/$MAX_RETRIES), waiting..."
+    sleep 2
+done
+
+echo "✅ Database connection established"
+
+# Ensure Prisma client is generated
+echo "🔧 Ensuring Prisma client is ready..."
+npx prisma generate
+
+# Run database migrations
+echo "🔄 Running database migrations..."
+npx prisma migrate deploy
+
+# Seed database with initial data
+echo "🌱 Seeding database..."
+npx prisma db seed || echo "ℹ️  Database seed completed or skipped"
+
+# Health check before starting
+echo "🔍 Pre-flight checks..."
+if [ ! -f "dist/server.js" ]; then
+    echo "❌ Backend build not found!"
+    exit 1
+fi
+
+if [ ! -d "public" ] || [ ! "$(ls -A public)" ]; then
+    echo "❌ Frontend build not found!"
+    exit 1
+fi
+
+echo "✅ All checks passed"
+
+# Start the application server
+echo "🌟 Starting application server on port ${PORT:-3000}..."
+echo "🌐 Application will be available at: ${APP_URL:-http://localhost:3000}"
+echo "🔐 Default admin: admin@biskaken.com / admin123"
+echo "⏰ Started at: $(date)"
+
+# Start with proper signal handling
+exec node dist/server.js
+EOF
+
+# Make startup script executable
+RUN chmod +x /app/start-final.sh
+
+# Set up proper permissions
+RUN chown -R node:node /app
+USER node
+
+# Environment variables with defaults
+ENV NODE_ENV=production
+ENV PORT=3000
+ENV APP_URL=https://biskakenauto.rpnmore.com
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD curl -f http://localhost:${PORT}/health || exit 1
+
+# Expose port
+EXPOSE 3000
+
+# Metadata
+LABEL maintainer="Biskaken Auto Team"
+LABEL description="Biskaken Auto Shop Management System"
+LABEL version="1.0.0"
+
+# Start the application
+CMD ["/app/start-final.sh"]
