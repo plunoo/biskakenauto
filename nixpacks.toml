@@ -15,7 +15,7 @@ nixPkgs = ["nodejs_20", "postgresql", "curl", "bash", "coreutils"]
 [phases.install]
 cmds = [
     "echo '📦 Installing unified application dependencies...'",
-    "npm ci --prefer-offline --no-audit --include=dev"
+    "npm install --prefer-offline --no-audit --include=dev"
 ]
 cacheDirectories = ["node_modules"]
 
