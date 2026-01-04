@@ -251,13 +251,13 @@ export const jobController = {
             action: 'CREATE_JOB',
             entityType: 'JOB',
             entityId: job.id,
-            details: {
+            details: JSON.stringify({
               jobNumber: job.jobNumber,
               customer: customer.name,
               vehicle: `${job.vehicle.make} ${job.vehicle.model}`,
               complaint: complaint.substring(0, 100),
               timestamp: new Date().toISOString()
-            }
+            })
           }
         });
       }
@@ -347,11 +347,11 @@ export const jobController = {
             action: 'UPDATE_JOB',
             entityType: 'JOB',
             entityId: id,
-            details: {
+            details: JSON.stringify({
               jobNumber: updatedJob.jobNumber,
               changes: updateData,
               timestamp: new Date().toISOString()
-            }
+            })
           }
         });
       }
@@ -433,12 +433,12 @@ export const jobController = {
             action: 'UPDATE_JOB_STATUS',
             entityType: 'JOB',
             entityId: id,
-            details: {
+            details: JSON.stringify({
               jobNumber: updatedJob.jobNumber,
               oldStatus: existingJob.status,
               newStatus: status,
               timestamp: new Date().toISOString()
-            }
+            })
           }
         });
       }
@@ -514,11 +514,11 @@ export const jobController = {
             action: 'ASSIGN_JOB',
             entityType: 'JOB',
             entityId: id,
-            details: {
+            details: JSON.stringify({
               jobNumber: updatedJob.jobNumber,
               mechanicName: mechanic.name,
               timestamp: new Date().toISOString()
-            }
+            })
           }
         });
       }
@@ -588,10 +588,10 @@ export const jobController = {
             action: 'DELETE_JOB',
             entityType: 'JOB',
             entityId: id,
-            details: {
+            details: JSON.stringify({
               jobNumber: job.jobNumber,
               timestamp: new Date().toISOString()
-            }
+            })
           }
         });
       }

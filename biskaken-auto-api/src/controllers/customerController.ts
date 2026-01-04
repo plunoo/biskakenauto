@@ -194,11 +194,11 @@ export const customerController = {
             action: 'CREATE_CUSTOMER',
             entityType: 'CUSTOMER',
             entityId: result.customer.id,
-            details: {
+            details: JSON.stringify({
               customerName: name,
               vehicle: `${vehicle.make} ${vehicle.model}`,
               timestamp: new Date().toISOString()
-            }
+            })
           }
         });
       }
@@ -278,11 +278,11 @@ export const customerController = {
             action: 'UPDATE_CUSTOMER',
             entityType: 'CUSTOMER',
             entityId: id,
-            details: {
+            details: JSON.stringify({
               customerName: updatedCustomer.name,
               changes: req.body,
               timestamp: new Date().toISOString()
-            }
+            })
           }
         });
       }
@@ -352,10 +352,10 @@ export const customerController = {
             action: 'DELETE_CUSTOMER',
             entityType: 'CUSTOMER',
             entityId: id,
-            details: {
+            details: JSON.stringify({
               customerName: customer.name,
               timestamp: new Date().toISOString()
-            }
+            })
           }
         });
       }

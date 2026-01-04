@@ -133,11 +133,11 @@ router.post('/',
             action: 'CREATE_USER',
             entityType: 'USER',
             entityId: user.id,
-            details: {
+            details: JSON.stringify({
               userName: user.name,
               userRole: user.role,
               timestamp: new Date().toISOString()
-            }
+            })
           }
         });
       }
@@ -292,11 +292,11 @@ router.put('/:id',
             action: 'UPDATE_USER',
             entityType: 'USER',
             entityId: id,
-            details: {
+            details: JSON.stringify({
               userName: updatedUser.name,
               changes: { name, email, phone, role },
               timestamp: new Date().toISOString()
-            }
+            })
           }
         });
       }
@@ -373,11 +373,11 @@ router.put('/:id/status',
             action: status === 'ACTIVE' ? 'ACTIVATE_USER' : 'DEACTIVATE_USER',
             entityType: 'USER',
             entityId: id,
-            details: {
+            details: JSON.stringify({
               userName: updatedUser.name,
               newStatus: status,
               timestamp: new Date().toISOString()
-            }
+            })
           }
         });
       }
@@ -443,10 +443,10 @@ router.put('/:id/reset-password',
             action: 'RESET_USER_PASSWORD',
             entityType: 'USER',
             entityId: id,
-            details: {
+            details: JSON.stringify({
               userName: user.name,
               timestamp: new Date().toISOString()
-            }
+            })
           }
         });
       }
@@ -515,10 +515,10 @@ router.delete('/:id',
             action: 'DELETE_USER',
             entityType: 'USER',
             entityId: id,
-            details: {
+            details: JSON.stringify({
               userName: user.name,
               timestamp: new Date().toISOString()
-            }
+            })
           }
         });
       }

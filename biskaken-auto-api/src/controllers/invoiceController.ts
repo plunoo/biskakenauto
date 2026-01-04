@@ -270,12 +270,12 @@ export const invoiceController = {
             action: 'CREATE_INVOICE',
             entityType: 'INVOICE',
             entityId: invoice.id,
-            details: {
+            details: JSON.stringify({
               invoiceNumber: invoice.invoiceNumber,
               customer: customer.name,
               total: invoice.total,
               timestamp: new Date().toISOString()
-            }
+            })
           }
         });
       }
@@ -354,11 +354,11 @@ export const invoiceController = {
             action: 'UPDATE_INVOICE',
             entityType: 'INVOICE',
             entityId: id,
-            details: {
+            details: JSON.stringify({
               invoiceNumber: updatedInvoice.invoiceNumber,
               changes: updateData,
               timestamp: new Date().toISOString()
-            }
+            })
           }
         });
       }
@@ -451,13 +451,13 @@ export const invoiceController = {
             action: 'RECORD_PAYMENT',
             entityType: 'INVOICE',
             entityId: id,
-            details: {
+            details: JSON.stringify({
               invoiceNumber: invoice.invoiceNumber,
               amount,
               method,
               reference,
               timestamp: new Date().toISOString()
-            }
+            })
           }
         });
       }
@@ -538,14 +538,14 @@ export const invoiceController = {
             action: 'INITIALIZE_MOBILE_MONEY_PAYMENT',
             entityType: 'INVOICE',
             entityId: id,
-            details: {
+            details: JSON.stringify({
               invoiceNumber: invoice.invoiceNumber,
               amount: invoice.total,
               phone,
               provider,
               reference,
               timestamp: new Date().toISOString()
-            }
+            })
           }
         });
       }
@@ -634,13 +634,13 @@ export const invoiceController = {
             action: 'INITIALIZE_ONLINE_PAYMENT',
             entityType: 'INVOICE',
             entityId: id,
-            details: {
+            details: JSON.stringify({
               invoiceNumber: invoice.invoiceNumber,
               amount: invoice.total,
               email,
               reference,
               timestamp: new Date().toISOString()
-            }
+            })
           }
         });
       }
@@ -725,13 +725,13 @@ export const invoiceController = {
               action: 'PAYMENT_VERIFIED',
               entityType: 'INVOICE',
               entityId: invoiceId,
-              details: {
+              details: JSON.stringify({
                 invoiceNumber: updatedInvoice.invoiceNumber,
                 amount: paymentData.amount,
                 channel: paymentData.channel,
                 reference,
                 timestamp: new Date().toISOString()
-              }
+              })
             }
           });
         }
@@ -929,11 +929,11 @@ export const invoiceController = {
               action: 'SEND_PAYMENT_REMINDER',
               entityType: 'INVOICE',
               entityId: id,
-              details: {
+              details: JSON.stringify({
                 invoiceNumber: invoice.invoiceNumber,
                 customerPhone: invoice.customer.phone,
                 timestamp: new Date().toISOString()
-              }
+              })
             }
           });
         }
@@ -995,10 +995,10 @@ export const invoiceController = {
             action: 'DELETE_INVOICE',
             entityType: 'INVOICE',
             entityId: id,
-            details: {
+            details: JSON.stringify({
               invoiceNumber: invoice.invoiceNumber,
               timestamp: new Date().toISOString()
-            }
+            })
           }
         });
       }

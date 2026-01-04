@@ -208,12 +208,12 @@ export const inventoryController = {
             action: 'CREATE_INVENTORY_ITEM',
             entityType: 'INVENTORY',
             entityId: item.id,
-            details: {
+            details: JSON.stringify({
               partName,
               category,
               stockQty,
               timestamp: new Date().toISOString()
-            }
+            })
           }
         });
       }
@@ -292,11 +292,11 @@ export const inventoryController = {
             action: 'UPDATE_INVENTORY_ITEM',
             entityType: 'INVENTORY',
             entityId: id,
-            details: {
+            details: JSON.stringify({
               partName: updatedItem.partName,
               changes: updateData,
               timestamp: new Date().toISOString()
-            }
+            })
           }
         });
       }
@@ -358,10 +358,10 @@ export const inventoryController = {
             action: 'DELETE_INVENTORY_ITEM',
             entityType: 'INVENTORY',
             entityId: id,
-            details: {
+            details: JSON.stringify({
               partName: item.partName,
               timestamp: new Date().toISOString()
-            }
+            })
           }
         });
       }
@@ -467,7 +467,7 @@ export const inventoryController = {
             action: 'ADJUST_INVENTORY_STOCK',
             entityType: 'INVENTORY',
             entityId: id,
-            details: {
+            details: JSON.stringify({
               partName: item.partName,
               oldStock: item.stockQty,
               newStock,
@@ -475,7 +475,7 @@ export const inventoryController = {
               quantity,
               reason,
               timestamp: new Date().toISOString()
-            }
+            })
           }
         });
       }

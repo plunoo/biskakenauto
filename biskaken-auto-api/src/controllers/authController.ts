@@ -157,11 +157,11 @@ export const authController = {
           action: 'LOGIN',
           entityType: 'USER',
           entityId: user.id,
-          details: {
+          details: JSON.stringify({
             email,
             timestamp: new Date().toISOString(),
             userAgent: req.headers['user-agent']
-          }
+          })
         }
       });
 
@@ -338,9 +338,9 @@ export const authController = {
           action: 'PASSWORD_CHANGE',
           entityType: 'USER',
           entityId: req.user.id,
-          details: {
+          details: JSON.stringify({
             timestamp: new Date().toISOString()
-          }
+          })
         }
       });
 
@@ -370,9 +370,9 @@ export const authController = {
             action: 'LOGOUT',
             entityType: 'USER',
             entityId: req.user.id,
-            details: {
+            details: JSON.stringify({
               timestamp: new Date().toISOString()
-            }
+            })
           }
         });
       }
