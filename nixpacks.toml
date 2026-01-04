@@ -22,13 +22,10 @@ cacheDirectories = ["node_modules", "biskaken-auto-api/node_modules"]
 cmds = [
     "echo '🏗️  Building frontend...'",
     "npm run build:frontend",
-    "echo '🏗️  Building backend...'", 
-    "cd biskaken-auto-api",
-    "npx prisma generate",
-    "npx tsc",
+    "echo '🏗️  Building backend...'",
+    "(cd biskaken-auto-api && npx prisma generate && npx tsc)",
     "echo '📁 Copying frontend to backend...'",
-    "mkdir -p public",
-    "cp -r ../dist/* ./public/",
+    "(cd biskaken-auto-api && mkdir -p public && cp -r ../dist/* ./public/)",
     "echo '✅ Build completed successfully!'"
 ]
 cacheDirectories = ["dist", "biskaken-auto-api/dist", "biskaken-auto-api/public"]
