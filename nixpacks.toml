@@ -4,7 +4,7 @@
 # Specify exact Node.js version and ensure consistent environment
 [variables]
 NODE_ENV = "production"
-PORT = "3000"
+PORT = "5000"
 NODE_VERSION = "20"
 NPM_CONFIG_CACHE = "/tmp/.npm"
 

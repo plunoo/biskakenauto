@@ -973,16 +973,16 @@ process.on('unhandledRejection', (reason, promise) => {
   gracefulShutdown('UNHANDLED_REJECTION');
 });
 
-// Start server
-const server = app.listen(PORT, () => {
+// Start server - Bind to 0.0.0.0 for external access in containers
+const server = app.listen(PORT, '0.0.0.0', () => {
   console.log(`
 🚀 Biskaken Auto Services API Server Started
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-📍 Server: http://localhost:${PORT}
+📍 Server: http://0.0.0.0:${PORT} (external access enabled)
 🌍 Environment: ${process.env.NODE_ENV || 'development'}
-📊 Health Check: http://localhost:${PORT}/health
-📈 API Status: http://localhost:${PORT}/api/status
+📊 Health Check: http://0.0.0.0:${PORT}/health
+📈 API Status: http://0.0.0.0:${PORT}/api/status
 
 🔧 API Endpoints:
    Auth:      /api/auth/*
