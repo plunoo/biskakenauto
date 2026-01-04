@@ -104,10 +104,37 @@ networks:
 
 ### Troubleshooting
 
-- **Build Errors**: Check if all TypeScript errors are resolved
-- **Database Connection**: Ensure PostgreSQL service starts successfully
-- **Port Issues**: App runs on port 3000 (configured in Traefik labels)
-- **SSL/Domain**: Ensure DNS A record points to your server
+#### 1. "No such file or directory: Dockerfile"
+If you get this error, it means Dokploy can't find the Dockerfile:
+- **Solution 1**: Use the content of `docker-compose.dokploy.yml` instead (includes explicit dockerfile path)
+- **Solution 2**: In Dokploy, go to "Advanced Settings" and set Build Context to root directory (.)
+- **Solution 3**: Ensure Repository URL and Branch are correct in Dokploy settings
+
+#### 2. Build Errors
+- Check if all TypeScript errors are resolved in the latest commit
+- Verify all dependencies are properly installed
+- Check that `package.json` and `package-lock.json` are present in both root and `biskaken-auto-api` directories
+
+#### 3. Database Connection Issues
+- Ensure PostgreSQL service starts successfully (check logs)
+- Wait for database health checks to pass before application starts
+- Verify DATABASE_URL format is correct
+
+#### 4. Port/Access Issues  
+- App runs on port 3000 (configured in Traefik labels)
+- Verify domain `biskakenauto.rpnmore.com` points to your server
+- Check Dokploy networking configuration
+
+#### 5. SSL/Domain Issues
+- Ensure DNS A record points to your server
+- Wait for Let's Encrypt certificate generation (may take 1-2 minutes)
+- Check Dokploy Traefik configuration
+
+#### 6. If All Else Fails
+Try the alternative configuration file:
+1. Copy content from `docker-compose.dokploy.yml` 
+2. Paste in Dokploy "Raw" Docker Compose section
+3. This version has more explicit settings and might work better
 
 ### Production Considerations
 
