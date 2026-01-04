@@ -1,42 +1,35 @@
-# Biskaken Auto Shop Management - Production Nixpacks Configuration
-# Optimized for Dokploy deployment with 2025 best practices
+# Biskaken Auto Shop Management - Unified Production Build
+# Single application with frontend + backend + database in one deployment
 
-# Specify exact Node.js version and ensure consistent environment
 [variables]
 NODE_ENV = "production"
 PORT = "5000"
 NODE_VERSION = "20"
 NPM_CONFIG_CACHE = "/tmp/.npm"
 
-# Setup phase - Install system packages with specific Node.js version
+# Install system packages including PostgreSQL client
 [phases.setup]
 nixPkgs = ["nodejs_20", "postgresql", "curl", "bash", "coreutils"]
 
-# Install phase - Use npm ci for faster, deterministic installs
+# Single install phase for all dependencies
 [phases.install]
 cmds = [
-    "echo '📦 Installing root dependencies...'",
-    "npm ci --prefer-offline --no-audit --include=dev",
-    "echo '📦 Installing backend dependencies...'", 
-    "(cd biskaken-auto-api && npm ci --prefer-offline --no-audit --include=dev)"
+    "echo '📦 Installing unified application dependencies...'",
+    "npm ci --prefer-offline --no-audit --include=dev"
 ]
-cacheDirectories = ["node_modules", "biskaken-auto-api/node_modules"]
+cacheDirectories = ["node_modules"]
 
-# Build phase - Generate Prisma client, build frontend and backend
+# Unified build phase - Everything in one go
 [phases.build]
 cmds = [
     "echo '🔧 Generating Prisma client...'",
-    "(cd biskaken-auto-api && npx prisma generate)",
-    "echo '🏗️  Building frontend...'",
-    "npm run build:frontend",
-    "echo '🏗️  Building backend TypeScript...'",
-    "(cd biskaken-auto-api && npx tsc --skipLibCheck)",
-    "echo '📁 Integrating frontend with backend...'",
-    "(cd biskaken-auto-api && mkdir -p public && cp -r ../dist/* ./public/)",
-    "echo '✅ Build completed successfully!'"
+    "npx prisma generate",
+    "echo '🏗️  Building complete application (frontend + backend)...'",
+    "npm run build",
+    "echo '✅ Unified build completed successfully!'"
 ]
-cacheDirectories = ["dist", "biskaken-auto-api/dist", "biskaken-auto-api/public", "biskaken-auto-api/node_modules/.prisma"]
+cacheDirectories = ["dist", "public", "node_modules/.prisma"]
 
-# Start phase - Production startup with database readiness check and migrations
+# Single start command for unified application
 [start]
-cmd = "cd biskaken-auto-api && echo '🚀 Starting Biskaken Auto Production...' && echo '⏳ Waiting for database connection...' && until pg_isready -h ${DATABASE_HOST:-localhost} -p ${DATABASE_PORT:-5432} -U ${DATABASE_USER:-postgres} -q 2>/dev/null; do echo 'Database not ready, retrying in 3s...'; sleep 3; done && echo '✅ Database connected successfully' && echo '🔄 Running database migrations...' && npx prisma migrate deploy && echo '🌱 Seeding database...' && (npm run db:seed 2>/dev/null || echo 'Seeding completed or skipped') && echo '🌟 Starting production server...' && echo '🔐 Default Admin: admin@biskaken.com / admin123' && npm start"
+cmd = "echo '🚀 Starting Biskaken Auto Unified Application...' && echo '⏳ Waiting for database connection...' && until pg_isready -h ${DATABASE_HOST:-localhost} -p ${DATABASE_PORT:-5432} -U ${DATABASE_USER:-postgres} -q 2>/dev/null; do echo 'Database not ready, retrying in 3s...'; sleep 3; done && echo '✅ Database connected successfully' && echo '🔄 Running database migrations...' && npx prisma migrate deploy && echo '🌱 Seeding database...' && (npm run db:seed 2>/dev/null || echo 'Seeding completed or skipped') && echo '🌟 Starting unified server...' && echo '🔐 Admin: admin@biskaken.com / admin123' && npm start"
