@@ -1,79 +1,80 @@
-# Simple Single-Stage Dockerfile for Biskaken Auto
+# Unified Dockerfile for Dokploy Docker Compose deployment
 FROM node:20-alpine
 
 # Install system dependencies
 RUN apk add --no-cache bash curl postgresql-client
 
+# Set working directory
 WORKDIR /app
 
-# Copy all source files
+# Copy package files for dependency installation
+COPY package*.json ./
+COPY biskaken-auto-api/package*.json ./biskaken-auto-api/
+
+# Install frontend dependencies
+RUN npm install
+
+# Copy all source code
 COPY . .
 
-# Install frontend dependencies and build frontend
-RUN npm install
+# Build frontend
 RUN npm run build:frontend
 
-# Install backend dependencies  
+# Move to backend directory and install dependencies
 WORKDIR /app/biskaken-auto-api
 RUN npm install
 
-# Copy prisma schema and generate client
+# Generate Prisma client
 RUN npx prisma generate
 
-# Build backend (force ignore all TypeScript errors)
-RUN npx tsc --noEmit false --skipLibCheck --allowJs --transpileOnly || echo "Build completed - ignoring TypeScript errors"
+# Build backend TypeScript code
+RUN npx tsc
 
 # Copy built frontend to backend public directory
 RUN mkdir -p public && cp -r /app/dist/* ./public/
 
-# Create startup script
+# Create simplified startup script for Docker Compose
 RUN cat > /app/start.sh << 'EOF'
 #!/bin/bash
 set -e
 
-echo "🚀 Starting Biskaken Auto Production Server..."
-
-# Change to backend directory
+echo "🚀 Starting Biskaken Auto..."
 cd /app/biskaken-auto-api
 
-# Wait for database to be ready
-echo "⏳ Waiting for database connection..."
-until pg_isready -h ${DB_HOST:-postgres} -p ${DB_PORT:-5432} -U ${DB_USER:-postgres}; do
+# Wait for database service
+echo "⏳ Waiting for database..."
+until pg_isready -h db -p 5432 -U postgres; do
   echo "Database not ready, waiting..."
-  sleep 2
+  sleep 3
 done
-
-echo "✅ Database connection established"
-
-# Generate Prisma client (ensure it's available)
-echo "🔧 Generating Prisma client..."
-npx prisma generate
+echo "✅ Database connected"
 
 # Run database migrations
-echo "🔄 Running database migrations..."
+echo "🔄 Running migrations..."
 npx prisma migrate deploy
 
-# Seed database with initial data if needed
+# Seed database with initial data
 echo "🌱 Seeding database..."
-npx prisma db seed || echo "Seed completed or already exists"
+npx prisma db seed || echo "Seed completed"
 
 # Start the server
-echo "🌟 Starting application server..."
+echo "🌟 Starting server on port 3000..."
 exec node dist/server.js
 EOF
 
+# Make script executable
 RUN chmod +x /app/start.sh
 
-# Environment variables
+# Set environment variables
 ENV NODE_ENV=production
-ENV PORT=5000
-ENV APP_URL=https://biskakenauto.rpnmore.com
+ENV PORT=3000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
-  CMD curl -f http://localhost:5000/health || exit 1
+# Expose port 3000 (standard for Dokploy)
+EXPOSE 3000
 
-EXPOSE 5000
+# Health check for Docker Compose
+HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
+  CMD curl -f http://localhost:3000/health || exit 1
 
-# Start application
+# Start the application
 CMD ["/app/start.sh"]

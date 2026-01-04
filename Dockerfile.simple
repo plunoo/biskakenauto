@@ -1,0 +1,73 @@
+# Multi-stage build for unified frontend + backend
+FROM node:20-alpine
+
+# Install required packages
+RUN apk add --no-cache bash curl postgresql-client
+
+# Set working directory
+WORKDIR /app
+
+# Copy root package files
+COPY package*.json ./
+
+# Install frontend dependencies
+RUN npm install
+
+# Copy all source code
+COPY . .
+
+# Build frontend
+RUN npm run build:frontend
+
+# Install backend dependencies
+WORKDIR /app/biskaken-auto-api
+RUN npm install
+
+# Generate Prisma client
+RUN npx prisma generate
+
+# Copy built frontend to backend public directory
+RUN mkdir -p public && cp -r /app/dist/* ./public/
+
+# Create simplified startup script
+RUN cat > /app/start-simple.sh << 'EOF'
+#!/bin/bash
+set -e
+
+echo "🚀 Starting Biskaken Auto..."
+
+cd /app/biskaken-auto-api
+
+# Wait for database
+echo "⏳ Waiting for database..."
+until pg_isready -h db -p 5432 -U postgres; do
+  echo "Database not ready, waiting..."
+  sleep 2
+done
+
+echo "✅ Database ready"
+
+# Run migrations
+echo "🔄 Running migrations..."
+npx prisma migrate deploy
+
+# Seed database
+echo "🌱 Seeding database..."
+npx prisma db seed || echo "Seed completed"
+
+# Start server
+echo "🌟 Starting server..."
+exec node dist/server.js
+EOF
+
+RUN chmod +x /app/start-simple.sh
+
+# Expose port
+EXPOSE 3000
+
+# Set environment
+ENV NODE_ENV=production
+ENV PORT=3000
+
+# Start application
+CMD ["/app/start-simple.sh"]
