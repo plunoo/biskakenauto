@@ -1,34 +1,42 @@
 # Biskaken Auto Shop Management - Production Nixpacks Configuration
-# Unified full-stack deployment for Dokploy
+# Optimized for Dokploy deployment with 2025 best practices
 
+# Specify exact Node.js version and ensure consistent environment
 [variables]
 NODE_ENV = "production"
 PORT = "3000"
 NODE_VERSION = "20"
+NPM_CONFIG_CACHE = "/tmp/.npm"
 
+# Setup phase - Install system packages with specific Node.js version
 [phases.setup]
 nixPkgs = ["nodejs_20", "postgresql", "curl", "bash", "coreutils"]
 
+# Install phase - Use npm ci for faster, deterministic installs
 [phases.install]
 cmds = [
-    "echo '📦 Installing dependencies...'",
-    "npm ci --include=dev",
-    "echo '📦 Installing backend dependencies...'",
-    "cd biskaken-auto-api && npm ci --include=dev"
+    "echo '📦 Installing root dependencies...'",
+    "npm ci --prefer-offline --no-audit --include=dev",
+    "echo '📦 Installing backend dependencies...'", 
+    "(cd biskaken-auto-api && npm ci --prefer-offline --no-audit --include=dev)"
 ]
 cacheDirectories = ["node_modules", "biskaken-auto-api/node_modules"]
 
+# Build phase - Generate Prisma client, build frontend and backend
 [phases.build]
 cmds = [
+    "echo '🔧 Generating Prisma client...'",
+    "(cd biskaken-auto-api && npx prisma generate)",
     "echo '🏗️  Building frontend...'",
     "npm run build:frontend",
-    "echo '🏗️  Building backend...'",
-    "(cd biskaken-auto-api && npx prisma generate && npx tsc)",
-    "echo '📁 Copying frontend to backend...'",
+    "echo '🏗️  Building backend TypeScript...'",
+    "(cd biskaken-auto-api && npx tsc --skipLibCheck)",
+    "echo '📁 Integrating frontend with backend...'",
     "(cd biskaken-auto-api && mkdir -p public && cp -r ../dist/* ./public/)",
     "echo '✅ Build completed successfully!'"
 ]
-cacheDirectories = ["dist", "biskaken-auto-api/dist", "biskaken-auto-api/public"]
+cacheDirectories = ["dist", "biskaken-auto-api/dist", "biskaken-auto-api/public", "biskaken-auto-api/node_modules/.prisma"]
 
+# Start phase - Production startup with database readiness check and migrations
 [start]
-cmd = "cd biskaken-auto-api && echo '🚀 Starting Biskaken Auto Production...' && echo '⏳ Waiting for database...' && until pg_isready -h ${DATABASE_HOST:-localhost} -p ${DATABASE_PORT:-5432} -U ${DATABASE_USER:-postgres} -q 2>/dev/null; do echo 'Database not ready, waiting...'; sleep 3; done && echo '✅ Database connected' && npx prisma generate && npx prisma migrate deploy && (npx prisma db seed || echo 'Seed completed') && echo '🌟 Starting server...' && echo '🔐 Admin: admin@biskaken.com / admin123' && node dist/server.js"
+cmd = "cd biskaken-auto-api && echo '🚀 Starting Biskaken Auto Production...' && echo '⏳ Waiting for database connection...' && until pg_isready -h ${DATABASE_HOST:-localhost} -p ${DATABASE_PORT:-5432} -U ${DATABASE_USER:-postgres} -q 2>/dev/null; do echo 'Database not ready, retrying in 3s...'; sleep 3; done && echo '✅ Database connected successfully' && echo '🔄 Running database migrations...' && npx prisma migrate deploy && echo '🌱 Seeding database...' && (npm run db:seed 2>/dev/null || echo 'Seeding completed or skipped') && echo '🌟 Starting production server...' && echo '🔐 Default Admin: admin@biskaken.com / admin123' && npm start"
