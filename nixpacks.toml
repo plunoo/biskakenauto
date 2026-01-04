@@ -1,27 +1,72 @@
-# Biskaken Auto Shop Management - Nixpacks Configuration
-# Dokploy deployment with Node.js 18 and PostgreSQL support
+# Biskaken Auto Shop Management - Production Nixpacks Configuration
+# Unified full-stack deployment for Dokploy
 
 [variables]
 NODE_ENV = "production"
-PORT = "5000"
+PORT = "3000"
+NODE_VERSION = "20"
 
 [phases.setup]
-nixPkgs = ["nodejs_18", "postgresql"]
+nixPkgs = ["nodejs_20", "postgresql", "curl", "bash", "coreutils"]
 
 [phases.install]
 cmds = [
+    "echo '📦 Installing dependencies...'",
     "npm ci --include=dev",
+    "echo '📦 Installing backend dependencies...'",
     "cd biskaken-auto-api && npm ci --include=dev"
 ]
 cacheDirectories = ["node_modules", "biskaken-auto-api/node_modules"]
 
 [phases.build]
 cmds = [
+    "echo '🏗️  Building frontend...'",
     "npm run build:frontend",
-    "npm run build:backend", 
-    "npm run build:copy"
+    "echo '🏗️  Building backend...'", 
+    "cd biskaken-auto-api",
+    "npx prisma generate",
+    "npx tsc",
+    "echo '📁 Copying frontend to backend...'",
+    "mkdir -p public",
+    "cp -r ../dist/* ./public/",
+    "echo '✅ Build completed successfully!'"
 ]
-cacheDirectories = ["dist", "biskaken-auto-api/dist"]
+cacheDirectories = ["dist", "biskaken-auto-api/dist", "biskaken-auto-api/public"]
 
 [start]
-cmd = "cd biskaken-auto-api && npm start"
+cmd = """
+echo '🚀 Starting Biskaken Auto Production...'
+cd biskaken-auto-api
+
+echo '⏳ Waiting for database connection...'
+MAX_RETRIES=30
+RETRY_COUNT=0
+
+while ! pg_isready -h ${DATABASE_HOST:-localhost} -p ${DATABASE_PORT:-5432} -U ${DATABASE_USER:-postgres} -q 2>/dev/null; do
+    RETRY_COUNT=$((RETRY_COUNT+1))
+    if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
+        echo '❌ Database connection failed after 30 attempts'
+        exit 1
+    fi
+    echo "Database not ready (attempt $RETRY_COUNT/30), waiting..."
+    sleep 2
+done
+
+echo '✅ Database connected successfully'
+
+echo '🔧 Generating Prisma client...'
+npx prisma generate
+
+echo '🔄 Running database migrations...'
+npx prisma migrate deploy
+
+echo '🌱 Seeding database with initial data...'
+npx prisma db seed || echo 'Database seeding completed'
+
+echo '🌟 Starting application server on port 3000...'
+echo '🌐 Application URL: https://biskakenauto.rpnmore.com'
+echo '🔐 Default admin credentials: admin@biskaken.com / admin123'
+echo '⏰ Started at: '$(date)
+
+exec node dist/server.js
+"""
