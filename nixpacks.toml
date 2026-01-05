@@ -15,7 +15,10 @@ nixPkgs = ["nodejs_20", "postgresql", "curl", "bash", "coreutils"]
 [phases.install]
 cmds = [
     "echo '📦 Installing unified application dependencies...'",
-    "npm install --prefer-offline --no-audit --include=dev"
+    "npm install --prefer-offline --no-audit --include=dev",
+    "echo '🔧 Fixing Rollup native dependencies issue...'",
+    "npm install @rollup/rollup-linux-x64-gnu --save-optional",
+    "npm rebuild"
 ]
 cacheDirectories = ["node_modules"]
 
