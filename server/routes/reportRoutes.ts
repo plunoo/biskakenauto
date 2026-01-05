@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import { authenticate, authorize } from '../middleware/auth';
-import { asyncHandler } from '../middleware/errorHandler';
-import { prisma } from '../utils/prisma';
-import { AuthRequest, ApiResponse } from '../types';
+import { authenticate, authorize } from '../middleware/auth.js';
+import { asyncHandler } from '../middleware/errorHandler.js';
+import { prisma } from '../utils/prisma.js';
+import { AuthRequest, ApiResponse } from '../types/index.js';
 import { Response } from 'express';
-import { aiService } from '../services/aiService';
-import { pdfService } from '../services/pdfService';
+import { aiService } from '../services/aiService.js';
+import { pdfService } from '../services/pdfService.js';
 
 const router = Router();
 

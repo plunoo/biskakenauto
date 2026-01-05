@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { PaymentResponse } from '../types';
+import { PaymentResponse } from '../types/index.js';
 
 /**
  * Payment Service

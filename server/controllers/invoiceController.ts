@@ -1,9 +1,9 @@
 import { Response } from 'express';
-import { prisma } from '../utils/prisma';
-import { AuthRequest, ApiResponse } from '../types';
-import { pdfService } from '../services/pdfService';
-import { smsService } from '../services/smsService';
-import { paymentService } from '../services/paymentService';
+import { prisma } from '../utils/prisma.js';
+import { AuthRequest, ApiResponse } from '../types/index.js';
+import { pdfService } from '../services/pdfService.js';
+import { smsService } from '../services/smsService.js';
+import { paymentService } from '../services/paymentService.js';
 
 /**
  * Invoice Controller

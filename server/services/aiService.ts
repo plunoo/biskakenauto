@@ -1,5 +1,5 @@
 import OpenAI from 'openai';
-import { AIDiagnosis, AIInsight } from '../types';
+import { AIDiagnosis, AIInsight } from '../types/index.js';
 
 /**
  * AI Service using OpenAI GPT-4

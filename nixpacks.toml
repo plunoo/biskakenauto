@@ -15,23 +15,23 @@ nixPkgs = ["nodejs_20", "postgresql", "curl", "bash", "coreutils"]
 [phases.install]
 cmds = [
     "echo '📦 Installing unified application dependencies...'",
-    "npm install --prefer-offline --no-audit --include=dev",
+    "npm ci --include=dev",
     "echo '🔧 Fixing Rollup native dependencies issue...'",
     "npm install @rollup/rollup-linux-x64-gnu --save-optional",
     "npm rebuild"
 ]
-cacheDirectories = ["node_modules"]
 
 # Unified build phase - Everything in one go
 [phases.build]
 cmds = [
+    "echo '🔧 Ensuring Rollup dependencies are available...'",
+    "npm install @rollup/rollup-linux-x64-gnu --save-optional",
     "echo '🔧 Generating Prisma client...'",
     "npx prisma generate",
     "echo '🏗️  Building complete application (frontend + backend)...'",
     "npm run build",
     "echo '✅ Unified build completed successfully!'"
 ]
-cacheDirectories = ["dist", "public", "node_modules/.prisma"]
 
 # Single start command for unified application
 [start]

@@ -1,6 +1,6 @@
 import { Response } from 'express';
-import { prisma } from '../utils/prisma';
-import { AuthRequest, ApiResponse, Customer, CustomerQuery } from '../types';
+import { prisma } from '../utils/prisma.js';
+import { AuthRequest, ApiResponse, Customer, CustomerQuery } from '../types/index.js';
 
 /**
  * Customer Controller

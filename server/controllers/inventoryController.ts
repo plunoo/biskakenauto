@@ -1,7 +1,7 @@
 import { Response } from 'express';
-import { prisma } from '../utils/prisma';
-import { AuthRequest, ApiResponse, InventoryQuery } from '../types';
-import { aiService } from '../services/aiService';
+import { prisma } from '../utils/prisma.js';
+import { AuthRequest, ApiResponse, InventoryQuery } from '../types/index.js';
+import { aiService } from '../services/aiService.js';
 
 /**
  * Inventory Controller

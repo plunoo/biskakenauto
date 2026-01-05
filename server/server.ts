@@ -7,27 +7,27 @@ import path from 'path';
 dotenv.config();
 
 // Import middleware
-import { errorHandler, notFound, asyncHandler } from './middleware/errorHandler';
-import { authenticate, optionalAuth } from './middleware/auth';
+import { errorHandler, notFound, asyncHandler } from './middleware/errorHandler.js';
+import { authenticate, optionalAuth } from './middleware/auth.js';
 
 // Import routes
-import authRoutes from './routes/authRoutes';
-import customerRoutes from './routes/customerRoutes';
-import jobRoutes from './routes/jobRoutes';
-import inventoryRoutes from './routes/inventoryRoutes';
-import invoiceRoutes from './routes/invoiceRoutes';
-import reportRoutes from './routes/reportRoutes';
-import userRoutes from './routes/userRoutes';
+import authRoutes from './routes/authRoutes.js';
+import customerRoutes from './routes/customerRoutes.js';
+import jobRoutes from './routes/jobRoutes.js';
+import inventoryRoutes from './routes/inventoryRoutes.js';
+import invoiceRoutes from './routes/invoiceRoutes.js';
+import reportRoutes from './routes/reportRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 
 // Import services
-import { paymentService } from './services/paymentService';
-import { smsService } from './services/smsService';
-import { aiService } from './services/aiService';
-import { pdfService } from './services/pdfService';
-import { prisma } from './utils/prisma';
+import { paymentService } from './services/paymentService.js';
+import { smsService } from './services/smsService.js';
+import { aiService } from './services/aiService.js';
+import { pdfService } from './services/pdfService.js';
+import { prisma } from './utils/prisma.js';
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = parseInt(process.env.PORT || '5000', 10);
 
 // Trust proxy for proper IP detection (important for rate limiting, etc.)
 app.set('trust proxy', 1);

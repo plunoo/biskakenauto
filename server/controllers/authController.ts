@@ -1,8 +1,8 @@
 import { Response } from 'express';
 import bcrypt from 'bcryptjs';
 import jwt, { SignOptions } from 'jsonwebtoken';
-import { prisma } from '../utils/prisma';
-import { AuthRequest, ApiResponse, LoginCredentials, RegisterData, UserRole } from '../types';
+import { prisma } from '../utils/prisma.js';
+import { AuthRequest, ApiResponse, LoginCredentials, RegisterData, UserRole } from '../types/index.js';
 
 /**
  * Authentication Controller

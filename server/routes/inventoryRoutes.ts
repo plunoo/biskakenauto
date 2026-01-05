@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { inventoryController } from '../controllers/inventoryController';
-import { authenticate, authorize } from '../middleware/auth';
-import { validate, schemas } from '../middleware/validation';
-import { asyncHandler } from '../middleware/errorHandler';
+import { inventoryController } from '../controllers/inventoryController.js';
+import { authenticate, authorize } from '../middleware/auth.js';
+import { validate, schemas } from '../middleware/validation.js';
+import { asyncHandler } from '../middleware/errorHandler.js';
 
 const router = Router();
 

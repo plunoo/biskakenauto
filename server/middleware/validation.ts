@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
-import { ApiResponse } from '../types';
+import { ApiResponse } from '../types/index.js';
 
 /**
  * Generic validation middleware factory

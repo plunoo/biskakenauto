@@ -1,6 +1,6 @@
 import { Response } from 'express';
-import { prisma } from '../utils/prisma';
-import { AuthRequest, ApiResponse, JobQuery } from '../types';
+import { prisma } from '../utils/prisma.js';
+import { AuthRequest, ApiResponse, JobQuery } from '../types/index.js';
 
 /**
  * Job Controller

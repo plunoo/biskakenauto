@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import { jobController } from '../controllers/jobController';
-import { authenticate, authorize } from '../middleware/auth';
-import { validate, schemas } from '../middleware/validation';
-import { asyncHandler } from '../middleware/errorHandler';
-import { aiService } from '../services/aiService';
+import { jobController } from '../controllers/jobController.js';
+import { authenticate, authorize } from '../middleware/auth.js';
+import { validate, schemas } from '../middleware/validation.js';
+import { asyncHandler } from '../middleware/errorHandler.js';
+import { aiService } from '../services/aiService.js';
 import { Response } from 'express';
-import { AuthRequest, ApiResponse } from '../types';
+import { AuthRequest, ApiResponse } from '../types/index.js';
 
 const router = Router();
 

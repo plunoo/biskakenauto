@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import { authenticate, authorize } from '../middleware/auth';
-import { validate, schemas } from '../middleware/validation';
-import { asyncHandler } from '../middleware/errorHandler';
-import { prisma } from '../utils/prisma';
-import { AuthRequest, ApiResponse, UserRole } from '../types';
+import { authenticate, authorize } from '../middleware/auth.js';
+import { validate, schemas } from '../middleware/validation.js';
+import { asyncHandler } from '../middleware/errorHandler.js';
+import { prisma } from '../utils/prisma.js';
+import { AuthRequest, ApiResponse, UserRole } from '../types/index.js';
 import { Response } from 'express';
 import bcrypt from 'bcryptjs';
 

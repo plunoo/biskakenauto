@@ -1,7 +1,7 @@
 import { Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { prisma } from '../utils/prisma';
-import { AuthRequest, JWTPayload, ApiResponse } from '../types';
+import { prisma } from '../utils/prisma.js';
+import { AuthRequest, JWTPayload, ApiResponse } from '../types/index.js';
 
 /**
  * Authentication middleware - Verifies JWT token and adds user to request

@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import { customerController } from '../controllers/customerController';
-import { authenticate, authorize } from '../middleware/auth';
-import { validate, schemas } from '../middleware/validation';
-import { asyncHandler } from '../middleware/errorHandler';
+import { customerController } from '../controllers/customerController.js';
+import { authenticate, authorize } from '../middleware/auth.js';
+import { validate, schemas } from '../middleware/validation.js';
+import { asyncHandler } from '../middleware/errorHandler.js';
 
 const router = Router();
 
