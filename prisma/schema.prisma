@@ -5,49 +5,11 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider = "sqlite"
+  url      = "file:./dev.db"
 }
 
-enum UserRole {
-  ADMIN
-  SUB_ADMIN
-  STAFF
-}
-
-enum UserStatus {
-  ACTIVE
-  INACTIVE
-}
-
-enum JobStatus {
-  PENDING
-  IN_PROGRESS
-  COMPLETED
-  CANCELLED
-}
-
-enum JobPriority {
-  LOW
-  MEDIUM
-  HIGH
-}
-
-enum InvoiceStatus {
-  DRAFT
-  SENT
-  PAID
-  OVERDUE
-  CANCELLED
-}
-
-enum PaymentMethod {
-  CASH
-  MOBILE_MONEY
-  CARD
-  BANK_TRANSFER
-  USDT
-}
+// SQLite-compatible enums as String fields
 
 model User {
   id            String      @id @default(uuid())
@@ -55,8 +17,8 @@ model User {
   phone         String?     @unique
   password      String
   name          String
-  role          UserRole    @default(STAFF)
-  status        UserStatus  @default(ACTIVE)
+  role          String      @default("STAFF")
+  status        String      @default("ACTIVE")
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
   
@@ -109,8 +71,8 @@ model Job {
   complaint           String
   diagnosis           String?
   aiDiagnosis         String?     // Store AI diagnosis results as JSON string
-  status              JobStatus   @default(PENDING)
-  priority            JobPriority @default(MEDIUM)
+  status              String      @default("PENDING")
+  priority            String      @default("MEDIUM")
   assignedTo          String?
   laborHours          Float?
   laborRate           Float?
@@ -177,8 +139,8 @@ model Invoice {
   tax           Float          @default(0)
   discount      Float          @default(0)
   total         Float
-  status        InvoiceStatus  @default(DRAFT)
-  paymentMethod PaymentMethod?
+  status        String         @default("DRAFT")
+  paymentMethod String?
   paymentDate   DateTime?
   paymentRef    String?
   notes         String?

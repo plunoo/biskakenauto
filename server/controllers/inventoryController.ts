@@ -21,7 +21,7 @@ export const inventoryController = {
       const where: any = {};
       
       if (category) {
-        where.category = { contains: category, mode: 'insensitive' };
+        where.category = { contains: category };
       }
 
       if (lowStock === 'true') {
@@ -168,7 +168,7 @@ export const inventoryController = {
       // Check if part with same name already exists
       const existingPart = await prisma.inventory.findFirst({
         where: {
-          partName: { equals: partName, mode: 'insensitive' }
+          partName: { equals: partName }
         }
       });
 
@@ -266,7 +266,7 @@ export const inventoryController = {
       if (updateData.partName && updateData.partName !== existingItem.partName) {
         const nameConflict = await prisma.inventory.findFirst({
           where: {
-            partName: { equals: updateData.partName, mode: 'insensitive' },
+            partName: { equals: updateData.partName },
             id: { not: id }
           }
         });

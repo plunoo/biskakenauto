@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "vite",
     "build:frontend": "vite build",
-    "build:backend": "echo 'Using pre-compiled backend from biskaken-auto-api/dist'",
+    "build:backend": "npx tsc --project server/tsconfig.json",
     "build": "npm run build:frontend && npm run build:backend && mkdir -p public && cp -r dist/* public/",
     "start": "node dist/server.js",
     "preview": "vite preview",

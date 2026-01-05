@@ -7,9 +7,9 @@ PORT = "5000"
 NODE_VERSION = "20"
 NPM_CONFIG_CACHE = "/tmp/.npm"
 
-# Install system packages including PostgreSQL client
+# Install system packages 
 [phases.setup]
-nixPkgs = ["nodejs_20", "postgresql", "curl", "bash", "coreutils"]
+nixPkgs = ["nodejs_20", "curl", "bash", "coreutils"]
 
 # Single install phase for all dependencies
 [phases.install]
@@ -33,6 +33,6 @@ cmds = [
     "echo '✅ Unified build completed successfully!'"
 ]
 
-# Single start command for unified application
+# Single start command for unified application with embedded SQLite
 [start]
-cmd = "echo '🚀 Starting Biskaken Auto Unified Application...' && echo '⏳ Waiting for database connection...' && until pg_isready -h ${DATABASE_HOST:-localhost} -p ${DATABASE_PORT:-5432} -U ${DATABASE_USER:-postgres} -q 2>/dev/null; do echo 'Database not ready, retrying in 3s...'; sleep 3; done && echo '✅ Database connected successfully' && echo '🔄 Running database migrations...' && npx prisma migrate deploy && echo '🌱 Seeding database...' && (npm run db:seed 2>/dev/null || echo 'Seeding completed or skipped') && echo '🌟 Starting unified server...' && echo '🔐 Admin: admin@biskaken.com / admin123' && npm start"
+cmd = "echo '🚀 Starting Biskaken Auto Unified Application...' && echo '🔄 Running database migrations...' && npx prisma migrate deploy && echo '🌱 Seeding database...' && (npm run db:seed 2>/dev/null || echo 'Seeding completed or skipped') && echo '🌟 Starting unified server...' && echo '🔐 Admin: admin@biskaken.com / admin123' && npm start"

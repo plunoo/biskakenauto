@@ -20,16 +20,16 @@ export const customerController = {
       const where: any = {};
       if (search) {
         where.OR = [
-          { name: { contains: search, mode: 'insensitive' } },
+          { name: { contains: search } },
           { phone: { contains: search } },
-          { email: { contains: search, mode: 'insensitive' } },
+          { email: { contains: search } },
           {
             vehicles: {
               some: {
                 OR: [
-                  { make: { contains: search, mode: 'insensitive' } },
-                  { model: { contains: search, mode: 'insensitive' } },
-                  { plateNumber: { contains: search, mode: 'insensitive' } }
+                  { make: { contains: search } },
+                  { model: { contains: search } },
+                  { plateNumber: { contains: search } }
                 ]
               }
             }
@@ -457,16 +457,16 @@ export const customerController = {
       const customers = await prisma.customer.findMany({
         where: {
           OR: [
-            { name: { contains: searchTerm, mode: 'insensitive' } },
+            { name: { contains: searchTerm } },
             { phone: { contains: searchTerm } },
-            { email: { contains: searchTerm, mode: 'insensitive' } },
+            { email: { contains: searchTerm } },
             {
               vehicles: {
                 some: {
                   OR: [
-                    { make: { contains: searchTerm, mode: 'insensitive' } },
-                    { model: { contains: searchTerm, mode: 'insensitive' } },
-                    { plateNumber: { contains: searchTerm, mode: 'insensitive' } }
+                    { make: { contains: searchTerm } },
+                    { model: { contains: searchTerm } },
+                    { plateNumber: { contains: searchTerm } }
                   ]
                 }
               }

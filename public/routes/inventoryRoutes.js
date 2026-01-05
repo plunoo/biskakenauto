@@ -1,0 +1,17 @@
+import { Router } from 'express';
+import { inventoryController } from '../controllers/inventoryController.js';
+import { authenticate, authorize } from '../middleware/auth.js';
+import { validate, schemas } from '../middleware/validation.js';
+import { asyncHandler } from '../middleware/errorHandler.js';
+const router = Router();
+router.use(authenticate);
+router.get('/', validate(schemas.pagination), asyncHandler(inventoryController.list));
+router.get('/low-stock', asyncHandler(inventoryController.getLowStock));
+router.get('/usage', asyncHandler(inventoryController.getUsageReport));
+router.post('/', authorize('ADMIN', 'SUB_ADMIN'), validate(schemas.createInventoryItem), asyncHandler(inventoryController.create));
+router.get('/:id', validate(schemas.uuidParam), asyncHandler(inventoryController.getById));
+router.put('/:id', authorize('ADMIN', 'SUB_ADMIN'), validate(schemas.updateInventoryItem), asyncHandler(inventoryController.update));
+router.post('/:id/adjust-stock', authorize('ADMIN', 'SUB_ADMIN'), validate(schemas.uuidParam), asyncHandler(inventoryController.updateStock));
+router.get('/:id/ai-predict', authorize('ADMIN', 'SUB_ADMIN'), validate(schemas.uuidParam), asyncHandler(inventoryController.getAIPrediction));
+router.delete('/:id', authorize('ADMIN'), validate(schemas.uuidParam), asyncHandler(inventoryController.delete));
+export default router;
