@@ -1,7 +1,0 @@
-{
-  "name": "Biskaken Auto Shop Management",
-  "description": "A comprehensive, role-based management system for auto repair shops featuring AI-powered diagnosis, inventory prediction, and financial reporting.",
-  "requestFramePermissions": [
-    "microphone"
-  ]
-}
