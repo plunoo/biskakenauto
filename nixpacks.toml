@@ -2,14 +2,15 @@
 [variables]
 NODE_ENV = "production"
 NODE_VERSION = "20"
+PORT = "80"
 
 [phases.setup]
-nixPkgs = ["nodejs_20"]
+nixPkgs = ["nodejs_20", "caddy"]
 
 [phases.install]
 cmds = [
     "echo '📦 Installing frontend dependencies...'",
-    "npm ci --omit=dev",
+    "npm install",
     "echo '🔧 Installing Rollup native dependencies for Linux...'",
     "npm install @rollup/rollup-linux-x64-gnu --save-optional"
 ]
@@ -17,8 +18,10 @@ cmds = [
 [phases.build]
 cmds = [
     "echo '🏗️ Building static frontend...'",
-    "npm run build:frontend"
+    "npm run build:frontend",
+    "echo '📁 Verifying dist directory...'",
+    "ls -la dist/"
 ]
 
 [start]
-cmd = "echo '🚀 Starting Express static server...' && npm start"
+cmd = "echo '🚀 Starting Caddy web server on port 80...' && caddy run --config /app/Caddyfile --adapter caddyfile"
