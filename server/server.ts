@@ -109,12 +109,13 @@ app.use(cors(corsOptions));
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Root endpoint
+// Root endpoint - Simple status without database
 app.get('/', (req, res) => {
   res.json({ 
     message: '🚀 Biskaken Auto Services API',
     status: 'running',
     version: '1.0.0',
+    timestamp: new Date().toISOString(),
     endpoints: {
       health: '/health',
       auth: '/api/auth/*',
@@ -911,20 +912,25 @@ app.post('/api/callbacks/mobile-money',
   })
 );
 
-// Serve static files in production
-if (process.env.NODE_ENV === 'production') {
-  // Serve static files from the built frontend
-  app.use(express.static(path.join(__dirname, '../public')));
-  
-  // Handle React Router routes - send all non-API requests to index.html
-  app.get('*', (req, res, next) => {
-    // Skip API routes
-    if (req.path.startsWith('/api/')) {
-      return next();
+// Serve static files from the built frontend (always serve in deployment)
+console.log('📁 Serving static files from:', path.join(__dirname, '../public'));
+app.use(express.static(path.join(__dirname, '../public')));
+
+// Handle React Router routes - send all non-API requests to index.html
+app.get('*', (req, res, next) => {
+  // Skip API routes
+  if (req.path.startsWith('/api/')) {
+    return next();
+  }
+  const indexPath = path.join(__dirname, '../public/index.html');
+  console.log('📄 Serving index.html from:', indexPath);
+  res.sendFile(indexPath, (err) => {
+    if (err) {
+      console.error('❌ Error serving index.html:', err);
+      res.status(500).send('Unable to serve application');
     }
-    res.sendFile(path.join(__dirname, '../public/index.html'));
   });
-}
+});
 
 // Catch-all for unmatched API routes (must be last)
 app.use('/api', (req, res) => {

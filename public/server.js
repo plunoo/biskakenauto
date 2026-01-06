@@ -80,6 +80,7 @@ app.get('/', (req, res) => {
         message: '🚀 Biskaken Auto Services API',
         status: 'running',
         version: '1.0.0',
+        timestamp: new Date().toISOString(),
         endpoints: {
             health: '/health',
             auth: '/api/auth/*',
@@ -751,15 +752,21 @@ app.post('/api/callbacks/mobile-money', asyncHandler(async (req, res) => {
         res.status(500).json({ error: 'Callback processing failed' });
     }
 }));
-if (process.env.NODE_ENV === 'production') {
-    app.use(express.static(path.join(__dirname, '../public')));
-    app.get('*', (req, res, next) => {
-        if (req.path.startsWith('/api/')) {
-            return next();
+console.log('📁 Serving static files from:', path.join(__dirname, '../public'));
+app.use(express.static(path.join(__dirname, '../public')));
+app.get('*', (req, res, next) => {
+    if (req.path.startsWith('/api/')) {
+        return next();
+    }
+    const indexPath = path.join(__dirname, '../public/index.html');
+    console.log('📄 Serving index.html from:', indexPath);
+    res.sendFile(indexPath, (err) => {
+        if (err) {
+            console.error('❌ Error serving index.html:', err);
+            res.status(500).send('Unable to serve application');
         }
-        res.sendFile(path.join(__dirname, '../public/index.html'));
     });
-}
+});
 app.use('/api', (req, res) => {
     res.status(404).json({
         success: false,

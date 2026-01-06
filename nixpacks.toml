@@ -35,4 +35,4 @@ cmds = [
 
 # Single start command for unified application with embedded SQLite
 [start]
-cmd = "echo '🚀 Starting Biskaken Auto Unified Application...' && echo '🔄 Running database migrations...' && npx prisma migrate deploy && echo '🌱 Seeding database...' && (npm run db:seed 2>/dev/null || echo 'Seeding completed or skipped') && echo '🌟 Starting unified server...' && echo '🔐 Admin: admin@biskaken.com / admin123' && npm start"
+cmd = "echo '🚀 Starting Biskaken Auto Unified Application...' && cd /app && echo '🔄 Running database migrations...' && npx prisma migrate deploy --schema=./prisma/schema.prisma && echo '🌱 Seeding database...' && (npm run db:seed 2>/dev/null || echo 'Seeding completed or skipped') && echo '🌟 Starting unified server...' && echo '🔐 Admin: admin@biskaken.com / admin123' && npm start"
