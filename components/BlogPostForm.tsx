@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { Button, Input, Card } from './UI';
 import { apiService } from '../services/apiService';
-import { getAIInsights } from '../services/gemini';
+// import { getAIInsights } from '../services/gemini';
 
 interface BlogPost {
   id?: string;

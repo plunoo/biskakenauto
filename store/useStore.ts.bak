@@ -3,7 +3,7 @@ import { create } from 'zustand';
 import { User, Customer, Job, InventoryItem, Invoice, UserRole, JobStatus, Priority, InvoiceStatus } from '../types';
 import { MOCK_USERS } from '../constants';
 import { apiService } from '../services/apiService';
-// import { smsService } from '../services/smsService'; // Disabled for static deployment
+// import { smsService } from '../services/smsService'; // Removed for static deployment
 
 interface Notification {
   id: string;
@@ -346,9 +346,26 @@ export const useStore = create<AppState>((set, get) => ({
       userName: updatedState.user?.name
     });
 
-    // SMS notification disabled for static deployment
+    // Send SMS notification to customer when new job is created
     if (customer && customer.phone) {
-      console.log('📱 Would send SMS to:', customer.phone, 'for job:', job.id);
+      const vehicleInfo = `${customer.vehicle.make} ${customer.vehicle.model} (${customer.vehicle.plateNumber})`;
+      const message = `Hello ${customer.name}, we've received your vehicle (${vehicleInfo}) for repair. Job ID: ${job.id}. We'll keep you updated on the progress. - Biskaken Auto`;
+      
+      // smsService.sendSMS({
+        to: customer.phone,
+        message,
+        type: 'job_update',
+        jobId: job.id
+      }).then(result => {
+        if (result.success) {
+          console.log('✅ Job creation SMS sent successfully:', result.messageId);
+        } else {
+          console.error('❌ Failed to send job creation SMS:', result.error);
+        }
+      }).catch(error => {
+        console.error('❌ SMS error:', error);
+        // SMS error logged to console
+      });
     }
   },
   updateJob: (jobId, updates) => set((state) => ({
@@ -371,9 +388,22 @@ export const useStore = create<AppState>((set, get) => ({
       userName: updatedState.user?.name
     });
 
-    // SMS notification disabled for static deployment
+    // Send SMS notification to customer when status changes
     if (job && customer && customer.phone) {
-      console.log('📱 Would send SMS status update to:', customer.phone, status);
+      const vehicleInfo = `${customer.vehicle.make} ${customer.vehicle.model} (${customer.vehicle.plateNumber})`;
+      // smsService.sendJobStatusUpdate(
+        customer.phone,
+        customer.name,
+        jobId,
+        status,
+        vehicleInfo
+      ).then(result => {
+        if (result.success) {
+          console.log('✅ SMS sent successfully:', result.messageId);
+        } else {
+          console.error('❌ SMS failed:', result.error);
+        }
+      });
     }
   },
   deleteJob: (jobId) => set((state) => ({
@@ -483,9 +513,20 @@ export const useStore = create<AppState>((set, get) => ({
       userName: updatedState.user?.name
     });
     
-    // SMS notification disabled for static deployment
+    // Send SMS confirmation to customer
     if (customer && customer.phone) {
-      console.log('📱 Would send payment confirmation SMS to:', customer.phone);
+      // smsService.sendPaymentConfirmation(
+        customer.phone,
+        customer.name,
+        payment.amount,
+        payment.method
+      ).then(result => {
+        if (result.success) {
+          console.log('✅ Payment SMS sent successfully:', result.messageId);
+        } else {
+          console.error('❌ Payment SMS failed:', result.error);
+        }
+      });
     }
 
   },

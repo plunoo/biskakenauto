@@ -31,8 +31,7 @@ export default defineConfig(({ mode }) => {
             manualChunks: {
               vendor: ['react', 'react-dom', 'react-router-dom'],
               ui: ['lucide-react', 'zustand'],
-              charts: ['recharts'],
-              ai: ['@google/genai']
+              charts: ['recharts']
             }
           }
         }

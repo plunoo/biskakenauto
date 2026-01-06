@@ -15,7 +15,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { JobStatus, Priority, Job, AIDiagnosis } from '../types';
-import { getAIDiagnosis } from '../services/gemini';
+// import { getAIDiagnosis } from '../services/gemini';
 
 const StatusBadge = ({ status }: { status: JobStatus }) => {
   const config = {

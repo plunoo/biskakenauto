@@ -1,38 +1,22 @@
-# Biskaken Auto Shop Management - Unified Production Build
-# Single application with frontend + backend + database in one deployment
-
+# Static Frontend Deployment for Biskaken Auto Landing Page + Blog
 [variables]
 NODE_ENV = "production"
-PORT = "5000"
 NODE_VERSION = "20"
-NPM_CONFIG_CACHE = "/tmp/.npm"
 
-# Install system packages 
 [phases.setup]
-nixPkgs = ["nodejs_20", "curl", "bash", "coreutils"]
+nixPkgs = ["nodejs_20"]
 
-# Single install phase for all dependencies
 [phases.install]
 cmds = [
-    "echo '📦 Installing unified application dependencies...'",
-    "npm ci --include=dev",
-    "echo '🔧 Fixing Rollup native dependencies issue...'",
-    "npm install @rollup/rollup-linux-x64-gnu --save-optional",
-    "npm rebuild"
+    "echo '📦 Installing frontend dependencies...'",
+    "npm ci --omit=dev"
 ]
 
-# Unified build phase - Everything in one go
 [phases.build]
 cmds = [
-    "echo '🔧 Ensuring Rollup dependencies are available...'",
-    "npm install @rollup/rollup-linux-x64-gnu --save-optional",
-    "echo '🔧 Generating Prisma client...'",
-    "npx prisma generate",
-    "echo '🏗️  Building complete application (frontend + backend)...'",
-    "npm run build",
-    "echo '✅ Unified build completed successfully!'"
+    "echo '🏗️ Building static frontend...'",
+    "npm run build:frontend"
 ]
 
-# Single start command for unified application with embedded SQLite
 [start]
-cmd = "echo '🚀 Starting Biskaken Auto Unified Application...' && cd /app && echo '🔄 Running database migrations...' && npx prisma migrate deploy --schema=./prisma/schema.prisma && echo '🌱 Seeding database...' && (npm run db:seed 2>/dev/null || echo 'Seeding completed or skipped') && echo '🌟 Starting unified server...' && echo '🔐 Admin: admin@biskaken.com / admin123' && npm start"
+cmd = "echo '🚀 Serving static files...' && npx serve dist -s -l 5000"
