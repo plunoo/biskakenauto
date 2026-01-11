@@ -24,6 +24,57 @@ router.get('/endpoints', (req, res) => {
   });
 });
 
+// Test admin login credentials
+router.post('/admin-login', async (req, res) => {
+  try {
+    const { pool } = require('../db/connection');
+    
+    // Check if admin user exists
+    const adminCheck = await pool.query('SELECT * FROM users WHERE email = $1', ['admin@biskaken-v3.com']);
+    
+    res.json({
+      success: true,
+      data: {
+        adminUserExists: adminCheck.rows.length > 0,
+        adminEmail: 'admin@biskaken-v3.com',
+        adminPassword: 'admin123',
+        userCount: adminCheck.rows.length,
+        message: adminCheck.rows.length > 0 ? 'Admin user found in database' : 'Admin user NOT found'
+      }
+    });
+  } catch (error) {
+    res.json({
+      success: false,
+      error: error.message,
+      message: 'Database query failed'
+    });
+  }
+});
+
+// Test database connection
+router.get('/db-status', async (req, res) => {
+  try {
+    const { pool } = require('../db/connection');
+    const result = await pool.query('SELECT NOW() as current_time, COUNT(*) as user_count FROM users');
+    
+    res.json({
+      success: true,
+      data: {
+        database_connected: true,
+        current_time: result.rows[0].current_time,
+        total_users: result.rows[0].user_count,
+        message: 'Database connection successful'
+      }
+    });
+  } catch (error) {
+    res.json({
+      success: false,
+      error: error.message,
+      message: 'Database connection failed'
+    });
+  }
+});
+
 // Test customers endpoint
 router.get('/customers', (req, res) => {
   res.json({
