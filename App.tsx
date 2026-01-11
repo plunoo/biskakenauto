@@ -12,6 +12,7 @@ import JobsPageUITest from './pages/JobsPageUITest';
 import JobsPageUIBugTest from './pages/JobsPageUIBugTest';
 import JobsPageFixed from './pages/JobsPageFixed';
 import InventoryPageFixed from './pages/InventoryPageFixed';
+import BlogManagementPageFixed from './pages/BlogManagementPageFixed';
 import CustomersPage from './pages/CustomersPage';
 import InventoryPage from './pages/InventoryPage';
 import InvoicesPage from './pages/InvoicesPage';
@@ -79,13 +80,9 @@ const App: React.FC = () => {
           )
         } />
         <Route path="/blog" element={
-          user ? (
-            <Layout>
-              <BlogManagementPage />
-            </Layout>
-          ) : (
-            <Navigate to="/login" />
-          )
+          <Layout>
+            <BlogManagementPageFixed />
+          </Layout>
         } />
         <Route path="/reports" element={
           user ? (
