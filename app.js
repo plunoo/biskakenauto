@@ -209,7 +209,9 @@ app.use((req, res) => {
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, '0.0.0.0', () => {
-  console.log(`🚀 Biskaken Auto API v3 running on port ${PORT}`);
+  console.log(`🚀 Biskaken Auto API v3.2 running on port ${PORT}`);
+  console.log(`📅 Deployment time: ${new Date().toISOString()}`);
+  console.log(`🌐 Available at: http://0.0.0.0:${PORT}`);
 });
 
 module.exports = app;
