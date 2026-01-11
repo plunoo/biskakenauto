@@ -1,17 +1,26 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
-const pool = new Pool({
-  host: process.env.DB_HOST || 'localhost',
-  port: process.env.DB_PORT || 5432,
+// Database configuration with fallbacks
+const dbConfig = {
+  host: process.env.DB_HOST || 'postgres',
+  port: parseInt(process.env.DB_PORT) || 5432,
   database: process.env.DB_NAME || 'biskaken_auto',
   user: process.env.DB_USER || 'postgres',
-  password: process.env.DB_PASSWORD || 'password',
+  password: process.env.DB_PASSWORD,
   ssl: process.env.DB_SSL === 'true' ? { rejectUnauthorized: false } : false,
   max: 20,
   idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
+  connectionTimeoutMillis: 5000,
+};
+
+// Log configuration (without password)
+console.log('🔧 Database configuration:', {
+  ...dbConfig,
+  password: dbConfig.password ? '[SET]' : '[NOT SET]'
 });
+
+const pool = new Pool(dbConfig);
 
 // Test connection
 pool.on('connect', () => {
@@ -22,10 +31,34 @@ pool.on('error', (err) => {
   console.error('❌ Database connection error:', err);
 });
 
+// Wait for database connection with retry logic
+const waitForDatabase = async (maxRetries = 10, delay = 3000) => {
+  for (let i = 0; i < maxRetries; i++) {
+    try {
+      console.log(`🔄 Attempting database connection (${i + 1}/${maxRetries})...`);
+      await pool.query('SELECT NOW()');
+      console.log('✅ Database connection successful');
+      return true;
+    } catch (error) {
+      console.log(`❌ Database connection failed (${i + 1}/${maxRetries}):`, error.message);
+      if (i < maxRetries - 1) {
+        console.log(`⏳ Waiting ${delay/1000}s before retry...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+  }
+  throw new Error('Database connection failed after all retries');
+};
+
 // Initialize database with required tables
 const initializeDatabase = async () => {
   try {
-    console.log('🔄 Initializing database tables...');
+    console.log('🔄 Initializing database...');
+    
+    // Wait for database to be ready
+    await waitForDatabase();
+    
+    console.log('🔄 Creating database tables...');
 
     // Users table
     await pool.query(`
