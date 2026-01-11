@@ -13,12 +13,13 @@ import JobsPageUIBugTest from './pages/JobsPageUIBugTest';
 import JobsPageFixed from './pages/JobsPageFixed';
 import InventoryPageFixed from './pages/InventoryPageFixed';
 import BlogManagementPageFixed from './pages/BlogManagementPageFixed';
+import BlogTestPage from './pages/BlogTestPage';
 import CustomersPage from './pages/CustomersPage';
 import InventoryPage from './pages/InventoryPage';
 import InvoicesPage from './pages/InvoicesPage';
 import BlogPage from './pages/BlogPage';
 import BlogManagementPage from './pages/BlogManagementPage';
-import ReportsPage from './pages/ReportsPage';
+import ReportsPageFixed from './pages/ReportsPageFixed';
 import AdminPage from './pages/AdminPage';
 import SettingsPage from './pages/SettingsPage';
 import { useStore } from './store/useStore';
@@ -84,14 +85,15 @@ const App: React.FC = () => {
             <BlogManagementPageFixed />
           </Layout>
         } />
+        <Route path="/blog-test" element={
+          <Layout>
+            <BlogTestPage />
+          </Layout>
+        } />
         <Route path="/reports" element={
-          user ? (
-            <Layout>
-              <ReportsPage />
-            </Layout>
-          ) : (
-            <Navigate to="/login" />
-          )
+          <Layout>
+            <ReportsPageFixed />
+          </Layout>
         } />
         <Route path="/admin" element={
           user?.role === 'ADMIN' ? (

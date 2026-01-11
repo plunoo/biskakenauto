@@ -36,6 +36,8 @@ const BlogManagementPageFixed: React.FC = () => {
   const [imagePrompt, setImagePrompt] = useState('');
   const [uploadedImage, setUploadedImage] = useState<string | null>(null);
   const [showImageOptions, setShowImageOptions] = useState(false);
+  const [showCustomImageInput, setShowCustomImageInput] = useState(false);
+  const [customImageUrl, setCustomImageUrl] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Mock blog posts for demo
@@ -141,6 +143,15 @@ By following these guidelines for ${topic}, you'll ensure your vehicle remains r
     }
   };
 
+  const handleCustomImageUrl = () => {
+    if (!customImageUrl.trim()) return;
+    
+    setUploadedImage(customImageUrl);
+    setCurrentPost(prev => prev ? {...prev, image: customImageUrl} : null);
+    setShowCustomImageInput(false);
+    setCustomImageUrl('');
+  };
+
   const publishPost = () => {
     if (!currentPost || !currentPost.title || !currentPost.content) return;
     
@@ -161,6 +172,8 @@ By following these guidelines for ${topic}, you'll ensure your vehicle remains r
     setUploadedImage(null);
     setImagePrompt('');
     setShowImageOptions(false);
+    setShowCustomImageInput(false);
+    setCustomImageUrl('');
   };
 
   const deletePost = (postId: string) => {
@@ -201,11 +214,74 @@ By following these guidelines for ${topic}, you'll ensure your vehicle remains r
               onChange={(e) => setTopic(e.target.value)}
             />
           </div>
+
+          {/* Image Options - Available Immediately */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Featured Image (Optional)</label>
+            
+            {uploadedImage ? (
+              <div className="relative">
+                <img 
+                  src={uploadedImage} 
+                  alt="Featured" 
+                  className="w-full h-48 object-cover rounded-lg border"
+                />
+                <button
+                  onClick={() => {
+                    setUploadedImage(null);
+                    setCurrentPost(prev => prev ? {...prev, image: ''} : null);
+                  }}
+                  className="absolute top-2 right-2 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+            ) : (
+              <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
+                <ImageIcon className="mx-auto h-8 w-8 text-gray-400 mb-3" />
+                <p className="text-gray-500 mb-3 text-sm">Add an image for your blog post</p>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
+                  <button
+                    onClick={() => fileInputRef.current?.click()}
+                    className="bg-blue-600 text-white px-3 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 justify-center text-sm"
+                  >
+                    <Upload size={14} />
+                    Upload Image
+                  </button>
+                  
+                  <button
+                    onClick={() => setShowImageOptions(true)}
+                    className="bg-purple-600 text-white px-3 py-2 rounded-lg flex items-center gap-2 hover:bg-purple-700 justify-center text-sm"
+                  >
+                    <Sparkles size={14} />
+                    Generate with AI
+                  </button>
+
+                  <button
+                    onClick={() => setShowCustomImageInput(true)}
+                    className="bg-green-600 text-white px-3 py-2 rounded-lg flex items-center gap-2 hover:bg-green-700 justify-center text-sm"
+                  >
+                    <Plus size={14} />
+                    Custom URL
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              onChange={handleImageUpload}
+              className="hidden"
+            />
+          </div>
           
           <button
             onClick={generateBlogPost}
             disabled={!topic.trim() || isGeneratingText}
-            className="bg-purple-600 text-white px-6 py-3 rounded-lg flex items-center gap-2 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full bg-purple-600 text-white px-6 py-3 rounded-lg flex items-center gap-2 hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed justify-center"
           >
             {isGeneratingText ? (
               <>
@@ -286,10 +362,10 @@ By following these guidelines for ${topic}, you'll ensure your vehicle remains r
                   <ImageIcon className="mx-auto h-12 w-12 text-gray-400 mb-4" />
                   <p className="text-gray-500 mb-4">Add a featured image for your blog post</p>
                   
-                  <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                     <button
                       onClick={() => fileInputRef.current?.click()}
-                      className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700"
+                      className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-blue-700 justify-center"
                     >
                       <Upload size={16} />
                       Upload Image
@@ -297,10 +373,18 @@ By following these guidelines for ${topic}, you'll ensure your vehicle remains r
                     
                     <button
                       onClick={() => setShowImageOptions(true)}
-                      className="bg-purple-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-purple-700"
+                      className="bg-purple-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-purple-700 justify-center"
                     >
                       <Sparkles size={16} />
                       Generate with AI
+                    </button>
+
+                    <button
+                      onClick={() => setShowCustomImageInput(true)}
+                      className="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center gap-2 hover:bg-green-700 justify-center"
+                    >
+                      <Plus size={16} />
+                      Custom URL
                     </button>
                   </div>
                 </div>
@@ -329,6 +413,10 @@ By following these guidelines for ${topic}, you'll ensure your vehicle remains r
                 onClick={() => {
                   setCurrentPost(null);
                   setUploadedImage(null);
+                  setShowImageOptions(false);
+                  setShowCustomImageInput(false);
+                  setCustomImageUrl('');
+                  setImagePrompt('');
                 }}
                 className="bg-gray-100 text-gray-700 px-6 py-3 rounded-lg hover:bg-gray-200"
               >
@@ -398,6 +486,64 @@ By following these guidelines for ${topic}, you'll ensure your vehicle remains r
                       Generate Image
                     </>
                   )}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Custom Image URL Modal */}
+      {showCustomImageInput && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md">
+            <div className="px-6 py-4 border-b flex justify-between items-center">
+              <h3 className="text-lg font-semibold">Add Custom Image URL</h3>
+              <button
+                onClick={() => {
+                  setShowCustomImageInput(false);
+                  setCustomImageUrl('');
+                }}
+                className="p-1 text-gray-400 hover:text-gray-600"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Image URL
+                </label>
+                <input
+                  type="url"
+                  className="w-full p-3 border border-gray-300 rounded-md focus:ring-2 focus:ring-green-500 focus:border-green-500"
+                  placeholder="https://example.com/image.jpg"
+                  value={customImageUrl}
+                  onChange={(e) => setCustomImageUrl(e.target.value)}
+                />
+                <p className="text-xs text-gray-500 mt-1">
+                  Enter a direct URL to an image (jpg, png, gif, webp)
+                </p>
+              </div>
+              
+              <div className="flex gap-3">
+                <button
+                  onClick={() => {
+                    setShowCustomImageInput(false);
+                    setCustomImageUrl('');
+                  }}
+                  className="flex-1 bg-gray-100 text-gray-700 py-3 rounded-lg hover:bg-gray-200"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleCustomImageUrl}
+                  disabled={!customImageUrl.trim()}
+                  className="flex-1 bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                >
+                  <Plus size={16} />
+                  Add Image
                 </button>
               </div>
             </div>
