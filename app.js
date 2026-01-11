@@ -7,6 +7,7 @@ app.use(cors({
   origin: [
     'https://biskakenauto.rpnmore.com',
     'http://localhost:3000',
+    'https://biskakenend-biskakenback-yifz9h-abad91-168-231-117-165.traefik.me',
     /.*\.rpnmore\.com$/,
     /.*\.traefik\.me$/
   ],
@@ -18,6 +19,26 @@ app.use(express.json());
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
   next();
+});
+
+// Root endpoint
+app.get('/', (req, res) => {
+  res.json({ 
+    success: true,
+    message: 'Biskaken Auto API v3 is running!',
+    service: 'Biskaken Auto API',
+    version: '3.0.0',
+    timestamp: new Date().toISOString(),
+    endpoints: {
+      health: '/health',
+      status: '/api/status',
+      login: '/api/auth/login',
+      dashboard: '/api/test/reports/dashboard',
+      customers: '/api/test/customers',
+      jobs: '/api/test/jobs',
+      inventory: '/api/test/inventory'
+    }
+  });
 });
 
 // Health check
