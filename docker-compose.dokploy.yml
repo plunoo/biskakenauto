@@ -33,7 +33,7 @@ services:
       DB_USER: postgres
       DB_PASSWORD: ${DB_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
-      CORS_ORIGINS: https://biskakenauto.rpnmore.com,http://frontend:3000
+      CORS_ORIGINS: https://biskakenauto.rpnmore.com,http://biskakenend-biskakenback-yifz9h:5000
     depends_on:
       postgres:
         condition: service_healthy

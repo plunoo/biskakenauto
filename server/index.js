@@ -39,7 +39,7 @@ const allowedOrigins = [
   'http://localhost:3003', 
   'https://biskakenauto.rpnmore.com',
   'https://biskakenauto.rpnmore.com:3000',
-  // Dokploy internal container communication
+  // Dokploy internal container communication  
   'http://frontend:3000',
   'http://frontend',
   // Allow any internal container network

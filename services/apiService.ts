@@ -8,7 +8,7 @@ const getApiBaseUrl = () => {
   
   // Production fallback - try internal container first
   if (import.meta.env.PROD) {
-    return 'http://backend:5000';
+    return 'http://biskakenend-biskakenback-yifz9h:5000';
   }
   
   // Development fallback
