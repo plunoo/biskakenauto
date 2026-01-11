@@ -7,10 +7,10 @@ const getApiBaseUrl = () => {
     return import.meta.env.VITE_API_URL;
   }
   
-  // Dokploy external URL communication
+  // Dokploy internal container communication
   if (import.meta.env.PROD) {
-    console.log('🌐 Using external Dokploy URL');
-    return 'http://biskakenend-biskakenback-yifz9h-c4562f-168-231-117-165.traefik.me';
+    console.log('🐳 Using internal container communication');
+    return 'http://backend:5000';
   }
   
   // Development fallback

@@ -1,3 +1,6 @@
+# Standard Dokploy Deployment Configuration
+# Uses internal container networking only - no external ports
+
 version: '3.8'
 
 services:
@@ -19,7 +22,7 @@ services:
       timeout: 10s
       retries: 5
 
-  # Backend API Service
+  # Backend API Service - Internal Only
   backend:
     build: ./server
     container_name: biskaken-backend
@@ -45,7 +48,7 @@ services:
       timeout: 10s
       retries: 3
 
-  # Frontend Application
+  # Frontend Application - Externally Accessible via Dokploy
   frontend:
     build: 
       context: .
@@ -54,6 +57,7 @@ services:
     environment:
       NODE_ENV: production
       PORT: 3000
+      # Use internal container communication
       VITE_API_URL: http://backend:5000
       VITE_APP_URL: https://biskakenauto.rpnmore.com
     ports:
