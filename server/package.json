@@ -6,6 +6,8 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon index.js",
+    "start:simple": "node index.simple.js",
+    "start:dokploy": "node index.simple.js",
     "test-server": "node test-server.js",
     "build": "echo 'Build completed'",
     "test": "echo 'No tests specified'"
