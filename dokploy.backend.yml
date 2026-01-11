@@ -1,0 +1,29 @@
+# Dokploy Backend Configuration
+# Optimized for single backend service deployment
+
+version: '3.8'
+
+services:
+  backend:
+    build: ./server
+    ports:
+      - "5000:5000"
+    environment:
+      NODE_ENV: production
+      PORT: 5000
+      HOST: 0.0.0.0
+      # Database will be provided by separate Dokploy service
+      DB_HOST: ${DB_HOST}
+      DB_PORT: ${DB_PORT}
+      DB_NAME: ${DB_NAME}
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      # CORS for external access
+      CORS_ORIGINS: https://biskakenauto.rpnmore.com,http://biskakenend-biskakenback-yifz9h-c4562f-168-231-117-165.traefik.me
+    healthcheck:
+      test: ["CMD", "node", "-e", "const http = require('http'); const options = { hostname: '0.0.0.0', port: 5000, path: '/health', timeout: 5000 }; const req = http.request(options, (res) => { process.exit(res.statusCode === 200 ? 0 : 1); }); req.on('error', () => process.exit(1)); req.end();"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s

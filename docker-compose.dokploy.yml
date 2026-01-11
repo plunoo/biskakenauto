@@ -23,6 +23,8 @@ services:
   backend:
     build: ./server
     container_name: biskaken-backend
+    ports:
+      - "5000:5000"
     environment:
       NODE_ENV: production
       PORT: 5000
@@ -33,14 +35,14 @@ services:
       DB_USER: postgres
       DB_PASSWORD: ${DB_PASSWORD}
       JWT_SECRET: ${JWT_SECRET}
-      CORS_ORIGINS: https://biskakenauto.rpnmore.com,http://biskakenend-biskakenback-yifz9h:5000
+      CORS_ORIGINS: https://biskakenauto.rpnmore.com,http://biskakenend-biskakenback-yifz9h-c4562f-168-231-117-165.traefik.me
     depends_on:
       postgres:
         condition: service_healthy
     networks:
       - biskaken-network
     healthcheck:
-      test: ["CMD", "node", "-e", "const http = require('http'); const options = { hostname: 'localhost', port: 5000, path: '/health', timeout: 5000 }; const req = http.request(options, (res) => { process.exit(res.statusCode === 200 ? 0 : 1); }); req.on('error', () => process.exit(1)); req.end();"]
+      test: ["CMD", "node", "-e", "const http = require('http'); const options = { hostname: '0.0.0.0', port: 5000, path: '/health', timeout: 5000 }; const req = http.request(options, (res) => { process.exit(res.statusCode === 200 ? 0 : 1); }); req.on('error', () => process.exit(1)); req.end();"]
       interval: 30s
       timeout: 10s
       retries: 3
