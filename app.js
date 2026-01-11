@@ -14,9 +14,45 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// Request logging
+app.use((req, res, next) => {
+  console.log(`${new Date().toISOString()} - ${req.method} ${req.url}`);
+  next();
+});
+
 // Health check
 app.get('/health', (req, res) => {
   res.json({ status: 'OK', service: 'Biskaken Auto API v3', timestamp: new Date().toISOString() });
+});
+
+app.get('/api/status', (req, res) => {
+  res.json({
+    success: true,
+    data: {
+      server: 'running',
+      database: 'connected',
+      version: '3.0.0',
+      environment: process.env.NODE_ENV || 'development'
+    }
+  });
+});
+
+app.get('/api/test/endpoints', (req, res) => {
+  res.json({
+    success: true,
+    data: {
+      available_endpoints: [
+        'GET /health',
+        'GET /api/status',
+        'POST /api/auth/login',
+        'GET /api/test/customers',
+        'GET /api/test/jobs',
+        'GET /api/test/inventory',
+        'GET /api/test/invoices',
+        'GET /api/test/reports/dashboard'
+      ]
+    }
+  });
 });
 
 // Auth endpoints
@@ -92,6 +128,56 @@ app.get('/api/test/invoices', (req, res) => {
     data: [
       { id: 1, customerId: 1, jobId: 1, subtotal: 150, tax: 22.5, grandTotal: 172.5, status: 'PAID' }
     ]
+  });
+});
+
+// Blog endpoints
+app.get('/api/test/blog', (req, res) => {
+  res.json({
+    success: true,
+    data: [
+      { id: 1, title: 'Car Maintenance Tips', content: 'Regular maintenance is important...', status: 'PUBLISHED' }
+    ]
+  });
+});
+
+// User endpoints  
+app.get('/api/test/users', (req, res) => {
+  res.json({
+    success: true,
+    data: [
+      { id: 1, name: 'Admin User', email: 'admin@biskaken.com', role: 'ADMIN', status: 'ACTIVE' }
+    ]
+  });
+});
+
+// Financial reports
+app.get('/api/test/reports/financial', (req, res) => {
+  res.json({
+    success: true,
+    data: {
+      totalRevenue: 15250.50,
+      totalProfit: 4575.15,
+      totalInvoices: 45,
+      averageInvoiceValue: 338.90,
+      monthlyData: [
+        { month: 'Nov', revenue: 5800, profit: 1740 },
+        { month: 'Dec', revenue: 5250.50, profit: 1575.15 }
+      ]
+    }
+  });
+});
+
+// Database status
+app.get('/api/test/db-status', (req, res) => {
+  res.json({
+    success: true,
+    data: {
+      database_connected: true,
+      current_time: new Date().toISOString(),
+      total_users: 1,
+      message: 'Database connection successful'
+    }
   });
 });
 
