@@ -1,0 +1,13 @@
+{
+  "name": "biskaken-backend",
+  "type": "application",
+  "buildPath": "./server",
+  "dockerfile": "Dockerfile.dokploy",
+  "port": 5000,
+  "env": {
+    "NODE_ENV": "production",
+    "PORT": "5000",
+    "HOST": "0.0.0.0",
+    "CORS_ORIGINS": "https://biskakenauto.rpnmore.com"
+  }
+}
