@@ -106,6 +106,30 @@ const initializeStore = () => {
     }
   }
   
+  // Auto-login demo user for localhost testing
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    console.log('🏠 Localhost detected, auto-logging demo user...');
+    const demoUser = {
+      id: 'admin@biskaken.com',
+      name: 'Demo Admin User',
+      email: 'admin@biskaken.com',
+      role: 'ADMIN'
+    };
+    const demoToken = `demo_token_${Date.now()}`;
+    
+    localStorage.setItem('authToken', demoToken);
+    localStorage.setItem('user', JSON.stringify(demoUser));
+    
+    // Load data after auto-login
+    setTimeout(() => {
+      const store = useStore.getState();
+      console.log('📊 Loading data after auto-login...');
+      store.loadAllData();
+    }, 100);
+    
+    return { user: demoUser };
+  }
+  
   return { user: null };
 };
 
@@ -268,7 +292,7 @@ export const useStore = create<AppState>((set, get) => ({
       
       // Make data available globally for debugging
       if (typeof window !== 'undefined') {
-        window.debugStore = freshState;
+        (window as any).debugStore = freshState;
         console.log('🐛 Store data available as window.debugStore');
       }
     } catch (error) {

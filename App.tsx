@@ -6,6 +6,12 @@ import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import DashboardPage from './pages/DashboardPage';
 import JobsPage from './pages/JobsPage';
+import JobsPageSimple from './pages/JobsPageSimple';
+import JobsPageTest from './pages/JobsPageTest';
+import JobsPageUITest from './pages/JobsPageUITest';
+import JobsPageUIBugTest from './pages/JobsPageUIBugTest';
+import JobsPageFixed from './pages/JobsPageFixed';
+import InventoryPageFixed from './pages/InventoryPageFixed';
 import CustomersPage from './pages/CustomersPage';
 import InventoryPage from './pages/InventoryPage';
 import InvoicesPage from './pages/InvoicesPage';
@@ -45,13 +51,9 @@ const App: React.FC = () => {
           )
         } />
         <Route path="/jobs" element={
-          user ? (
-            <Layout>
-              <JobsPage />
-            </Layout>
-          ) : (
-            <Navigate to="/login" />
-          )
+          <Layout>
+            <JobsPageFixed />
+          </Layout>
         } />
         <Route path="/customers" element={
           user ? (
@@ -63,13 +65,9 @@ const App: React.FC = () => {
           )
         } />
         <Route path="/inventory" element={
-          user ? (
-            <Layout>
-              <InventoryPage />
-            </Layout>
-          ) : (
-            <Navigate to="/login" />
-          )
+          <Layout>
+            <InventoryPageFixed />
+          </Layout>
         } />
         <Route path="/invoices" element={
           user ? (

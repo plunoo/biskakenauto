@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Card, Badge, Button, Modal, Input } from '../components/UI';
 import { useStore } from '../store/useStore';
@@ -15,7 +14,6 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { JobStatus, Priority, Job, AIDiagnosis } from '../types';
-// import { getAIDiagnosis } from '../services/gemini';
 
 const StatusBadge = ({ status }: { status: JobStatus }) => {
   const config = {
@@ -50,7 +48,15 @@ const JobsPage: React.FC = () => {
     if (!complaint) return;
     setIsDiagnosing(true);
     try {
-      const result = await getAIDiagnosis(complaint);
+      // Mock AI diagnosis for demo
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      const result: AIDiagnosis = {
+        diagnosis: `Based on the symptoms described: "${complaint}", this appears to be a common automotive issue that requires professional inspection.`,
+        confidence: 0.85,
+        estimatedCostRange: "150-300",
+        repairTime: "2-4 hours",
+        suggestedParts: ["Diagnostic scan", "Standard parts", "Labor"]
+      };
       setDiagnosis(result);
     } finally {
       setIsDiagnosing(false);

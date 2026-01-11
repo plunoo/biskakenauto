@@ -22,8 +22,14 @@
     "zustand": "^5.0.9"
   },
   "devDependencies": {
+    "@playwright/test": "^1.57.0",
     "@types/node": "^22.14.0",
-    "typescript": "~5.8.2"
+    "@types/supertest": "^6.0.3",
+    "@vitest/ui": "^4.0.16",
+    "playwright": "^1.57.0",
+    "supertest": "^7.2.2",
+    "typescript": "~5.8.2",
+    "vitest": "^4.0.16"
   },
   "optionalDependencies": {
     "@rollup/rollup-linux-x64-gnu": "^4.30.0"
