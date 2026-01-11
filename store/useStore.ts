@@ -108,14 +108,24 @@ const initializeStore = () => {
   
   // Auto-login demo user for localhost testing
   if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-    console.log('🏠 Localhost detected, auto-logging demo user...');
+    console.log('🏠 Localhost detected, auto-logging v3 demo user...');
+    
+    // Clear old data stack
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('user');
+    localStorage.removeItem('demo_customers');
+    localStorage.removeItem('demo_jobs');
+    localStorage.removeItem('demo_inventory');
+    localStorage.removeItem('demo_invoices');
+    localStorage.removeItem('demo_reports');
+    
     const demoUser = {
-      id: 'admin@biskaken.com',
-      name: 'Demo Admin User',
-      email: 'admin@biskaken.com',
+      id: 'admin@biskaken-v3.com',
+      name: 'Admin V3 User',
+      email: 'admin@biskaken-v3.com',
       role: 'ADMIN'
     };
-    const demoToken = `demo_token_${Date.now()}`;
+    const demoToken = `v3_demo_token_${Date.now()}`;
     
     localStorage.setItem('authToken', demoToken);
     localStorage.setItem('user', JSON.stringify(demoUser));

@@ -1,5 +1,21 @@
 // API service to connect frontend with backend
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+// Supports both internal container communication and external URLs
+const getApiBaseUrl = () => {
+  // Check if we're in a Dokploy container environment
+  if (import.meta.env.VITE_API_URL) {
+    return import.meta.env.VITE_API_URL;
+  }
+  
+  // Production fallback - try internal container first
+  if (import.meta.env.PROD) {
+    return 'http://backend:5000';
+  }
+  
+  // Development fallback
+  return 'http://localhost:5000';
+};
+
+const API_BASE_URL = getApiBaseUrl();
 
 class ApiService {
   private async request(endpoint: string, options: RequestInit = {}) {

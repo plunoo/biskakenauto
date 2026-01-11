@@ -4,7 +4,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { Layout } from './components/Layout';
 import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
-import DashboardPage from './pages/DashboardPage';
+import DashboardPageFixed from './pages/DashboardPageFixed';
 import JobsPage from './pages/JobsPage';
 import JobsPageSimple from './pages/JobsPageSimple';
 import JobsPageTest from './pages/JobsPageTest';
@@ -46,7 +46,7 @@ const App: React.FC = () => {
         <Route path="/dashboard" element={
           user ? (
             <Layout>
-              <DashboardPage />
+              <DashboardPageFixed />
             </Layout>
           ) : (
             <Navigate to="/login" />
