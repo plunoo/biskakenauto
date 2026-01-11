@@ -6,9 +6,9 @@ const getApiBaseUrl = () => {
     return import.meta.env.VITE_API_URL;
   }
   
-  // Production fallback - try internal container first
+  // Production fallback - try external Dokploy URL first, then internal container
   if (import.meta.env.PROD) {
-    return 'http://biskakenend-biskakenback-yifz9h:5000';
+    return 'http://biskakenend-biskakenback-yifz9h-c4562f-168-231-117-165.traefik.me';
   }
   
   // Development fallback

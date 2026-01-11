@@ -39,13 +39,17 @@ const allowedOrigins = [
   'http://localhost:3003', 
   'https://biskakenauto.rpnmore.com',
   'https://biskakenauto.rpnmore.com:3000',
+  // Dokploy backend external URL
+  'http://biskakenend-biskakenback-yifz9h-c4562f-168-231-117-165.traefik.me',
+  'https://biskakenend-biskakenback-yifz9h-c4562f-168-231-117-165.traefik.me',
   // Dokploy internal container communication  
   'http://frontend:3000',
   'http://frontend',
   // Allow any internal container network
   /^http:\/\/.*\.internal$/,
   /^http:\/\/frontend/,
-  /^http:\/\/.*:3000$/
+  /^http:\/\/.*:3000$/,
+  /^https?:\/\/.*\.traefik\.me$/
 ];
 
 // Add custom origins from environment
