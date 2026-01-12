@@ -12,6 +12,7 @@ import BlogManagementPage from './pages/BlogManagementPage';
 import ReportsPageFixed from './pages/ReportsPageFixed';
 import AdminPage from './pages/AdminPage';
 import SettingsPage from './pages/SettingsPage';
+import LandingPage from './pages/LandingPage';
 import { useStore } from './store/useStore';
 
 // Placeholder Pages for Demonstration
@@ -25,9 +26,21 @@ const PlaceholderPage = ({ title }: { title: string }) => (
 const App: React.FC = () => {
   const { user } = useStore();
 
+  // Determine if we're on the admin domain or main domain
+  const isAdminDomain = () => {
+    if (typeof window !== 'undefined') {
+      const hostname = window.location.hostname;
+      return hostname.includes('bisadmin') || hostname.includes('admin') || hostname.includes('localhost');
+    }
+    return false;
+  };
+
   return (
     <Router>
       <Routes>
+        {/* Landing page for main domain */}
+        <Route path="/landing" element={<LandingPage />} />
+        
         {/* Login route */}
         <Route path="/login" element={!user ? <LoginPage /> : <Navigate to="/dashboard" />} />
         
@@ -114,8 +127,12 @@ const App: React.FC = () => {
           )
         } />
         
-        {/* Default redirect */}
-        <Route path="/" element={user ? <Navigate to="/dashboard" /> : <Navigate to="/login" />} />
+        {/* Default redirect - route based on domain */}
+        <Route path="/" element={
+          isAdminDomain() 
+            ? (user ? <Navigate to="/dashboard" /> : <Navigate to="/login" />)
+            : <Navigate to="/landing" />
+        } />
       </Routes>
     </Router>
   );

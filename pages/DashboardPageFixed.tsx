@@ -19,6 +19,7 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 import { apiService } from '../services/apiService';
 import { JobStatus } from '../types';
 import MobileMoneyTest from '../components/MobileMoneyTest';
+import DatabaseStatus from '../components/DatabaseStatus';
 
 const revenueData = [
   { name: 'Mon', revenue: 1200 },
@@ -260,13 +261,7 @@ const DashboardPageFixed: React.FC = () => {
         <div className="bg-white p-6 rounded-xl shadow-sm border">
           <h3 className="text-lg font-semibold text-gray-900 mb-4">System Status</h3>
           <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Database</span>
-              <span className="flex items-center text-green-600">
-                <CheckCircle2 size={16} className="mr-1" />
-                Online
-              </span>
-            </div>
+            <DatabaseStatus />
             <div className="flex items-center justify-between">
               <span className="text-sm text-gray-600">API Services</span>
               <span className="flex items-center text-green-600">
