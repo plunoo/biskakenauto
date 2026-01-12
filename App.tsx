@@ -2,23 +2,12 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Layout } from './components/Layout';
-import LandingPage from './pages/LandingPage';
 import LoginPage from './pages/LoginPage';
 import DashboardPageFixed from './pages/DashboardPageFixed';
-import JobsPage from './pages/JobsPage';
-import JobsPageSimple from './pages/JobsPageSimple';
-import JobsPageTest from './pages/JobsPageTest';
-import JobsPageUITest from './pages/JobsPageUITest';
-import JobsPageUIBugTest from './pages/JobsPageUIBugTest';
 import JobsPageFixed from './pages/JobsPageFixed';
 import InventoryPageFixed from './pages/InventoryPageFixed';
-import BlogManagementPageFixed from './pages/BlogManagementPageFixed';
-import BlogTestPage from './pages/BlogTestPage';
 import CustomersPage from './pages/CustomersPage';
-import InventoryPage from './pages/InventoryPage';
 import InvoicesPage from './pages/InvoicesPage';
-import BlogPage from './pages/BlogPage';
-import BlogManagementPage from './pages/BlogManagementPage';
 import ReportsPageFixed from './pages/ReportsPageFixed';
 import AdminPage from './pages/AdminPage';
 import SettingsPage from './pages/SettingsPage';
@@ -38,11 +27,10 @@ const App: React.FC = () => {
   return (
     <Router>
       <Routes>
-        {/* Public routes without Layout */}
-        <Route path="/landing" element={<LandingPage />} />
+        {/* Login route */}
         <Route path="/login" element={!user ? <LoginPage /> : <Navigate to="/dashboard" />} />
         
-        {/* Protected routes with Layout */}
+        {/* Protected admin dashboard routes */}
         <Route path="/dashboard" element={
           user ? (
             <Layout>
@@ -53,9 +41,13 @@ const App: React.FC = () => {
           )
         } />
         <Route path="/jobs" element={
-          <Layout>
-            <JobsPageFixed />
-          </Layout>
+          user ? (
+            <Layout>
+              <JobsPageFixed />
+            </Layout>
+          ) : (
+            <Navigate to="/login" />
+          )
         } />
         <Route path="/customers" element={
           user ? (
@@ -67,9 +59,13 @@ const App: React.FC = () => {
           )
         } />
         <Route path="/inventory" element={
-          <Layout>
-            <InventoryPageFixed />
-          </Layout>
+          user ? (
+            <Layout>
+              <InventoryPageFixed />
+            </Layout>
+          ) : (
+            <Navigate to="/login" />
+          )
         } />
         <Route path="/invoices" element={
           user ? (
@@ -80,20 +76,14 @@ const App: React.FC = () => {
             <Navigate to="/login" />
           )
         } />
-        <Route path="/blog" element={
-          <Layout>
-            <BlogManagementPageFixed />
-          </Layout>
-        } />
-        <Route path="/blog-test" element={
-          <Layout>
-            <BlogTestPage />
-          </Layout>
-        } />
         <Route path="/reports" element={
-          <Layout>
-            <ReportsPageFixed />
-          </Layout>
+          user ? (
+            <Layout>
+              <ReportsPageFixed />
+            </Layout>
+          ) : (
+            <Navigate to="/login" />
+          )
         } />
         <Route path="/admin" element={
           user?.role === 'ADMIN' ? (
@@ -115,7 +105,7 @@ const App: React.FC = () => {
         } />
         
         {/* Default redirect */}
-        <Route path="/" element={user ? <Navigate to="/dashboard" /> : <Navigate to="/landing" />} />
+        <Route path="/" element={user ? <Navigate to="/dashboard" /> : <Navigate to="/login" />} />
       </Routes>
     </Router>
   );

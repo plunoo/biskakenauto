@@ -1,12 +1,73 @@
+# Ignore node_modules to prevent conflicts
 node_modules
 npm-debug.log*
-.env
-.env.local
-.env.*.local
+
+# Ignore build artifacts (will be created during build)
+dist
+.vite
+.tmp
+
+# Ignore git and development files
 .git
 .gitignore
-README.md
 *.md
+README.*
+DEPLOYMENT*
+FRONTEND*
+DOKPLOY*
+BACKEND*
+
+# Ignore backend API files (we're deploying React admin dashboard only)
+server/
+app.js
+index.js
+version.js
+
+# Ignore removed landing page and blog files
+pages/LandingPage.tsx
+pages/BlogPage.tsx
+pages/BlogManagementPage.tsx
+pages/BlogManagementPageFixed.tsx
+pages/BlogTestPage.tsx
+
+# Ignore test files
+*.test.*
+test-*
+*test.html
+jobs-test.html
+
+# Ignore deployment files
+deploy*.sh
+docker-compose*.yml
+dokploy*.yml
+Dockerfile.*
+package.*.json
+check-dashboard.js
+
+# Ignore environment files (security)
+.env*
+!.env.example
+
+# Ignore IDE and editor files
 .vscode
-dist
-build
+.idea
+*.swp
+*.swo
+*~
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
+
+# Ignore logs
+logs
+*.log
+
+# Ignore temporary files
+tmp/
+temp/
+.cache
+
+# Ignore backup files
+*.backup
+*.bak
