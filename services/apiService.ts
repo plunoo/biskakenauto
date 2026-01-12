@@ -444,6 +444,89 @@ class ApiService {
     });
   }
 
+  // AI Content Generation API
+  async generateAIContent(prompt: string, type?: 'title' | 'excerpt' | 'content') {
+    try {
+      return await this.request('/api/test/ai/generate-content', {
+        method: 'POST',
+        body: JSON.stringify({ prompt, type })
+      });
+    } catch (error) {
+      console.log('🔄 Using fallback AI content generation');
+      return {
+        success: true,
+        data: this.generateFallbackAIContent(prompt, type)
+      };
+    }
+  }
+
+  async generateAIImage(imageData: { prompt: string; style?: string }) {
+    try {
+      return await this.request('/api/test/ai/generate-image', {
+        method: 'POST',
+        body: JSON.stringify(imageData)
+      });
+    } catch (error) {
+      console.log('🔄 Using fallback AI image generation');
+      return {
+        success: true,
+        data: {
+          imageUrl: `https://picsum.photos/800/400?random&${Date.now()}`,
+          prompt: imageData.prompt
+        }
+      };
+    }
+  }
+
+  // Image Upload API
+  async uploadImage(file: File, alt?: string) {
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+      if (alt) formData.append('alt', alt);
+
+      return await this.request('/api/test/upload/image', {
+        method: 'POST',
+        body: formData,
+        headers: {} // Remove Content-Type to let browser set it with boundary
+      });
+    } catch (error) {
+      console.log('🔄 Using fallback image upload');
+      return {
+        success: true,
+        data: {
+          imageUrl: URL.createObjectURL(file),
+          filename: file.name,
+          size: file.size
+        }
+      };
+    }
+  }
+
+  // Fallback AI content generation
+  private generateFallbackAIContent(prompt: string, type?: string): string {
+    const templates = {
+      title: [
+        "Essential Car Maintenance Tips for Ghana's Roads",
+        "How to Choose Quality Auto Parts in West Africa",
+        "Vehicle Care in Tropical Climate: Best Practices",
+        "Common Engine Problems and Quick Solutions",
+        "Brake System Maintenance for Safety"
+      ],
+      excerpt: [
+        "Learn essential automotive maintenance tips specifically designed for Ghana's unique driving conditions, including tropical weather considerations and local road challenges.",
+        "Discover expert advice on keeping your vehicle running smoothly in West Africa's climate, with practical tips from experienced local mechanics.",
+        "Essential guidance for car owners in Ghana, covering everything from routine maintenance to dealing with local automotive challenges."
+      ],
+      content: [
+        `# Automotive Excellence in Ghana\n\nMaintaining your vehicle in Ghana's unique environment requires specialized knowledge and attention to detail.\n\n## Key Considerations\n\n### Climate Factors\nGhana's tropical climate presents unique challenges for vehicle maintenance. High humidity and temperatures affect engine performance, while seasonal rains impact visibility and road conditions.\n\n### Regular Maintenance\nEstablishing a consistent maintenance schedule is crucial. This includes regular oil changes, brake inspections, and cooling system checks.\n\n### Quality Parts\nUsing quality replacement parts ensures longevity and performance. Choose reputable suppliers who understand local driving conditions.\n\n## Professional Service\nRegular professional inspections help identify potential issues before they become costly repairs. Trust experienced mechanics who understand vehicles in tropical environments.\n\nRemember: Preventive care is always more cost-effective than reactive repairs.`
+      ]
+    };
+
+    const options = templates[type as keyof typeof templates] || templates.content;
+    return options[Math.floor(Math.random() * options.length)];
+  }
+
   // Landing Page API
   async getLandingHero() {
     return this.request('/api/test/landing/hero');

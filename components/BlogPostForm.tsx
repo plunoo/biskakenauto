@@ -16,7 +16,7 @@ import {
 } from 'lucide-react';
 import { Button, Input, Card } from './UI';
 import { apiService } from '../services/apiService';
-// import { getAIInsights } from '../services/gemini';
+import { generateAIContent, generateAIImage } from '../services/gemini';
 
 interface BlogPost {
   id?: string;
@@ -63,13 +63,16 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
     content: post?.content || '',
     category: post?.category || 'General',
     tags: post?.tags?.join(', ') || '',
-    status: post?.status || 'draft'
+    status: post?.status || 'draft',
+    featuredImage: post?.featuredImage || ''
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showPreview, setShowPreview] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [aiGenerating, setAiGenerating] = useState<string | null>(null);
+  const [imageGenerating, setImageGenerating] = useState(false);
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -160,7 +163,7 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
     }
   };
 
-  const generateAIContent = async (type: 'title' | 'excerpt' | 'content') => {
+  const generateAIContentHandler = async (type: 'title' | 'excerpt' | 'content') => {
     setAiGenerating(type);
     
     try {
@@ -180,17 +183,56 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
           break;
       }
       
-      const response = await getAIInsights(prompt);
-      const generatedContent = response[0] || 'AI content generation failed';
+      const response = await generateAIContent(prompt, type);
       
-      // Update the form data with generated content
-      handleInputChange(type, generatedContent);
+      if (response.success && response.data) {
+        // Update the form data with generated content
+        handleInputChange(type, response.data);
+      } else {
+        throw new Error(response.error || 'AI generation failed');
+      }
       
     } catch (error) {
       console.error('AI generation failed:', error);
       alert('AI content generation failed. Please try again or write manually.');
     } finally {
       setAiGenerating(null);
+    }
+  };
+
+  const handleImageUpload = async (file: File) => {
+    try {
+      setImageFile(file);
+      const response = await apiService.uploadImage(file, formData.title);
+      
+      if (response.success && response.data?.imageUrl) {
+        handleInputChange('featuredImage', response.data.imageUrl);
+      }
+    } catch (error) {
+      console.error('Image upload failed:', error);
+      alert('Image upload failed. Please try again.');
+    }
+  };
+
+  const generateAIImageHandler = async () => {
+    setImageGenerating(true);
+    
+    try {
+      const prompt = `${formData.category} automotive blog post illustration: ${formData.title || 'car maintenance'} - professional, clean, Ghana automotive context`;
+      
+      const response = await generateAIImage(prompt, 'illustration');
+      
+      if (response.success && response.data?.imageUrl) {
+        handleInputChange('featuredImage', response.data.imageUrl);
+      } else {
+        throw new Error(response.error || 'AI image generation failed');
+      }
+      
+    } catch (error) {
+      console.error('AI image generation failed:', error);
+      alert('AI image generation failed. Please try again or upload an image manually.');
+    } finally {
+      setImageGenerating(false);
     }
   };
 
@@ -294,7 +336,7 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
                     <Button
                       variant="outline"
                       size="sm"
-                      onClick={() => generateAIContent('title')}
+                      onClick={() => generateAIContentHandler('title')}
                       disabled={aiGenerating === 'title'}
                       className="mb-1 bg-gradient-to-r from-purple-100 to-blue-100 border-purple-200 text-purple-700 hover:from-purple-200 hover:to-blue-200 px-3 py-2 rounded-xl"
                       icon={aiGenerating === 'title' ? Loader : Sparkles}
@@ -336,7 +378,7 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => generateAIContent('excerpt')}
+                    onClick={() => generateAIContentHandler('excerpt')}
                     disabled={aiGenerating === 'excerpt' || !formData.title}
                     className="bg-gradient-to-r from-purple-100 to-blue-100 border-purple-200 text-purple-700 hover:from-purple-200 hover:to-blue-200 px-3 py-1 rounded-lg text-xs"
                     icon={aiGenerating === 'excerpt' ? Loader : Brain}
@@ -392,7 +434,7 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
                   <Button
                     variant="outline"
                     size="sm"
-                    onClick={() => generateAIContent('content')}
+                    onClick={() => generateAIContentHandler('content')}
                     disabled={aiGenerating === 'content' || !formData.title}
                     className="bg-gradient-to-r from-purple-100 to-blue-100 border-purple-200 text-purple-700 hover:from-purple-200 hover:to-blue-200 px-3 py-1 rounded-lg text-xs"
                     icon={aiGenerating === 'content' ? Loader : Wand2}
@@ -423,6 +465,66 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
                     {wordCount} words
                   </span>
                 </div>
+              </div>
+
+              {/* Featured Image */}
+              <div className="space-y-4">
+                <label className="block text-sm font-medium text-gray-700">
+                  Featured Image
+                </label>
+                
+                {formData.featuredImage && (
+                  <div className="relative">
+                    <img 
+                      src={formData.featuredImage} 
+                      alt="Featured" 
+                      className="w-full h-48 object-cover rounded-lg border-2 border-gray-200"
+                    />
+                    <button
+                      onClick={() => handleInputChange('featuredImage', '')}
+                      className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors"
+                    >
+                      <X size={16} />
+                    </button>
+                  </div>
+                )}
+                
+                <div className="flex gap-3">
+                  <div className="flex-1">
+                    <label className="cursor-pointer">
+                      <div className="flex items-center gap-2 px-4 py-2 bg-white border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all">
+                        <Upload size={20} className="text-gray-500" />
+                        <span className="text-sm text-gray-700">Upload Image</span>
+                      </div>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleImageUpload(file);
+                        }}
+                      />
+                    </label>
+                  </div>
+                  
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={generateAIImageHandler}
+                    disabled={imageGenerating || !formData.title}
+                    className="bg-gradient-to-r from-purple-100 to-blue-100 border-purple-200 text-purple-700 hover:from-purple-200 hover:to-blue-200 px-4 py-2 rounded-lg"
+                    icon={imageGenerating ? Loader : Sparkles}
+                  >
+                    {imageGenerating ? 'Generating...' : 'AI Generate'}
+                  </Button>
+                </div>
+                
+                {formData.featuredImage && !formData.featuredImage.startsWith('blob:') && (
+                  <div className="text-xs text-gray-500 bg-gray-50 p-2 rounded border">
+                    📷 Image URL: {formData.featuredImage}
+                  </div>
+                )}
               </div>
 
               {/* Status */}
