@@ -23,10 +23,9 @@ app.js
 index.js
 version.js
 
-# Ignore removed landing page and blog files
+# Ignore removed landing page and blog files (but keep BlogManagementPage.tsx)
 pages/LandingPage.tsx
 pages/BlogPage.tsx
-pages/BlogManagementPage.tsx
 pages/BlogManagementPageFixed.tsx
 pages/BlogTestPage.tsx
 
