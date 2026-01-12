@@ -8,6 +8,7 @@ import JobsPageFixed from './pages/JobsPageFixed';
 import InventoryPageFixed from './pages/InventoryPageFixed';
 import CustomersPage from './pages/CustomersPage';
 import InvoicesPage from './pages/InvoicesPage';
+import BlogManagementPage from './pages/BlogManagementPage';
 import ReportsPageFixed from './pages/ReportsPageFixed';
 import AdminPage from './pages/AdminPage';
 import SettingsPage from './pages/SettingsPage';
@@ -71,6 +72,15 @@ const App: React.FC = () => {
           user ? (
             <Layout>
               <InvoicesPage />
+            </Layout>
+          ) : (
+            <Navigate to="/login" />
+          )
+        } />
+        <Route path="/blog" element={
+          user ? (
+            <Layout>
+              <BlogManagementPage />
             </Layout>
           ) : (
             <Navigate to="/login" />
