@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, Badge, Button, Input } from '../components/UI';
 import { useStore } from '../store/useStore';
 import { apiService } from '../services/apiService';
@@ -56,6 +56,9 @@ const SettingsPage: React.FC = () => {
     status: 'idle'
   });
 
+  // Database status state
+  const [databaseStatus, setDatabaseStatus] = useState<any>(null);
+
   // Profile form state
   const [profileData, setProfileData] = useState({
     fullName: user?.name || '',
@@ -97,6 +100,21 @@ const SettingsPage: React.FC = () => {
     setShopData(prev => ({ ...prev, [field]: value }));
     setHasChanges(true);
   };
+
+  const checkDatabaseStatus = async () => {
+    try {
+      const status = await apiService.getDatabaseStatus();
+      setDatabaseStatus(status);
+      console.log('📊 Settings Database status:', status);
+    } catch (error) {
+      console.log('Settings Database status check failed');
+      setDatabaseStatus({ success: false, data: { status: 'disconnected' } });
+    }
+  };
+
+  useEffect(() => {
+    checkDatabaseStatus();
+  }, []);
 
   const handleSaveChanges = () => {
     // In production, this would call API to save changes
@@ -439,13 +457,34 @@ const SettingsPage: React.FC = () => {
           <p className="text-xs text-gray-500 mt-1">AI-Powered Release with Blog Management</p>
         </div>
         
-        <div className="p-6 border border-gray-200 rounded-lg bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
+        <div className={`p-6 border border-gray-200 rounded-lg ${
+          databaseStatus?.success && databaseStatus?.data?.status === 'connected'
+            ? 'bg-gradient-to-br from-green-50 to-emerald-50 border-green-200'
+            : 'bg-gradient-to-br from-red-50 to-pink-50 border-red-200'
+        }`}>
           <div className="flex items-center justify-between mb-2">
             <h3 className="font-medium text-gray-900">Database Status</h3>
-            <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+            <div className={`w-3 h-3 rounded-full ${
+              databaseStatus?.success && databaseStatus?.data?.status === 'connected'
+                ? 'bg-green-500 animate-pulse'
+                : 'bg-red-500'
+            }`}></div>
           </div>
-          <Badge variant="success">Connected</Badge>
-          <p className="text-xs text-gray-500 mt-2">PostgreSQL - Response time: 12ms</p>
+          {databaseStatus ? (
+            <>
+              <Badge variant={databaseStatus.success && databaseStatus.data.status === 'connected' ? 'success' : 'danger'}>
+                {databaseStatus.data.status === 'connected' ? 'Connected' : 'Disconnected'}
+              </Badge>
+              <p className="text-xs text-gray-500 mt-2">
+                {databaseStatus.data.mode || 'PostgreSQL'} - {databaseStatus.data.responseTime || 'Response time: N/A'}
+              </p>
+            </>
+          ) : (
+            <>
+              <Badge variant="warning">Checking...</Badge>
+              <p className="text-xs text-gray-500 mt-2">Verifying database connection...</p>
+            </>
+          )}
         </div>
         
         <div className="p-6 border border-gray-200 rounded-lg">
