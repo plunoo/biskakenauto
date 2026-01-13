@@ -182,14 +182,6 @@ const RegisterPage: React.FC = () => {
             ← Back to Homepage
           </Link>
           
-          <div className="border-t border-gray-200 pt-3">
-            <p className="text-xs text-gray-500">
-              Already a customer or staff member?
-            </p>
-            <Link to="/login" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
-              Login →
-            </Link>
-          </div>
         </div>
       </Card>
     </div>

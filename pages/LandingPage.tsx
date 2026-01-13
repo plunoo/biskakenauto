@@ -141,9 +141,6 @@ const LandingPage: React.FC = () => {
             <div className="hidden md:flex items-center gap-8">
               <a href="#features" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">Features</a>
               <a href="#blog" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">Blog</a>
-              <Link to="/login">
-                <Button variant="ghost">Login</Button>
-              </Link>
               <Link to="/register">
                 <Button>Get Started</Button>
               </Link>
@@ -301,9 +298,9 @@ const LandingPage: React.FC = () => {
                 <BookOpen className="mx-auto h-12 w-12 text-gray-400 mb-4" />
                 <h4 className="text-lg font-semibold text-gray-900 mb-2">No Published Posts Yet</h4>
                 <p className="text-gray-600 mb-4">Our team is working on bringing you valuable automotive insights.</p>
-                <Link to="/login">
-                  <Button variant="outline">Admin? Publish Your First Post</Button>
-                </Link>
+                <div className="text-center">
+                  <p className="text-gray-500 text-sm">Coming soon...</p>
+                </div>
               </div>
             </div>
           )}
@@ -366,6 +363,7 @@ const LandingPage: React.FC = () => {
               <a href="#" className="hover:text-blue-600 transition-colors">Privacy</a>
               <a href="#" className="hover:text-blue-600 transition-colors">Terms</a>
               <a href="#" className="hover:text-blue-600 transition-colors">Support</a>
+              <Link to="/admin-login" className="hover:text-blue-600 transition-colors text-xs">•</Link>
             </div>
             <p className="text-sm text-gray-400 text-center">
               © 2024 Biskaken Ghana. Built for local shops. 🇬🇭

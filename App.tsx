@@ -45,8 +45,10 @@ const App: React.FC = () => {
         {/* Customer registration */}
         <Route path="/register" element={<RegisterPage />} />
         
-        {/* Login route */}
+        {/* Hidden admin login routes */}
         <Route path="/login" element={!user ? <LoginPage /> : <Navigate to="/dashboard" />} />
+        <Route path="/admin-login" element={!user ? <LoginPage /> : <Navigate to="/dashboard" />} />
+        <Route path="/admin/login" element={!user ? <LoginPage /> : <Navigate to="/dashboard" />} />
         
         {/* Protected admin dashboard routes */}
         <Route path="/dashboard" element={
