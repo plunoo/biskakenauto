@@ -18,7 +18,12 @@ import {
   Wrench,
   Package,
   FileText,
-  BarChart3
+  BarChart3,
+  Brain,
+  Sparkles,
+  Stethoscope,
+  AlertCircle,
+  CheckCircle
 } from 'lucide-react';
 
 const SettingsPage: React.FC = () => {
@@ -38,6 +43,17 @@ const SettingsPage: React.FC = () => {
     email: '',
     role: 'STAFF' as 'ADMIN' | 'SUB_ADMIN' | 'STAFF',
     permissions: [] as string[]
+  });
+
+  // AI Diagnostic state
+  const [aiDiagnostic, setAiDiagnostic] = useState<{
+    running: boolean;
+    results: any[];
+    status: 'idle' | 'running' | 'success' | 'error';
+  }>({
+    running: false,
+    results: [],
+    status: 'idle'
   });
 
   // Profile form state
@@ -419,8 +435,8 @@ const SettingsPage: React.FC = () => {
             <h3 className="font-medium text-gray-900">Application Version</h3>
             <Monitor size={20} className="text-blue-600" />
           </div>
-          <p className="text-2xl font-bold text-blue-600">v1.0.0</p>
-          <p className="text-xs text-gray-500 mt-1">Stable Release</p>
+          <p className="text-2xl font-bold text-blue-600">v3.0.0</p>
+          <p className="text-xs text-gray-500 mt-1">AI-Powered Release with Blog Management</p>
         </div>
         
         <div className="p-6 border border-gray-200 rounded-lg bg-gradient-to-br from-green-50 to-emerald-50 border-green-200">
@@ -491,6 +507,73 @@ const SettingsPage: React.FC = () => {
             <Monitor size={16} />
             <span>System Logs</span>
           </Button>
+        </div>
+      </div>
+      
+      {/* AI Diagnostic Section */}
+      <div className="col-span-full mt-8">
+        <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-6 rounded-2xl border-2 border-purple-200">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h3 className="text-xl font-bold text-purple-800 flex items-center gap-2">
+                <Brain className="text-purple-600" size={24} />
+                🤖 AI System Diagnostic
+              </h3>
+              <p className="text-purple-600 mt-1">Test all AI features and troubleshoot any problems</p>
+            </div>
+            <Button
+              onClick={runAIDiagnostic}
+              disabled={aiDiagnostic.running}
+              className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300"
+              icon={aiDiagnostic.running ? Stethoscope : Brain}
+            >
+              {aiDiagnostic.running ? 'Running Tests...' : '🔍 Run AI Diagnostic'}
+            </Button>
+          </div>
+          
+          {aiDiagnostic.results.length > 0 && (
+            <div className="space-y-3">
+              {aiDiagnostic.results.map((result, index) => (
+                <div
+                  key={index}
+                  className={`flex items-center justify-between p-3 rounded-lg border ${
+                    result.success
+                      ? 'bg-green-50 border-green-200 text-green-800'
+                      : 'bg-red-50 border-red-200 text-red-800'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    {result.success ? (
+                      <CheckCircle size={20} className="text-green-600" />
+                    ) : (
+                      <AlertCircle size={20} className="text-red-600" />
+                    )}
+                    <span className="font-medium">{result.name}</span>
+                  </div>
+                  <span className="text-sm">{result.message}</span>
+                </div>
+              ))}
+              
+              {aiDiagnostic.status !== 'running' && (
+                <div className={`mt-4 p-4 rounded-lg text-center font-bold ${
+                  aiDiagnostic.status === 'success'
+                    ? 'bg-green-100 text-green-800 border border-green-200'
+                    : 'bg-red-100 text-red-800 border border-red-200'
+                }`}>
+                  {aiDiagnostic.status === 'success' 
+                    ? '✅ All AI systems are working correctly!' 
+                    : '❌ Some AI features need attention. Check the issues above.'}
+                </div>
+              )}
+            </div>
+          )}
+          
+          {aiDiagnostic.results.length === 0 && !aiDiagnostic.running && (
+            <div className="text-center py-6 text-purple-600">
+              <Sparkles size={48} className="mx-auto mb-3 opacity-60" />
+              <p>Click "Run AI Diagnostic" to test all AI features and troubleshoot any problems.</p>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -671,6 +754,120 @@ const SettingsPage: React.FC = () => {
 
   const handleBlogManagementClick = () => {
     window.location.href = '#/admin';
+  };
+
+  // AI Diagnostic function
+  const runAIDiagnostic = async () => {
+    setAiDiagnostic(prev => ({ ...prev, running: true, status: 'running', results: [] }));
+    
+    const tests = [
+      {
+        name: 'Gemini API Connection',
+        test: async () => {
+          try {
+            const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+            if (!apiKey) return { success: false, message: 'No Gemini API key found in environment' };
+            
+            const response = await fetch(
+              `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`,
+              {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  contents: [{ parts: [{ text: 'Test connection' }] }],
+                  generationConfig: { maxOutputTokens: 10 }
+                })
+              }
+            );
+            
+            if (response.ok) {
+              return { success: true, message: 'Gemini API connection successful' };
+            } else {
+              return { success: false, message: `API returned status: ${response.status}` };
+            }
+          } catch (error) {
+            return { success: false, message: `Connection failed: ${error.message}` };
+          }
+        }
+      },
+      {
+        name: 'Backend API Status',
+        test: async () => {
+          try {
+            const response = await apiService.testBlogAPI();
+            return response.success 
+              ? { success: true, message: 'Backend API is responding correctly' }
+              : { success: false, message: `API test failed: ${response.error}` };
+          } catch (error) {
+            return { success: false, message: `Backend connection failed: ${error.message}` };
+          }
+        }
+      },
+      {
+        name: 'Blog Form Components',
+        test: async () => {
+          try {
+            // Test if blog management page exists
+            const blogExists = document.querySelector('[href="/blog"]') !== null;
+            if (!blogExists) {
+              return { success: false, message: 'Blog management navigation not found' };
+            }
+            
+            return { success: true, message: 'Blog management components are available' };
+          } catch (error) {
+            return { success: false, message: `Component check failed: ${error.message}` };
+          }
+        }
+      },
+      {
+        name: 'Local Storage & Auth',
+        test: async () => {
+          try {
+            const token = localStorage.getItem('authToken');
+            if (!token) {
+              return { success: false, message: 'No authentication token found' };
+            }
+            
+            const user = localStorage.getItem('user');
+            if (!user) {
+              return { success: false, message: 'No user data found in local storage' };
+            }
+            
+            return { success: true, message: 'Authentication state is valid' };
+          } catch (error) {
+            return { success: false, message: `Auth check failed: ${error.message}` };
+          }
+        }
+      }
+    ];
+
+    const results = [];
+    for (const test of tests) {
+      try {
+        const result = await test.test();
+        results.push({ ...test, ...result });
+      } catch (error) {
+        results.push({ 
+          ...test, 
+          success: false, 
+          message: `Test execution failed: ${error.message}` 
+        });
+      }
+      
+      // Update results in real-time
+      setAiDiagnostic(prev => ({ ...prev, results: [...results] }));
+      
+      // Small delay between tests
+      await new Promise(resolve => setTimeout(resolve, 500));
+    }
+    
+    const allPassed = results.every(r => r.success);
+    setAiDiagnostic(prev => ({ 
+      ...prev, 
+      running: false, 
+      status: allPassed ? 'success' : 'error',
+      results 
+    }));
   };
 
   const sampleUsers = [

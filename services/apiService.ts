@@ -296,6 +296,24 @@ class ApiService {
     });
   }
 
+  // Test blog API functionality
+  async testBlogAPI() {
+    try {
+      const response = await this.request('/api/test/blog');
+      return {
+        success: true,
+        message: `Blog API working - found ${response.data?.length || 0} posts`,
+        data: response
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: `Blog API test failed: ${error.message}`,
+        error: error
+      };
+    }
+  }
+
   async updateBlogPostStatus(postId: string, status: string) {
     return this.request(`/api/test/blog/${postId}/status`, {
       method: 'PUT',
