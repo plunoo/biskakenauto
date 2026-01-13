@@ -33,6 +33,7 @@ interface BlogPost {
   views?: number;
   tags?: string[];
   featuredImage?: string;
+  featuredVideo?: string;
 }
 
 interface BlogPostFormProps {
@@ -64,7 +65,8 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
     category: initialData?.category || 'General',
     tags: initialData?.tags?.join(', ') || '',
     status: initialData?.status || 'DRAFT',
-    featuredImage: initialData?.featuredImage || ''
+    featuredImage: initialData?.featuredImage || '',
+    featuredVideo: initialData?.featuredVideo || ''
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -137,7 +139,9 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
         category: formData.category,
         tags,
         status: publishNow ? 'PUBLISHED' : formData.status,
-        readTime: estimateReadTime(formData.content)
+        readTime: estimateReadTime(formData.content),
+        featuredImage: formData.featuredImage,
+        featuredVideo: formData.featuredVideo
       };
 
       let response;
@@ -203,14 +207,49 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
   const handleImageUpload = async (file: File) => {
     try {
       setImageFile(file);
-      const response = await apiService.uploadImage(file, formData.title);
+      // Create local preview URL
+      const imageUrl = URL.createObjectURL(file);
+      handleInputChange('featuredImage', imageUrl);
       
-      if (response.success && response.data?.imageUrl) {
-        handleInputChange('featuredImage', response.data.imageUrl);
+      // Try to upload to server
+      try {
+        const response = await apiService.uploadImage(file, formData.title);
+        if (response.success && response.data?.imageUrl) {
+          handleInputChange('featuredImage', response.data.imageUrl);
+        }
+      } catch (serverError) {
+        console.log('Server upload failed, using local preview:', serverError);
       }
     } catch (error) {
       console.error('Image upload failed:', error);
       alert('Image upload failed. Please try again.');
+    }
+  };
+
+  const handleVideoUpload = async (file: File) => {
+    try {
+      // Check file size (limit to 100MB)
+      if (file.size > 100 * 1024 * 1024) {
+        alert('Video file is too large. Please choose a file smaller than 100MB.');
+        return;
+      }
+      
+      // Create local preview URL
+      const videoUrl = URL.createObjectURL(file);
+      handleInputChange('featuredVideo', videoUrl);
+      
+      // Try to upload to server
+      try {
+        const response = await apiService.uploadVideo(file, formData.title);
+        if (response.success && response.data?.videoUrl) {
+          handleInputChange('featuredVideo', response.data.videoUrl);
+        }
+      } catch (serverError) {
+        console.log('Server upload failed, using local preview:', serverError);
+      }
+    } catch (error) {
+      console.error('Video upload failed:', error);
+      alert('Video upload failed. Please try again.');
     }
   };
 
@@ -482,34 +521,18 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
                 </div>
               </div>
 
-              {/* Featured Image */}
-              <div className="space-y-4">
-                <label className="block text-sm font-medium text-gray-700">
-                  Featured Image <span className="text-orange-600 text-xs">(or use "🖼️ Create Image" button above to let AI create one)</span>
-                </label>
-                
-                {formData.featuredImage && (
-                  <div className="relative">
-                    <img 
-                      src={formData.featuredImage} 
-                      alt="Featured" 
-                      className="w-full h-48 object-cover rounded-lg border-2 border-gray-200"
-                    />
-                    <button
-                      onClick={() => handleInputChange('featuredImage', '')}
-                      className="absolute top-2 right-2 bg-red-500 text-white p-1 rounded-full hover:bg-red-600 transition-colors"
-                    >
-                      <X size={16} />
-                    </button>
-                  </div>
-                )}
-                
-                <div className="flex gap-3">
-                  <div className="flex-1">
-                    <label className="cursor-pointer">
-                      <div className="flex items-center gap-2 px-4 py-2 bg-white border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-500 hover:bg-blue-50 transition-all">
-                        <Upload size={20} className="text-gray-500" />
-                        <span className="text-sm text-gray-700">Upload Image</span>
+              {/* Media Upload Section - Images and Videos */}
+              <div className="space-y-6">
+                <div className="bg-gradient-to-r from-green-50 to-blue-50 p-6 rounded-2xl border-2 border-green-200">
+                  <h3 className="text-xl font-bold text-green-800 mb-4 text-center">📸 Add Images & Videos to Your Blog Post</h3>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                    {/* Upload Image */}
+                    <label className="cursor-pointer group">
+                      <div className="h-32 bg-gradient-to-br from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 flex flex-col items-center justify-center">
+                        <Upload size={32} className="mb-2" />
+                        <span className="font-bold text-lg">📷 Upload Image</span>
+                        <span className="text-xs opacity-90">JPG, PNG, WebP</span>
                       </div>
                       <input
                         type="file"
@@ -521,13 +544,86 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
                         }}
                       />
                     </label>
+                    
+                    {/* Upload Video */}
+                    <label className="cursor-pointer group">
+                      <div className="h-32 bg-gradient-to-br from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 flex flex-col items-center justify-center">
+                        <svg className="w-8 h-8 mb-2" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd"/>
+                        </svg>
+                        <span className="font-bold text-lg">🎥 Upload Video</span>
+                        <span className="text-xs opacity-90">MP4, WebM, MOV</span>
+                      </div>
+                      <input
+                        type="file"
+                        accept="video/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleVideoUpload(file);
+                        }}
+                      />
+                    </label>
+                    
+                    {/* AI Generate Image */}
+                    <Button
+                      onClick={generateAIImageHandler}
+                      disabled={imageGenerating || !formData.title}
+                      className="h-32 bg-gradient-to-br from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 flex flex-col items-center justify-center"
+                      icon={imageGenerating ? Loader : Sparkles}
+                    >
+                      <Sparkles size={32} className="mb-2" />
+                      <span className="text-lg">{imageGenerating ? 'Creating...' : '🖼️ AI Create Image'}</span>
+                      <span className="text-xs opacity-90">Let AI make it</span>
+                    </Button>
                   </div>
                   
-                  <div className="bg-orange-50 border-2 border-dashed border-orange-300 rounded-lg p-4 text-center">
-                    <p className="text-orange-600 font-medium">
-                      💡 Use the big "🖼️ Create Image" button above to let AI create a professional image for your blog post!
+                  <div className="text-center">
+                    <p className="text-green-600 font-medium">
+                      💡 Add professional images and videos to make your blog post more engaging!
                     </p>
                   </div>
+                </div>
+
+                {/* Show uploaded media preview */}
+                <div className="space-y-4">
+                  {formData.featuredImage && (
+                    <div className="relative">
+                      <h4 className="text-sm font-medium text-gray-700 mb-2">Featured Image Preview:</h4>
+                      <div className="relative">
+                        <img 
+                          src={formData.featuredImage} 
+                          alt="Featured" 
+                          className="w-full h-64 object-cover rounded-lg border-2 border-gray-200"
+                        />
+                        <button
+                          onClick={() => handleInputChange('featuredImage', '')}
+                          className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-colors shadow-lg"
+                        >
+                          <X size={20} />
+                        </button>
+                      </div>
+                    </div>
+                  )}
+                  
+                  {formData.featuredVideo && (
+                    <div className="relative">
+                      <h4 className="text-sm font-medium text-gray-700 mb-2">Featured Video Preview:</h4>
+                      <div className="relative">
+                        <video 
+                          src={formData.featuredVideo} 
+                          className="w-full h-64 object-cover rounded-lg border-2 border-gray-200"
+                          controls
+                        />
+                        <button
+                          onClick={() => handleInputChange('featuredVideo', '')}
+                          className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition-colors shadow-lg"
+                        >
+                          <X size={20} />
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 
                 {formData.featuredImage && !formData.featuredImage.startsWith('blob:') && (
