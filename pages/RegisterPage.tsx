@@ -187,7 +187,7 @@ const RegisterPage: React.FC = () => {
               Already a customer or staff member?
             </p>
             <Link to="/login" className="text-blue-600 hover:text-blue-700 text-sm font-medium">
-              Staff Login →
+              Login →
             </Link>
           </div>
         </div>

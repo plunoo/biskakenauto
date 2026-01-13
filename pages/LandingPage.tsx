@@ -142,7 +142,7 @@ const LandingPage: React.FC = () => {
               <a href="#features" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">Features</a>
               <a href="#blog" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">Blog</a>
               <Link to="/login">
-                <Button variant="ghost">Staff Login</Button>
+                <Button variant="ghost">Login</Button>
               </Link>
               <Link to="/register">
                 <Button>Get Started</Button>
@@ -302,7 +302,7 @@ const LandingPage: React.FC = () => {
                 <h4 className="text-lg font-semibold text-gray-900 mb-2">No Published Posts Yet</h4>
                 <p className="text-gray-600 mb-4">Our team is working on bringing you valuable automotive insights.</p>
                 <Link to="/login">
-                  <Button variant="outline">Staff? Publish Your First Post</Button>
+                  <Button variant="outline">Admin? Publish Your First Post</Button>
                 </Link>
               </div>
             </div>
