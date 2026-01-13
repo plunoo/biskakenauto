@@ -142,15 +142,15 @@ const LandingPage: React.FC = () => {
               <a href="#features" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">Features</a>
               <a href="#blog" className="text-gray-600 hover:text-blue-600 font-medium transition-colors">Blog</a>
               <Link to="/login">
-                <Button variant="ghost">Sign In</Button>
+                <Button variant="ghost">Staff Login</Button>
               </Link>
-              <Link to="/login">
+              <Link to="/register">
                 <Button>Get Started</Button>
               </Link>
             </div>
             <div className="md:hidden flex items-center gap-2">
-              <Link to="/login">
-                <Button size="sm">Login</Button>
+              <Link to="/register">
+                <Button size="sm">Get Started</Button>
               </Link>
             </div>
           </div>
@@ -173,7 +173,7 @@ const LandingPage: React.FC = () => {
                 Smart diagnosis, inventory control, and professional invoicing tailored for our local mechanics and workshop owners.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-                <Link to="/login">
+                <Link to="/register">
                   <Button size="lg" className="w-full sm:w-auto px-10 h-14" icon={ArrowRight}>
                     Get Started Free
                   </Button>
@@ -302,7 +302,7 @@ const LandingPage: React.FC = () => {
                 <h4 className="text-lg font-semibold text-gray-900 mb-2">No Published Posts Yet</h4>
                 <p className="text-gray-600 mb-4">Our team is working on bringing you valuable automotive insights.</p>
                 <Link to="/login">
-                  <Button variant="outline">Admin? Publish Your First Post</Button>
+                  <Button variant="outline">Staff? Publish Your First Post</Button>
                 </Link>
               </div>
             </div>
@@ -338,12 +338,12 @@ const LandingPage: React.FC = () => {
               Join professional auto shops across Ghana using Biskaken to drive efficiency and happy customers.
             </p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Link to="/login" className="w-full sm:w-auto">
+              <Link to="/register" className="w-full sm:w-auto">
                 <Button size="lg" className="w-full bg-white text-blue-600 hover:bg-gray-100 h-14 font-bold text-lg">
                   Start Now
                 </Button>
               </Link>
-              <Link to="/login" className="w-full sm:w-auto">
+              <Link to="/register" className="w-full sm:w-auto">
                 <Button variant="ghost" size="lg" className="w-full text-white hover:bg-blue-700 border border-blue-400 h-14">
                   Request Demo
                 </Button>

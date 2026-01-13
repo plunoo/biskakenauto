@@ -13,6 +13,7 @@ import ReportsPageFixed from './pages/ReportsPageFixed';
 import AdminPage from './pages/AdminPage';
 import SettingsPage from './pages/SettingsPage';
 import LandingPage from './pages/LandingPage';
+import RegisterPage from './pages/RegisterPage';
 import { useStore } from './store/useStore';
 
 // Placeholder Pages for Demonstration
@@ -40,6 +41,9 @@ const App: React.FC = () => {
       <Routes>
         {/* Landing page for main domain */}
         <Route path="/landing" element={<LandingPage />} />
+        
+        {/* Customer registration */}
+        <Route path="/register" element={<RegisterPage />} />
         
         {/* Login route */}
         <Route path="/login" element={!user ? <LoginPage /> : <Navigate to="/dashboard" />} />

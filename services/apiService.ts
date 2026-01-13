@@ -86,33 +86,37 @@ class ApiService {
 
   // Authentication endpoints
   async login(data: { email: string; password: string }) {
-    // Demo credentials for localhost testing
-    const validCredentials = [
-      { email: 'admin@biskaken.com', password: 'admin123', role: 'ADMIN', name: 'Admin User' },
-      { email: 'staff@biskaken.com', password: 'staff123', role: 'STAFF', name: 'Staff User' },
-      { email: 'manager@biskaken.com', password: 'manager123', role: 'SUB_ADMIN', name: 'Manager User' }
-    ];
-
-    // Check demo credentials first for localhost
-    console.log('🔐 Checking demo credentials for localhost...');
-    const user = validCredentials.find(cred => 
-      cred.email === data.email && cred.password === data.password
-    );
+    // Demo credentials ONLY for localhost development
+    const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    const isDev = import.meta.env.DEV;
     
-    if (user) {
-      console.log('✅ Demo login successful');
-      return {
-        success: true,
-        data: {
-          user: {
-            id: user.email,
-            name: user.name,
-            email: user.email,
-            role: user.role
-          },
-          token: `demo_token_${Date.now()}`
-        }
-      };
+    if (isLocalhost && isDev) {
+      const validCredentials = [
+        { email: 'admin@biskaken.com', password: 'admin123', role: 'ADMIN', name: 'Admin User' },
+        { email: 'staff@biskaken.com', password: 'staff123', role: 'STAFF', name: 'Staff User' },
+        { email: 'manager@biskaken.com', password: 'manager123', role: 'SUB_ADMIN', name: 'Manager User' }
+      ];
+
+      console.log('🔐 Checking demo credentials for localhost development...');
+      const user = validCredentials.find(cred => 
+        cred.email === data.email && cred.password === data.password
+      );
+      
+      if (user) {
+        console.log('✅ Demo login successful');
+        return {
+          success: true,
+          data: {
+            user: {
+              id: user.email,
+              name: user.name,
+              email: user.email,
+              role: user.role
+            },
+            token: `demo_token_${Date.now()}`
+          }
+        };
+      }
     }
 
     // Try backend login if demo credentials don't match
