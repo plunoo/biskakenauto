@@ -83,8 +83,16 @@ interface AppState {
 const initializeStore = () => {
   if (typeof window === 'undefined') return { user: null };
   
-  const token = localStorage.getItem('authToken');
-  const userStr = localStorage.getItem('user');
+  // Clear old localStorage tokens for security migration
+  if (localStorage.getItem('authToken')) {
+    console.log('🧹 Clearing old localStorage tokens for security...');
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('user');
+  }
+  
+  // Use sessionStorage instead of localStorage for better security
+  const token = sessionStorage.getItem('authToken');
+  const userStr = sessionStorage.getItem('user');
   
   if (token && userStr) {
     try {
@@ -101,8 +109,8 @@ const initializeStore = () => {
       return { user };
     } catch (error) {
       console.error('❌ Failed to restore user session:', error);
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('user');
+      sessionStorage.removeItem('authToken');
+      sessionStorage.removeItem('user');
     }
   }
   
@@ -167,10 +175,10 @@ export const useStore = create<AppState>((set, get) => ({
         const token = response.data.token;
         
         console.log('✅ Login successful, storing user and loading data...');
-        // Store user and token
+        // Store user and token in sessionStorage for better security
         set({ user, loading: false });
-        localStorage.setItem('authToken', token);
-        localStorage.setItem('user', JSON.stringify(user));
+        sessionStorage.setItem('authToken', token);
+        sessionStorage.setItem('user', JSON.stringify(user));
         
         // Load all data after successful login
         console.log('📊 Loading all data...');
@@ -190,9 +198,14 @@ export const useStore = create<AppState>((set, get) => ({
   },
   
   logout: () => {
+    console.log('🚪 Logging out user...');
     set({ user: null, customers: [], jobs: [], inventory: [], invoices: [] });
+    sessionStorage.removeItem('authToken');
+    sessionStorage.removeItem('user');
+    // Also clear any old localStorage tokens for migration
     localStorage.removeItem('authToken');
     localStorage.removeItem('user');
+    window.location.href = '/login';
   },
 
   // Data loading functions

@@ -862,7 +862,7 @@ const SettingsPage: React.FC = () => {
         name: 'Local Storage & Auth',
         test: async () => {
           try {
-            const token = localStorage.getItem('authToken');
+            const token = sessionStorage.getItem('authToken') || localStorage.getItem('authToken');
             if (!token) {
               return { success: false, message: 'No authentication token found' };
             }

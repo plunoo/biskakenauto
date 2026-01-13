@@ -25,8 +25,8 @@ class ApiService {
     try {
       console.log(`🌐 API Request: ${API_BASE_URL}${endpoint}`);
       
-      // Get auth token if available
-      const token = localStorage.getItem('authToken');
+      // Get auth token if available (check sessionStorage first, fallback to localStorage for migration)
+      const token = sessionStorage.getItem('authToken') || localStorage.getItem('authToken');
       
       const response = await fetch(`${API_BASE_URL}${endpoint}`, {
         ...options,

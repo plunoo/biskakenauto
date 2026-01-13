@@ -137,7 +137,12 @@ const DashboardPage: React.FC = () => {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Workshop Overview</h1>
-          <p className="text-gray-500">Welcome back! Here's what's happening today.</p>
+          <div className="flex items-center gap-4">
+            <p className="text-gray-500">Welcome back! Here's what's happening today.</p>
+            <div className="bg-gradient-to-r from-green-500 to-blue-500 text-white px-3 py-1 rounded-full text-xs font-bold animate-pulse">
+              V3.0 AI Features Active! 🤖
+            </div>
+          </div>
           <div className="flex flex-wrap items-center gap-4 mt-2">
             {backendStatus && (
               <div className="flex items-center gap-2">
