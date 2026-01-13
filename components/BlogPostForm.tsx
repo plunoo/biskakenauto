@@ -320,30 +320,69 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
           ) : (
             /* Edit Mode */
             <div className="space-y-6">
+              
+              {/* AI HELP SECTION - PROMINENT FOR NON-TECH USERS */}
+              <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-6 rounded-2xl border-2 border-purple-200 mb-8">
+                <div className="text-center mb-4">
+                  <h3 className="text-xl font-bold text-purple-800 mb-2">🤖 AI Assistant - Let AI Write Your Blog Post!</h3>
+                  <p className="text-purple-600">No writing experience needed! Choose what you want AI to create for you:</p>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                  <Button
+                    onClick={() => generateAIContentHandler('title')}
+                    disabled={aiGenerating === 'title'}
+                    className="h-16 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold text-lg shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300"
+                    icon={aiGenerating === 'title' ? Loader : Sparkles}
+                  >
+                    {aiGenerating === 'title' ? 'Creating...' : '✨ Create Title'}
+                  </Button>
+                  
+                  <Button
+                    onClick={() => generateAIContentHandler('excerpt')}
+                    disabled={aiGenerating === 'excerpt' || !formData.title}
+                    className="h-16 bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white font-bold text-lg shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300"
+                    icon={aiGenerating === 'excerpt' ? Loader : Brain}
+                  >
+                    {aiGenerating === 'excerpt' ? 'Creating...' : '🧠 Create Summary'}
+                  </Button>
+                  
+                  <Button
+                    onClick={() => generateAIContentHandler('content')}
+                    disabled={aiGenerating === 'content' || !formData.title}
+                    className="h-16 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold text-lg shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300"
+                    icon={aiGenerating === 'content' ? Loader : Wand2}
+                  >
+                    {aiGenerating === 'content' ? 'Writing...' : '📝 Write Full Article'}
+                  </Button>
+                  
+                  <Button
+                    onClick={generateAIImageHandler}
+                    disabled={imageGenerating || !formData.title}
+                    className="h-16 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-bold text-lg shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300"
+                    icon={imageGenerating ? Loader : Sparkles}
+                  >
+                    {imageGenerating ? 'Creating...' : '🖼️ Create Image'}
+                  </Button>
+                </div>
+                
+                <div className="text-center mt-4">
+                  <p className="text-sm text-purple-600 font-medium">
+                    💡 Tip: Start with "Create Title" then use other buttons. AI will create professional content for you!
+                  </p>
+                </div>
+              </div>
+
               {/* Title and Category Row */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="md:col-span-2">
-                  <div className="flex items-end gap-2">
-                    <div className="flex-1">
-                      <Input
-                        label="Post Title *"
-                        value={formData.title}
-                        onChange={(e) => handleInputChange('title', e.target.value)}
-                        placeholder="Enter an engaging title for your blog post..."
-                        error={errors.title}
-                      />
-                    </div>
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => generateAIContentHandler('title')}
-                      disabled={aiGenerating === 'title'}
-                      className="mb-1 bg-gradient-to-r from-purple-100 to-blue-100 border-purple-200 text-purple-700 hover:from-purple-200 hover:to-blue-200 px-3 py-2 rounded-xl"
-                      icon={aiGenerating === 'title' ? Loader : Sparkles}
-                    >
-                      AI
-                    </Button>
-                  </div>
+                  <Input
+                    label="Post Title *"
+                    value={formData.title}
+                    onChange={(e) => handleInputChange('title', e.target.value)}
+                    placeholder="Enter an engaging title for your blog post... (or use AI Create Title button above)"
+                    error={errors.title}
+                  />
                 </div>
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -371,28 +410,16 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
 
               {/* Excerpt */}
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Excerpt *
-                  </label>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => generateAIContentHandler('excerpt')}
-                    disabled={aiGenerating === 'excerpt' || !formData.title}
-                    className="bg-gradient-to-r from-purple-100 to-blue-100 border-purple-200 text-purple-700 hover:from-purple-200 hover:to-blue-200 px-3 py-1 rounded-lg text-xs"
-                    icon={aiGenerating === 'excerpt' ? Loader : Brain}
-                  >
-                    AI Generate
-                  </Button>
-                </div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Excerpt * <span className="text-purple-600 text-xs">(or use "🧠 Create Summary" button above)</span>
+                </label>
                 <textarea
                   className={`w-full p-3 border rounded-md h-24 focus:ring-2 focus:ring-blue-500 resize-none ${
                     errors.excerpt ? 'border-red-300' : 'border-gray-300'
                   }`}
                   value={formData.excerpt}
                   onChange={(e) => handleInputChange('excerpt', e.target.value)}
-                  placeholder="Write a compelling excerpt that summarizes your post..."
+                  placeholder="Write a compelling excerpt that summarizes your post... (or click 'Create Summary' above to let AI write it)"
                   maxLength={200}
                 />
                 <div className="flex justify-between items-center mt-1">
@@ -427,28 +454,16 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
 
               {/* Content */}
               <div>
-                <div className="flex items-center justify-between mb-2">
-                  <label className="block text-sm font-medium text-gray-700">
-                    Content *
-                  </label>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={() => generateAIContentHandler('content')}
-                    disabled={aiGenerating === 'content' || !formData.title}
-                    className="bg-gradient-to-r from-purple-100 to-blue-100 border-purple-200 text-purple-700 hover:from-purple-200 hover:to-blue-200 px-3 py-1 rounded-lg text-xs"
-                    icon={aiGenerating === 'content' ? Loader : Wand2}
-                  >
-                    AI Generate Full Content
-                  </Button>
-                </div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Content * <span className="text-green-600 text-xs">(or use "📝 Write Full Article" button above to let AI write everything)</span>
+                </label>
                 <textarea
                   className={`w-full p-3 border rounded-md h-64 focus:ring-2 focus:ring-blue-500 resize-y ${
                     errors.content ? 'border-red-300' : 'border-gray-300'
                   }`}
                   value={formData.content}
                   onChange={(e) => handleInputChange('content', e.target.value)}
-                  placeholder="Write your blog post content here..."
+                  placeholder="Write your blog post content here... (or click 'Write Full Article' above to let AI create a complete professional article for you)"
                 />
                 <div className="flex justify-between items-center mt-1">
                   {errors.content ? (
@@ -470,7 +485,7 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
               {/* Featured Image */}
               <div className="space-y-4">
                 <label className="block text-sm font-medium text-gray-700">
-                  Featured Image
+                  Featured Image <span className="text-orange-600 text-xs">(or use "🖼️ Create Image" button above to let AI create one)</span>
                 </label>
                 
                 {formData.featuredImage && (
@@ -508,16 +523,11 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
                     </label>
                   </div>
                   
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={generateAIImageHandler}
-                    disabled={imageGenerating || !formData.title}
-                    className="bg-gradient-to-r from-purple-100 to-blue-100 border-purple-200 text-purple-700 hover:from-purple-200 hover:to-blue-200 px-4 py-2 rounded-lg"
-                    icon={imageGenerating ? Loader : Sparkles}
-                  >
-                    {imageGenerating ? 'Generating...' : 'AI Generate'}
-                  </Button>
+                  <div className="bg-orange-50 border-2 border-dashed border-orange-300 rounded-lg p-4 text-center">
+                    <p className="text-orange-600 font-medium">
+                      💡 Use the big "🖼️ Create Image" button above to let AI create a professional image for your blog post!
+                    </p>
+                  </div>
                 </div>
                 
                 {formData.featuredImage && !formData.featuredImage.startsWith('blob:') && (
