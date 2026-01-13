@@ -21,23 +21,24 @@ import { generateAIContent, generateAIImage } from '../services/gemini';
 interface BlogPost {
   id?: string;
   title: string;
-  excerpt: string;
+  excerpt?: string;
   content: string;
-  author: string;
-  authorId: string;
-  date: string;
-  category: string;
-  readTime: string;
-  status: 'draft' | 'published' | 'archived';
-  views: number;
-  tags: string[];
+  author?: string;
+  authorId?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  category?: string;
+  readTime?: string;
+  status: 'DRAFT' | 'PUBLISHED' | 'ARCHIVED';
+  views?: number;
+  tags?: string[];
+  featuredImage?: string;
 }
 
 interface BlogPostFormProps {
-  post?: BlogPost | null;
-  isOpen: boolean;
-  onClose: () => void;
+  initialData?: BlogPost | null;
   onSave: (post: BlogPost) => void;
+  onCancel: () => void;
 }
 
 const CATEGORIES = [
@@ -52,19 +53,18 @@ const CATEGORIES = [
 ];
 
 export const BlogPostForm: React.FC<BlogPostFormProps> = ({
-  post,
-  isOpen,
-  onClose,
-  onSave
+  initialData,
+  onSave,
+  onCancel
 }) => {
   const [formData, setFormData] = useState({
-    title: post?.title || '',
-    excerpt: post?.excerpt || '',
-    content: post?.content || '',
-    category: post?.category || 'General',
-    tags: post?.tags?.join(', ') || '',
-    status: post?.status || 'draft',
-    featuredImage: post?.featuredImage || ''
+    title: initialData?.title || '',
+    excerpt: initialData?.excerpt || '',
+    content: initialData?.content || '',
+    category: initialData?.category || 'General',
+    tags: initialData?.tags?.join(', ') || '',
+    status: initialData?.status || 'DRAFT',
+    featuredImage: initialData?.featuredImage || ''
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -136,14 +136,14 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
         content: formData.content,
         category: formData.category,
         tags,
-        status: publishNow ? 'published' : formData.status,
+        status: publishNow ? 'PUBLISHED' : formData.status,
         readTime: estimateReadTime(formData.content)
       };
 
       let response;
-      if (post?.id) {
+      if (initialData?.id) {
         // Update existing post
-        response = await apiService.updateBlogPost(post.id, blogPostData);
+        response = await apiService.updateBlogPost(initialData.id, blogPostData);
       } else {
         // Create new post
         response = await apiService.createBlogPost(blogPostData);
@@ -151,7 +151,7 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
 
       if (response.success) {
         onSave(response.data);
-        onClose();
+        onCancel();
       } else {
         throw new Error(response.error || 'Failed to save blog post');
       }
@@ -239,7 +239,7 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
   const wordCount = formData.content.trim().split(/\s+/).filter(word => word.length > 0).length;
   const readTime = estimateReadTime(formData.content);
 
-  if (!isOpen) return null;
+  // Component is always rendered when included
 
   return (
     <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-start justify-center p-4 z-50 overflow-y-auto">
@@ -248,7 +248,7 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
         <div className="flex items-center justify-between p-8 bg-gradient-to-r from-purple-50 to-blue-50 border-b border-slate-200">
           <div>
             <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-700 to-blue-700 bg-clip-text text-transparent">
-              {post?.id ? '✏️ Edit Blog Post' : '✨ Create New Blog Post'}
+              {initialData?.id ? '✏️ Edit Blog Post' : '✨ Create New Blog Post'}
             </h2>
             <div className="flex items-center gap-4 mt-2">
               <p className="text-sm text-slate-600 font-medium">
@@ -271,7 +271,7 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
               {showPreview ? '📝 Edit' : '👁️ Preview'}
             </Button>
             <button
-              onClick={onClose}
+              onClick={onCancel}
               className="p-3 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-xl transition-all"
             >
               <X size={20} />
@@ -541,9 +541,9 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
                     value={formData.status}
                     onChange={(e) => handleInputChange('status', e.target.value)}
                   >
-                    <option value="draft">Draft</option>
-                    <option value="published">Published</option>
-                    <option value="archived">Archived</option>
+                    <option value="DRAFT">Draft</option>
+                    <option value="PUBLISHED">Published</option>
+                    <option value="ARCHIVED">Archived</option>
                   </select>
                 </div>
               </Card>
@@ -554,14 +554,14 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
         {/* Footer */}
         <div className="flex items-center justify-between p-8 bg-gradient-to-r from-slate-50 to-white border-t border-slate-200">
           <div className="flex items-center gap-3">
-            {post?.id ? (
+            {initialData?.id ? (
               <div className="flex items-center gap-2 text-slate-600">
                 <div className="p-2 bg-blue-100 rounded-lg">
                   <Calendar size={16} className="text-blue-600" />
                 </div>
                 <div>
                   <div className="text-sm font-medium text-slate-800">Last Updated</div>
-                  <div className="text-xs text-slate-500">{new Date(post.date).toLocaleDateString()}</div>
+                  <div className="text-xs text-slate-500">{new Date(initialData.createdAt || initialData.updatedAt || new Date()).toLocaleDateString()}</div>
                 </div>
               </div>
             ) : (
@@ -580,7 +580,7 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
           <div className="flex items-center gap-4">
             <Button
               variant="outline"
-              onClick={onClose}
+              onClick={onCancel}
               disabled={isSubmitting}
               className="px-6 py-3 rounded-xl border-2 border-slate-200 text-slate-700 hover:bg-slate-50 font-medium"
             >
