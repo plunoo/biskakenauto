@@ -106,9 +106,9 @@ const initializeStore = () => {
     }
   }
   
-  // Auto-login demo user for localhost testing
-  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-    console.log('🏠 Localhost detected, auto-logging v3 demo user...');
+  // Auto-login demo user ONLY for localhost development
+  if ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && import.meta.env.DEV) {
+    console.log('🏠 Localhost development detected, auto-logging v3 demo user...');
     
     // Clear old data stack
     localStorage.removeItem('authToken');

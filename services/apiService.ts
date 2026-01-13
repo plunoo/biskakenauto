@@ -6,9 +6,9 @@ const getApiBaseUrl = () => {
     return import.meta.env.VITE_API_URL;
   }
   
-  // Production fallback - use new Dokploy backend URL
+  // Production fallback - use bisadmin.rpnmore.com as API backend
   if (import.meta.env.PROD) {
-    return 'https://biskakenend-biskakenback-yifz9h-abad91-168-231-117-165.traefik.me';
+    return 'https://bisadmin.rpnmore.com';
   }
   
   // Development fallback

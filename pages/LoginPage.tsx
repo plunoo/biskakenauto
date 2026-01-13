@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useStore } from '../store/useStore';
 import { Button, Input, Card } from '../components/UI';
 import { UserRole } from '../types';
@@ -34,43 +34,29 @@ const LoginPage: React.FC = () => {
       <Card className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="w-16 h-16 bg-blue-600 rounded-2xl flex items-center justify-center text-white font-bold text-3xl mx-auto mb-4">B</div>
-          <h1 className="text-2xl font-bold text-gray-900">Biskaken Auto Shop</h1>
-          <p className="text-gray-500">Sign in to manage your workshop</p>
-          <div className="mt-4 p-3 bg-blue-50 rounded-md text-sm">
-            <p className="font-medium text-blue-800">Demo Credentials:</p>
-            <p className="text-blue-600">admin@biskaken.com / admin123</p>
-            <p className="text-blue-600">staff@biskaken.com / staff123</p>
+          <h1 className="text-2xl font-bold text-gray-900">Biskaken Admin Login</h1>
+          <p className="text-gray-500">Staff and admin access only</p>
+          <div className="mt-4 p-3 bg-amber-50 rounded-md text-sm border border-amber-200">
+            <p className="font-medium text-amber-800">🔐 Admin/Staff Access Required</p>
+            <p className="text-amber-600">Contact your workshop manager for login credentials</p>
           </div>
         </div>
 
         <form onSubmit={handleLogin} className="space-y-4">
           <Input 
-            label="Email Address" 
-            placeholder="admin@biskaken.com" 
+            label="Staff Email Address" 
+            placeholder="Enter your work email" 
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
           <Input 
             label="Password" 
-            placeholder="admin123" 
+            placeholder="Enter your password" 
             type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          
-          <div className="space-y-1">
-            <label className="text-sm font-medium text-gray-700">Access Role (Demo Only)</label>
-            <select 
-              className="w-full h-10 border rounded-md px-3 text-sm focus:ring-2 focus:ring-blue-500"
-              value={role}
-              onChange={(e) => setRole(e.target.value as UserRole)}
-            >
-              <option value={UserRole.ADMIN}>Admin (Owner)</option>
-              <option value={UserRole.SUB_ADMIN}>Sub-Admin (Manager)</option>
-              <option value={UserRole.STAFF}>Staff (Mechanic)</option>
-            </select>
-          </div>
 
           <div className="flex items-center justify-between text-sm">
             <label className="flex items-center gap-2 cursor-pointer">
@@ -85,7 +71,13 @@ const LoginPage: React.FC = () => {
           </Button>
         </form>
 
-        <div className="mt-8 text-center text-xs text-gray-400 uppercase tracking-widest">
+        <div className="mt-6 text-center">
+          <Link to="/landing" className="text-blue-600 hover:text-blue-700 text-sm">
+            ← Back to Biskaken Homepage
+          </Link>
+        </div>
+        
+        <div className="mt-4 text-center text-xs text-gray-400 uppercase tracking-widest">
           Ghana Market Edition 🇬🇭
         </div>
       </Card>

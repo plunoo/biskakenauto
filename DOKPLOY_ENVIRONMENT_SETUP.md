@@ -9,8 +9,8 @@ Set these in your Dokploy application environment settings:
 #### **Frontend Configuration (Required)**
 ```env
 NODE_ENV=production
-VITE_API_URL=https://biskakenend-biskakenback-yifz9h-abad91-168-231-117-165.traefik.me
-VITE_APP_URL=https://biskakenaut-biskaken-gmgjnk-db3a89-168-231-117-165.traefik.me
+VITE_API_URL=https://bisadmin.rpnmore.com
+VITE_APP_URL=https://biskakenauto.rpnmore.com
 ```
 
 #### **AI Services (Optional - Enables AI Features)**
@@ -52,7 +52,7 @@ CLOUDINARY_API_SECRET=your_cloudinary_secret
 
 #### **CORS Configuration (Backend)**
 ```env
-CORS_ORIGINS=https://biskakenaut-biskaken-gmgjnk-db3a89-168-231-117-165.traefik.me,http://localhost:3000
+CORS_ORIGINS=https://biskakenauto.rpnmore.com,http://localhost:3000
 ```
 
 ## 🔑 How to Get API Keys
@@ -118,10 +118,10 @@ CORS_ORIGINS=https://biskakenaut-biskaken-gmgjnk-db3a89-168-231-117-165.traefik.
 ### 2. Testing Features:
 ```bash
 # Test basic functionality
-curl https://biskakenaut-biskaken-gmgjnk-db3a89-168-231-117-165.traefik.me/health
+curl https://biskakenauto.rpnmore.com/health
 
 # Test admin dashboard
-# Login with: admin@biskaken-v3.com / admin123
+# Access admin login at landing page and use proper credentials
 ```
 
 ### 3. Verify AI Features:
@@ -151,13 +151,13 @@ curl https://biskakenaut-biskaken-gmgjnk-db3a89-168-231-117-165.traefik.me/healt
 For basic functionality:
 ```env
 NODE_ENV=production
-VITE_API_URL=https://biskakenend-biskakenback-yifz9h-abad91-168-231-117-165.traefik.me
+VITE_API_URL=https://bisadmin.rpnmore.com
 ```
 
 For AI-powered features:
 ```env
 NODE_ENV=production
-VITE_API_URL=https://biskakenend-biskakenback-yifz9h-abad91-168-231-117-165.traefik.me
+VITE_API_URL=https://bisadmin.rpnmore.com
 VITE_GEMINI_API_KEY=your_gemini_api_key_here
 ```
 
