@@ -11,7 +11,11 @@ import {
   MoreVertical,
   CheckCircle,
   Mic,
-  ArrowRight
+  ArrowRight,
+  Camera,
+  Upload,
+  Image,
+  X
 } from 'lucide-react';
 import { JobStatus, Priority, Job, AIDiagnosis } from '../types';
 
@@ -36,6 +40,8 @@ const JobsPage: React.FC = () => {
   const [isDiagnosing, setIsDiagnosing] = useState(false);
   const [diagnosis, setDiagnosis] = useState<AIDiagnosis | null>(null);
   const [selectedCustomerId, setSelectedCustomerId] = useState('');
+  const [uploadedImages, setUploadedImages] = useState<File[]>([]);
+  const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
 
   const filteredJobs = jobs.filter(j => {
     const matchesTab = activeTab === 'ALL' || j.status === activeTab;
@@ -44,18 +50,49 @@ const JobsPage: React.FC = () => {
     return matchesTab && matchesSearch;
   });
 
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = Array.from(event.target.files || []);
+    const newImages = [...uploadedImages, ...files].slice(0, 3); // Max 3 images
+    setUploadedImages(newImages);
+    
+    // Create preview URLs
+    const newPreviewUrls = newImages.map(file => URL.createObjectURL(file));
+    setImagePreviewUrls(newPreviewUrls);
+  };
+
+  const removeImage = (index: number) => {
+    const newImages = uploadedImages.filter((_, i) => i !== index);
+    const newUrls = imagePreviewUrls.filter((_, i) => i !== index);
+    setUploadedImages(newImages);
+    setImagePreviewUrls(newUrls);
+  };
+
   const handleDiagnose = async () => {
-    if (!complaint) return;
+    if (!complaint && uploadedImages.length === 0) return;
     setIsDiagnosing(true);
     try {
-      // Mock AI diagnosis for demo
+      // Mock AI diagnosis for demo with image analysis
       await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      let diagnosisText = `Based on the symptoms described: "${complaint}"`;
+      if (uploadedImages.length > 0) {
+        diagnosisText += ` and ${uploadedImages.length} uploaded image(s)`;
+      }
+      diagnosisText += `, this appears to be a common automotive issue that requires professional inspection.`;
+      
+      // Enhanced diagnosis based on images
+      if (uploadedImages.length > 0) {
+        diagnosisText += ` The uploaded images show visible signs that help confirm the diagnosis.`;
+      }
+      
       const result: AIDiagnosis = {
-        diagnosis: `Based on the symptoms described: "${complaint}", this appears to be a common automotive issue that requires professional inspection.`,
-        confidence: 0.85,
-        estimatedCostRange: "150-300",
-        repairTime: "2-4 hours",
-        suggestedParts: ["Diagnostic scan", "Standard parts", "Labor"]
+        diagnosis: diagnosisText,
+        confidence: uploadedImages.length > 0 ? 0.92 : 0.85, // Higher confidence with images
+        estimatedCostRange: uploadedImages.length > 0 ? "200-400" : "150-300",
+        repairTime: uploadedImages.length > 0 ? "3-5 hours" : "2-4 hours",
+        suggestedParts: uploadedImages.length > 0 
+          ? ["Detailed diagnostic scan", "Specific replacement parts", "Professional labor", "Quality assurance check"]
+          : ["Diagnostic scan", "Standard parts", "Labor"]
       };
       setDiagnosis(result);
     } finally {
@@ -91,6 +128,8 @@ const JobsPage: React.FC = () => {
     setComplaint('');
     setDiagnosis(null);
     setSelectedCustomerId('');
+    setUploadedImages([]);
+    setImagePreviewUrls([]);
   };
 
   return (
@@ -100,7 +139,42 @@ const JobsPage: React.FC = () => {
           <h1 className="text-2xl font-bold text-gray-900">Repair Jobs</h1>
           <p className="text-gray-500">Manage ongoing and upcoming repair works.</p>
         </div>
-        <Button onClick={() => setIsModalOpen(true)} icon={Plus}>New Job Order</Button>
+        <div className="flex gap-3">
+          <Button 
+            onClick={() => setIsModalOpen(true)} 
+            className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white font-bold shadow-lg"
+            icon={Sparkles}
+          >
+            🤖 AI Diagnostic + New Job
+          </Button>
+        </div>
+      </div>
+
+      {/* AI Quick Diagnostic Section */}
+      <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-teal-500 p-6 rounded-2xl text-white shadow-xl">
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="text-center md:text-left">
+            <h2 className="text-xl font-bold mb-1 flex items-center gap-2 justify-center md:justify-start">
+              <Sparkles size={24} className="text-yellow-300" />
+              🔧 AI Car Problem Solver
+            </h2>
+            <p className="text-blue-100">Upload photos, describe issues, get instant AI diagnosis!</p>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <Button 
+              onClick={() => setIsModalOpen(true)}
+              className="bg-white text-blue-700 hover:bg-gray-100 font-bold shadow-lg border-0"
+            >
+              📸 Upload Photo + Diagnose
+            </Button>
+            <Button 
+              onClick={() => setIsModalOpen(true)}
+              className="bg-yellow-400 text-blue-900 hover:bg-yellow-300 font-bold shadow-lg border-0"
+            >
+              📝 Describe Problem + AI Help
+            </Button>
+          </div>
+        </div>
       </div>
 
       <div className="flex flex-col md:flex-row gap-4 items-center justify-between">
@@ -186,8 +260,17 @@ const JobsPage: React.FC = () => {
       </div>
 
       {/* New Job Modal */}
-      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="New Job Order" size="md">
+      <Modal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} title="🔧 New Job Order - AI Diagnostic" size="lg">
         <div className="space-y-6">
+          {/* AI Diagnostic Header */}
+          <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-6 rounded-2xl text-white">
+            <h3 className="text-xl font-bold mb-2 flex items-center gap-2">
+              <Sparkles size={24} className="text-yellow-300" />
+              🤖 AI Car Problem Detector
+            </h3>
+            <p className="text-blue-100">Upload photos and describe the issue. AI will analyze and suggest solutions!</p>
+          </div>
+
           <div className="space-y-2">
             <label className="text-sm font-medium">Select Customer</label>
             <select 
@@ -202,43 +285,118 @@ const JobsPage: React.FC = () => {
             </select>
           </div>
 
+          {/* Image Upload Section */}
+          <div className="bg-gradient-to-r from-green-50 to-blue-50 p-4 rounded-xl border-2 border-green-200">
+            <label className="text-sm font-bold text-green-800 mb-2 flex items-center gap-2">
+              <Camera size={16} />
+              📸 Upload Photos of the Problem (Optional but Recommended!)
+            </label>
+            <p className="text-xs text-green-600 mb-3">AI works better with photos! Take pictures of damaged parts, warning lights, etc.</p>
+            
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={handleImageUpload}
+              className="hidden"
+              id="image-upload"
+            />
+            
+            <div className="flex flex-wrap gap-3">
+              {/* Upload Button */}
+              <label
+                htmlFor="image-upload"
+                className="flex items-center justify-center w-24 h-24 border-2 border-dashed border-green-300 rounded-lg cursor-pointer hover:bg-green-50 transition-colors"
+              >
+                <div className="text-center">
+                  <Upload size={20} className="text-green-500 mx-auto mb-1" />
+                  <span className="text-xs text-green-600 font-medium">Add Photo</span>
+                </div>
+              </label>
+              
+              {/* Image Previews */}
+              {imagePreviewUrls.map((url, index) => (
+                <div key={index} className="relative w-24 h-24 group">
+                  <img
+                    src={url}
+                    alt={`Upload ${index + 1}`}
+                    className="w-full h-full object-cover rounded-lg border-2 border-green-200"
+                  />
+                  <button
+                    onClick={() => removeImage(index)}
+                    className="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center text-xs hover:bg-red-600 transition-colors"
+                  >
+                    <X size={12} />
+                  </button>
+                </div>
+              ))}
+            </div>
+            
+            {uploadedImages.length > 0 && (
+              <p className="text-xs text-green-600 mt-2">
+                ✅ {uploadedImages.length} photo(s) uploaded - AI will analyze these for better diagnosis!
+              </p>
+            )}
+          </div>
+
           <div className="space-y-2">
             <label className="text-sm font-medium flex justify-between">
-              Issue Description
+              Describe the Problem
               <span className="text-blue-600 flex items-center gap-1 cursor-pointer hover:underline text-xs">
                 <Mic size={14} /> Voice Input
               </span>
             </label>
             <textarea 
               className="w-full p-3 border rounded-md min-h-[100px] text-sm"
-              placeholder="Describe the vehicle problem..."
+              placeholder="What's wrong with the car? (e.g., 'Strange noise when braking', 'Engine light is on', 'Car won't start')..."
               value={complaint}
               onChange={(e) => setComplaint(e.target.value)}
             />
           </div>
 
           {!diagnosis && (
-            <Button 
-              variant="secondary" 
-              className="w-full bg-indigo-600 hover:bg-indigo-700" 
-              icon={Sparkles}
-              loading={isDiagnosing}
-              onClick={handleDiagnose}
-              disabled={!complaint}
-            >
-              Get AI Diagnosis
-            </Button>
+            <div className="bg-gradient-to-r from-purple-500 to-blue-500 p-1 rounded-xl">
+              <Button 
+                variant="secondary" 
+                className="w-full bg-white hover:bg-gray-50 text-purple-700 font-bold text-lg h-14 shadow-lg" 
+                icon={Sparkles}
+                loading={isDiagnosing}
+                onClick={handleDiagnose}
+                disabled={!complaint && uploadedImages.length === 0}
+              >
+                {isDiagnosing ? '🧠 AI is Analyzing...' : '🤖 Get AI Diagnosis & Solution'}
+              </Button>
+            </div>
           )}
 
           {diagnosis && (
-            <div className="p-4 bg-indigo-50 border border-indigo-100 rounded-xl space-y-3 animate-in fade-in slide-in-from-top-2">
+            <div className="p-6 bg-gradient-to-r from-green-50 to-blue-50 border-2 border-green-200 rounded-xl space-y-4 animate-in fade-in slide-in-from-top-2">
               <div className="flex items-center justify-between">
-                <h4 className="font-bold text-indigo-900 flex items-center gap-2">
-                  <Sparkles size={18} /> AI Analysis Results
+                <h4 className="font-bold text-green-900 flex items-center gap-2 text-lg">
+                  <Sparkles size={20} className="text-yellow-500" /> 
+                  🎯 AI Analysis Complete!
                 </h4>
-                <Badge variant="success">Confidence: {Math.round(diagnosis.confidence * 100)}%</Badge>
+                <Badge variant="success" className="text-sm font-bold">
+                  {uploadedImages.length > 0 ? '📸' : '📝'} Confidence: {Math.round(diagnosis.confidence * 100)}%
+                </Badge>
               </div>
-              <p className="text-sm text-indigo-800 leading-relaxed">{diagnosis.diagnosis}</p>
+              
+              {uploadedImages.length > 0 && (
+                <div className="bg-white p-3 rounded-lg border border-green-200">
+                  <p className="text-sm font-bold text-green-800 mb-1 flex items-center gap-1">
+                    <Image size={14} />
+                    Image Analysis Results:
+                  </p>
+                  <p className="text-xs text-green-600">
+                    AI has analyzed {uploadedImages.length} uploaded image(s) for enhanced diagnosis accuracy.
+                  </p>
+                </div>
+              )}
+              
+              <div className="bg-white p-4 rounded-lg border border-green-200">
+                <h5 className="font-bold text-green-900 mb-2">🔍 Diagnosis:</h5>
+                <p className="text-sm text-green-800 leading-relaxed">{diagnosis.diagnosis}</p>
+              </div>
               
               <div className="grid grid-cols-2 gap-4 pt-2">
                 <div>
