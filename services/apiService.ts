@@ -70,16 +70,17 @@ class ApiService {
         };
       }
     } catch (error) {
-      console.log('Using fallback database status for test mode');
+      console.log('Backend not available, using demo mode database status');
     }
     
-    // Fallback for test endpoints - always show as connected
+    // Fallback for demo mode - show as connected for testing
     return {
       success: true,
       data: {
         status: 'connected',
         responseTime: '< 50ms',
-        mode: 'test-mode'
+        mode: 'demo-mode',
+        note: 'Database simulation for local development'
       }
     };
   }
