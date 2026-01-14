@@ -3,8 +3,8 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { Layout } from './components/Layout';
 import LoginPage from './pages/LoginPage';
-import DashboardPageFixed from './pages/DashboardPageFixed';
-import JobsPageFixed from './pages/JobsPageFixed';
+import DashboardPage from './pages/DashboardPage';
+import JobsPage from './pages/JobsPage';
 import InventoryPageFixed from './pages/InventoryPageFixed';
 import CustomersPage from './pages/CustomersPage';
 import InvoicesPage from './pages/InvoicesPage';
@@ -54,7 +54,7 @@ const App: React.FC = () => {
         <Route path="/dashboard" element={
           user ? (
             <Layout>
-              <DashboardPageFixed />
+              <DashboardPage />
             </Layout>
           ) : (
             <Navigate to="/login" />
@@ -63,7 +63,7 @@ const App: React.FC = () => {
         <Route path="/jobs" element={
           user ? (
             <Layout>
-              <JobsPageFixed />
+              <JobsPage />
             </Layout>
           ) : (
             <Navigate to="/login" />
