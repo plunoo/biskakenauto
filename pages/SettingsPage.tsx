@@ -453,8 +453,8 @@ const SettingsPage: React.FC = () => {
             <h3 className="font-medium text-gray-900">Application Version</h3>
             <Monitor size={20} className="text-blue-600" />
           </div>
-          <p className="text-2xl font-bold text-blue-600">v3.0.0</p>
-          <p className="text-xs text-gray-500 mt-1">AI-Powered Release with Blog Management</p>
+          <p className="text-2xl font-bold text-purple-600">v4.0.0</p>
+          <p className="text-xs text-gray-500 mt-1">Enhanced AI-Powered Release with Car Diagnostics</p>
         </div>
         
         <div className={`p-6 border border-gray-200 rounded-lg ${

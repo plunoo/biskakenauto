@@ -12,8 +12,8 @@ PORT=80
 VITE_API_URL=https://bisadmin.rpnmore.com
 
 # Build Configuration
-VITE_APP_TITLE=Biskaken Auto V3
-VITE_APP_VERSION=3.0.0
+VITE_APP_TITLE=Biskaken Auto V4
+VITE_APP_VERSION=4.0.0
 ```
 
 ### Optional AI Configuration (for future):
@@ -83,7 +83,7 @@ OPENAI_API_KEY=your_openai_api_key_here
 ```yaml
 Service Name: biskaken-auto-frontend
 Repository: https://github.com/plunoo/biskakenauto.git
-Branch: v3-ai-features
+Branch: v4-ai-features
 Dockerfile: Dockerfile.frontend
 Build Context: ./
 Container Port: 80
@@ -190,8 +190,8 @@ After deployment, verify these features work:
 
 ## 🔧 Troubleshooting
 
-### If V3 features don't show:
-1. Verify Dokploy is deploying from `v3-ai-features` branch
+### If V4 features don't show:
+1. Verify Dokploy is deploying from `v4-ai-features` branch
 2. Clear browser cache completely
 3. Check console for JavaScript errors
 4. Verify API connectivity
@@ -219,6 +219,6 @@ If you encounter issues:
 4. Ensure both services can communicate
 
 **Repository**: https://github.com/plunoo/biskakenauto.git  
-**Branch**: v3-ai-features  
+**Branch**: v4-ai-features  
 **Backend**: https://github.com/plunoo/bisadmin.git  
-**Version**: 3.0.0 - AI-Powered Features
+**Version**: 4.0.0 - Enhanced AI-Powered Features

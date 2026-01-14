@@ -139,8 +139,8 @@ const DashboardPage: React.FC = () => {
           <h1 className="text-2xl font-bold text-gray-900">Workshop Overview</h1>
           <div className="flex items-center gap-4">
             <p className="text-gray-500">Welcome back! Here's what's happening today.</p>
-            <div className="bg-gradient-to-r from-green-500 to-blue-500 text-white px-3 py-1 rounded-full text-xs font-bold animate-pulse">
-              V3.0 AI Features Active! 🤖
+            <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full text-xs font-bold animate-pulse">
+              V4.0 AI Features Active! 🚀🤖
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-4 mt-2">
@@ -185,7 +185,7 @@ const DashboardPage: React.FC = () => {
         <div className="text-center mb-6">
           <h2 className="text-3xl font-bold mb-2 flex items-center justify-center gap-3">
             <Sparkles size={32} className="text-yellow-300" />
-            AI Assistant - Let AI Help Your Business!
+            🚀 V4 AI Assistant - Let AI Help Your Business!
             <Sparkles size={32} className="text-yellow-300" />
           </h2>
           <p className="text-purple-100 text-lg">Perfect for non-technical users - Just click and AI does the work!</p>
