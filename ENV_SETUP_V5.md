@@ -91,6 +91,7 @@ In Dokploy backend service, set these environment variables:
 ```
 NODE_ENV=production
 PORT=5000
+HOST=0.0.0.0
 DB_HOST=biskakenend-postgres-kbcgia
 DB_PORT=5432
 DB_NAME=biskaken_auto
@@ -101,6 +102,7 @@ JWT_SECRET=biskaken-super-secure-jwt-secret-2026-v5
 JWT_EXPIRES_IN=7d
 CORS_ORIGINS=https://biskakenauto.rpnmore.com,https://bisadmin.rpnmore.com
 DEMO_MODE=false
+GEMINI_API_KEY=AIzaSyBnytBpJhjxrogjD2QGCOmd2wt_anQ758Q
 ```
 
 ### Step 2: Update Frontend Environment  
@@ -111,6 +113,7 @@ PORT=3000
 VITE_API_URL=https://biskakenend-biskakenback-yifz9h-abad91-168-231-117-165.traefik.me
 VITE_APP_URL=https://biskakenauto.rpnmore.com
 VITE_BUILD_TARGET=production
+VITE_GEMINI_API_KEY=AIzaSyBnytBpJhjxrogjD2QGCOmd2wt_anQ758Q
 ```
 
 ### Step 3: Deploy V5 Branch
