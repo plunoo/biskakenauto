@@ -1,20 +1,16 @@
 import React, { useState } from 'react';
-import { Card, Badge, Button, Modal, Input } from '../components/UI';
+import { Card, Badge, Button, Modal } from '../components/UI';
 import { useStore } from '../store/useStore';
 import { 
   Plus, 
   Search, 
-  Filter, 
   Clock, 
   Wrench, 
   Sparkles,
   MoreVertical,
   CheckCircle,
-  Mic,
-  ArrowRight,
   Camera,
   Upload,
-  Image,
   X
 } from 'lucide-react';
 import { JobStatus, Priority, Job, AIDiagnosis } from '../types';
