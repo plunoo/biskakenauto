@@ -12,7 +12,7 @@ const getApiBaseUrl = () => {
   }
   
   // Development fallback
-  return 'http://localhost:5000';
+  return 'http://localhost:5001';
 };
 
 const API_BASE_URL = getApiBaseUrl();
@@ -57,30 +57,51 @@ class ApiService {
 
   async getDatabaseStatus() {
     try {
-      // For test endpoints, simulate a successful database status
-      const healthResponse = await this.request('/health');
-      if (healthResponse.status === 'OK') {
+      // First try to get real database status from backend
+      const dbStatusResponse = await this.request('/api/db-status');
+      if (dbStatusResponse.success && dbStatusResponse.data) {
         return {
           success: true,
           data: {
-            status: 'connected',
-            responseTime: '< 50ms',
-            mode: 'test-endpoints'
+            status: dbStatusResponse.data.connected ? 'connected' : 'disconnected',
+            message: dbStatusResponse.data.message,
+            responseTime: dbStatusResponse.data.connected ? '< 50ms' : 'N/A',
+            mode: dbStatusResponse.data.mode || 'production',
+            host: dbStatusResponse.data.config?.host,
+            database: dbStatusResponse.data.config?.database
           }
         };
       }
     } catch (error) {
-      console.log('Backend not available, using demo mode database status');
+      console.log('Cannot get real database status, trying health check...');
+    }
+
+    try {
+      // Fallback to basic health check
+      const healthResponse = await this.request('/health');
+      if (healthResponse.database) {
+        return {
+          success: true,
+          data: {
+            status: healthResponse.database.connected ? 'connected' : 'disconnected',
+            message: healthResponse.database.message,
+            responseTime: healthResponse.database.connected ? '< 50ms' : 'N/A',
+            mode: healthResponse.database.status
+          }
+        };
+      }
+    } catch (error) {
+      console.log('Backend not available, database status unknown');
     }
     
-    // Fallback for demo mode - show as connected for testing
+    // Final fallback - backend is not available
     return {
-      success: true,
+      success: false,
       data: {
-        status: 'connected',
-        responseTime: '< 50ms',
-        mode: 'demo-mode',
-        note: 'Database simulation for local development'
+        status: 'backend-unavailable',
+        message: 'Cannot connect to backend server',
+        responseTime: 'N/A',
+        mode: 'offline'
       }
     };
   }

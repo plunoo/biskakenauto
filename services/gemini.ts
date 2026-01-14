@@ -49,7 +49,7 @@ export const generateAIContent = async (prompt: string, type: 'title' | 'excerpt
     const enhancedPrompt = enhancePromptForType(prompt, type);
     
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
       {
         method: 'POST',
         headers: {
@@ -69,11 +69,23 @@ export const generateAIContent = async (prompt: string, type: 'title' | 'excerpt
             temperature: type === 'title' ? 0.8 : 0.7,
             topK: 40,
             topP: 0.95,
-            maxOutputTokens: type === 'content' ? 1000 : type === 'excerpt' ? 200 : 50,
+            maxOutputTokens: type === 'content' ? 2000 : type === 'excerpt' ? 300 : 100,
           },
           safetySettings: [
             {
               category: "HARM_CATEGORY_HARASSMENT",
+              threshold: "BLOCK_MEDIUM_AND_ABOVE"
+            },
+            {
+              category: "HARM_CATEGORY_HATE_SPEECH",
+              threshold: "BLOCK_MEDIUM_AND_ABOVE"
+            },
+            {
+              category: "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+              threshold: "BLOCK_MEDIUM_AND_ABOVE"
+            },
+            {
+              category: "HARM_CATEGORY_DANGEROUS_CONTENT",
               threshold: "BLOCK_MEDIUM_AND_ABOVE"
             }
           ]
@@ -82,6 +94,13 @@ export const generateAIContent = async (prompt: string, type: 'title' | 'excerpt
     );
 
     if (!response.ok) {
+      const errorData = await response.json().catch(() => null);
+      console.error(`Gemini API error: ${response.status}`, errorData);
+      
+      if (response.status === 429) {
+        throw new Error('API quota exceeded. Using fallback content generation.');
+      }
+      
       throw new Error(`Gemini API error: ${response.status}`);
     }
 
