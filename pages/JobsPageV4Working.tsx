@@ -7,6 +7,10 @@ const JobsPageV4Working: React.FC = () => {
   const { jobs, customers, addJob, updateJobStatus } = useStore();
   const [searchTerm, setSearchTerm] = useState('');
   const [activeTab, setActiveTab] = useState<'ALL' | JobStatus>('ALL');
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedJob, setSelectedJob] = useState<Job | null>(null);
+  const [aiDiagnosis, setAiDiagnosis] = useState<string>('');
+  const [isDiagnosing, setIsDiagnosing] = useState(false);
 
   const filteredJobs = jobs.filter(j => {
     const matchesTab = activeTab === 'ALL' || j.status === activeTab;
@@ -23,6 +27,62 @@ const JobsPageV4Working: React.FC = () => {
       [JobStatus.CANCELLED]: 'bg-red-100 text-red-800'
     };
     return `px-2 py-1 text-xs font-semibold rounded-full ${styles[status]}`;
+  };
+
+  const handleAIDiagnose = async (job: Job) => {
+    setSelectedJob(job);
+    setIsDiagnosing(true);
+    setAiDiagnosis('');
+    
+    // Simulate AI diagnosis
+    try {
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      const diagnosis = `🤖 AI Analysis for ${job.customerName}'s ${job.vehicleInfo}:
+
+PROBLEM: ${job.issueDescription}
+
+DIAGNOSIS: Based on the symptoms described, this appears to be a common issue that requires:
+• Professional diagnostic scan
+• Inspection of related components  
+• Estimated repair time: 2-4 hours
+• Cost range: ₵150-300
+
+RECOMMENDED ACTIONS:
+1. Run diagnostic scan to confirm issue
+2. Check warranty coverage
+3. Order necessary parts
+4. Schedule repair appointment
+
+Confidence Level: 85%`;
+      
+      setAiDiagnosis(diagnosis);
+    } catch (error) {
+      setAiDiagnosis('❌ AI diagnosis failed. Please try again.');
+    } finally {
+      setIsDiagnosing(false);
+    }
+  };
+
+  const handlePhotoUpload = (job: Job) => {
+    setSelectedJob(job);
+    alert(`📸 Photo upload for ${job.customerName}'s ${job.vehicleInfo}\n\nThis would open a photo upload dialog where mechanics can:\n• Take photos of the problem\n• Upload existing photos\n• Get AI visual analysis\n• Enhance diagnosis accuracy`);
+  };
+
+  const handleQuickDiagnostic = (type: string) => {
+    switch(type) {
+      case 'photo':
+        alert('📸 Photo Upload + AI Diagnose\n\nThis would open a camera/file picker to:\n• Take photos of car problems\n• Upload existing diagnostic photos\n• Get instant AI visual analysis\n• Provide repair recommendations');
+        break;
+      case 'describe':
+        alert('📝 Describe Issue + AI Help\n\nThis would open a form to:\n• Describe customer problem in detail\n• Get AI-powered diagnosis\n• Receive repair suggestions\n• Estimate time and cost');
+        break;
+      case 'solution':
+        alert('🔧 Get AI Solution\n\nThis would provide:\n• Step-by-step repair instructions\n• Required tools and parts\n• Safety precautions\n• Troubleshooting tips');
+        break;
+      case 'estimate':
+        alert('⏱️ AI Time Estimate\n\nThis would calculate:\n• Estimated repair duration\n• Labor time breakdown\n• Parts delivery time\n• Total completion timeline');
+        break;
+    }
   };
 
   return (
@@ -53,7 +113,10 @@ const JobsPageV4Working: React.FC = () => {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          <button className="h-20 bg-white text-blue-700 hover:bg-gray-100 font-bold shadow-lg border-0 transform hover:scale-105 transition-all rounded-lg">
+          <button 
+            onClick={() => handleQuickDiagnostic('photo')}
+            className="h-20 bg-white text-blue-700 hover:bg-gray-100 font-bold shadow-lg border-0 transform hover:scale-105 transition-all rounded-lg"
+          >
             <div className="text-center">
               <Camera size={20} className="mx-auto mb-1" />
               <div className="text-sm font-bold">📸 Upload Photo</div>
@@ -61,7 +124,10 @@ const JobsPageV4Working: React.FC = () => {
             </div>
           </button>
           
-          <button className="h-20 bg-yellow-400 text-blue-900 hover:bg-yellow-300 font-bold shadow-lg border-0 transform hover:scale-105 transition-all rounded-lg">
+          <button 
+            onClick={() => handleQuickDiagnostic('describe')}
+            className="h-20 bg-yellow-400 text-blue-900 hover:bg-yellow-300 font-bold shadow-lg border-0 transform hover:scale-105 transition-all rounded-lg"
+          >
             <div className="text-center">
               <Sparkles size={20} className="mx-auto mb-1" />
               <div className="text-sm font-bold">📝 Describe Issue</div>
@@ -69,7 +135,10 @@ const JobsPageV4Working: React.FC = () => {
             </div>
           </button>
           
-          <button className="h-20 bg-green-500 text-white hover:bg-green-400 font-bold shadow-lg border-0 transform hover:scale-105 transition-all rounded-lg">
+          <button 
+            onClick={() => handleQuickDiagnostic('solution')}
+            className="h-20 bg-green-500 text-white hover:bg-green-400 font-bold shadow-lg border-0 transform hover:scale-105 transition-all rounded-lg"
+          >
             <div className="text-center">
               <Wrench size={20} className="mx-auto mb-1" />
               <div className="text-sm font-bold">🔧 Get Solution</div>
@@ -77,7 +146,10 @@ const JobsPageV4Working: React.FC = () => {
             </div>
           </button>
           
-          <button className="h-20 bg-orange-500 text-white hover:bg-orange-400 font-bold shadow-lg border-0 transform hover:scale-105 transition-all rounded-lg">
+          <button 
+            onClick={() => handleQuickDiagnostic('estimate')}
+            className="h-20 bg-orange-500 text-white hover:bg-orange-400 font-bold shadow-lg border-0 transform hover:scale-105 transition-all rounded-lg"
+          >
             <div className="text-center">
               <Clock size={20} className="mx-auto mb-1" />
               <div className="text-sm font-bold">⏱️ Time Estimate</div>
@@ -132,11 +204,17 @@ const JobsPageV4Working: React.FC = () => {
               {/* AI Diagnostic for this job */}
               <div className="mt-3 pt-3 border-t border-gray-200">
                 <div className="flex gap-2">
-                  <button className="flex-1 px-3 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs font-bold rounded hover:from-blue-600 hover:to-purple-600">
+                  <button 
+                    onClick={() => handleAIDiagnose(job)}
+                    className="flex-1 px-3 py-2 bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs font-bold rounded hover:from-blue-600 hover:to-purple-600"
+                  >
                     <Sparkles size={12} className="inline mr-1" />
                     🤖 AI Diagnose
                   </button>
-                  <button className="px-3 py-2 text-green-600 border border-green-300 hover:bg-green-50 text-xs font-bold rounded">
+                  <button 
+                    onClick={() => handlePhotoUpload(job)}
+                    className="px-3 py-2 text-green-600 border border-green-300 hover:bg-green-50 text-xs font-bold rounded"
+                  >
                     <Camera size={12} className="inline mr-1" />
                     📸 Photo
                   </button>
@@ -188,6 +266,73 @@ const JobsPageV4Working: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* AI Diagnosis Modal */}
+      {selectedJob && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-bold text-gray-900">
+                  🤖 AI Diagnosis for {selectedJob.customerName}
+                </h3>
+                <button 
+                  onClick={() => {
+                    setSelectedJob(null);
+                    setAiDiagnosis('');
+                    setIsDiagnosing(false);
+                  }}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                <h4 className="font-bold text-blue-900 mb-2">Job Details:</h4>
+                <p><strong>Vehicle:</strong> {selectedJob.vehicleInfo}</p>
+                <p><strong>Issue:</strong> {selectedJob.issueDescription}</p>
+                <p><strong>Status:</strong> {selectedJob.status}</p>
+              </div>
+
+              {isDiagnosing ? (
+                <div className="text-center py-8">
+                  <div className="animate-spin rounded-full h-12 w-12 border-4 border-blue-500 border-t-transparent mx-auto mb-4"></div>
+                  <p className="text-blue-600 font-semibold">🧠 AI is analyzing the problem...</p>
+                  <p className="text-gray-500 text-sm">This may take a few moments</p>
+                </div>
+              ) : aiDiagnosis ? (
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <h4 className="font-bold text-green-900 mb-3">AI Analysis Results:</h4>
+                  <pre className="text-sm text-green-800 whitespace-pre-wrap font-mono leading-relaxed">
+                    {aiDiagnosis}
+                  </pre>
+                  <div className="mt-4 pt-4 border-t border-green-200">
+                    <button 
+                      onClick={() => {
+                        setSelectedJob(null);
+                        setAiDiagnosis('');
+                      }}
+                      className="w-full px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 font-semibold"
+                    >
+                      ✅ Close & Apply Diagnosis
+                    </button>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-4">
+                  <button 
+                    onClick={() => handleAIDiagnose(selectedJob)}
+                    className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-semibold"
+                  >
+                    🚀 Start AI Analysis
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
