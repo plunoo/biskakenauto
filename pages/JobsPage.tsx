@@ -151,29 +151,66 @@ const JobsPage: React.FC = () => {
       </div>
 
       {/* AI Quick Diagnostic Section */}
-      <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-teal-500 p-6 rounded-2xl text-white shadow-xl">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="text-center md:text-left">
-            <h2 className="text-xl font-bold mb-1 flex items-center gap-2 justify-center md:justify-start">
-              <Sparkles size={24} className="text-yellow-300" />
-              🔧 AI Car Problem Solver
-            </h2>
-            <p className="text-blue-100">Upload photos, describe issues, get instant AI diagnosis!</p>
-          </div>
-          <div className="flex flex-col sm:flex-row gap-3">
-            <Button 
-              onClick={() => setIsModalOpen(true)}
-              className="bg-white text-blue-700 hover:bg-gray-100 font-bold shadow-lg border-0"
-            >
-              📸 Upload Photo + Diagnose
-            </Button>
-            <Button 
-              onClick={() => setIsModalOpen(true)}
-              className="bg-yellow-400 text-blue-900 hover:bg-yellow-300 font-bold shadow-lg border-0"
-            >
-              📝 Describe Problem + AI Help
-            </Button>
-          </div>
+      <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-teal-500 p-8 rounded-2xl text-white shadow-xl border border-blue-200">
+        <div className="text-center mb-6">
+          <h2 className="text-2xl font-bold mb-2 flex items-center justify-center gap-3">
+            <Sparkles size={28} className="text-yellow-300" />
+            🔧 AI Car Problem Solver - Perfect for Mechanics!
+            <Sparkles size={28} className="text-yellow-300" />
+          </h2>
+          <p className="text-blue-100 text-lg">Upload photos, describe customer issues, get instant AI diagnosis and solutions!</p>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <Button 
+            onClick={() => setIsModalOpen(true)}
+            className="h-20 bg-white text-blue-700 hover:bg-gray-100 font-bold shadow-lg border-0 transform hover:scale-105 transition-all"
+          >
+            <div className="text-center">
+              <Camera size={20} className="mx-auto mb-1" />
+              <div className="text-sm font-bold">📸 Upload Photo</div>
+              <div className="text-xs opacity-70">+ AI Diagnose</div>
+            </div>
+          </Button>
+          
+          <Button 
+            onClick={() => setIsModalOpen(true)}
+            className="h-20 bg-yellow-400 text-blue-900 hover:bg-yellow-300 font-bold shadow-lg border-0 transform hover:scale-105 transition-all"
+          >
+            <div className="text-center">
+              <Sparkles size={20} className="mx-auto mb-1" />
+              <div className="text-sm font-bold">📝 Describe Issue</div>
+              <div className="text-xs opacity-70">+ AI Help</div>
+            </div>
+          </Button>
+          
+          <Button 
+            onClick={() => setIsModalOpen(true)}
+            className="h-20 bg-green-500 text-white hover:bg-green-400 font-bold shadow-lg border-0 transform hover:scale-105 transition-all"
+          >
+            <div className="text-center">
+              <CheckCircle size={20} className="mx-auto mb-1" />
+              <div className="text-sm font-bold">🔧 Get Solution</div>
+              <div className="text-xs opacity-90">AI Repair Tips</div>
+            </div>
+          </Button>
+          
+          <Button 
+            onClick={() => setIsModalOpen(true)}
+            className="h-20 bg-orange-500 text-white hover:bg-orange-400 font-bold shadow-lg border-0 transform hover:scale-105 transition-all"
+          >
+            <div className="text-center">
+              <Clock size={20} className="mx-auto mb-1" />
+              <div className="text-sm font-bold">⏱️ Time Estimate</div>
+              <div className="text-xs opacity-90">AI Timing</div>
+            </div>
+          </Button>
+        </div>
+        
+        <div className="text-center mt-6">
+          <p className="text-blue-100 text-sm">
+            💡 <strong>For every job!</strong> Use AI to diagnose customer problems faster and more accurately. Upload photos of the issue for best results.
+          </p>
         </div>
       </div>
 
@@ -225,6 +262,38 @@ const JobsPage: React.FC = () => {
 
             <div className="p-3 bg-gray-50 rounded-lg mb-4">
               <p className="text-sm text-gray-700 italic line-clamp-2">"{job.issueDescription}"</p>
+              
+              {/* AI Diagnostic for this job */}
+              <div className="mt-3 pt-3 border-t border-gray-200">
+                <div className="flex gap-2">
+                  <Button 
+                    size="sm" 
+                    variant="secondary"
+                    className="flex-1 bg-gradient-to-r from-blue-500 to-purple-500 text-white border-0 hover:from-blue-600 hover:to-purple-600"
+                    onClick={() => {
+                      setSelectedCustomerId(job.customerId);
+                      setComplaint(job.issueDescription);
+                      setIsModalOpen(true);
+                    }}
+                  >
+                    <Sparkles size={14} className="mr-1" />
+                    🤖 AI Diagnose
+                  </Button>
+                  <Button 
+                    size="sm" 
+                    variant="outline"
+                    className="text-green-600 border-green-300 hover:bg-green-50"
+                    onClick={() => {
+                      setSelectedCustomerId(job.customerId);
+                      setComplaint(job.issueDescription + " - Need to upload diagnostic photos");
+                      setIsModalOpen(true);
+                    }}
+                  >
+                    <Camera size={14} className="mr-1" />
+                    📸 Photo
+                  </Button>
+                </div>
+              </div>
             </div>
 
             <div className="flex justify-between items-center text-sm">

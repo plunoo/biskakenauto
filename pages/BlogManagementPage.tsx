@@ -188,70 +188,70 @@ const BlogManagementPage: React.FC = () => {
           <p className="text-purple-100 text-lg">Perfect for auto shop owners - No writing experience needed!</p>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           <Button 
-            className="h-20 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white border-0 shadow-lg transform hover:scale-105 transition-all duration-200"
+            className="h-24 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white border-0 shadow-lg transform hover:scale-105 transition-all duration-200"
             onClick={handleCreatePost}
           >
             <div className="text-center">
-              <Sparkles size={24} className="mx-auto mb-1" />
-              <div className="text-sm font-bold">✨ AI Create Title</div>
-              <div className="text-xs opacity-90">Smart blog titles</div>
+              <Sparkles size={20} className="mx-auto mb-1" />
+              <div className="text-xs font-bold">✨ AI Create Title</div>
+              <div className="text-xs opacity-90">Smart titles</div>
             </div>
           </Button>
           
           <Button 
-            className="h-20 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white border-0 shadow-lg transform hover:scale-105 transition-all duration-200"
+            className="h-24 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white border-0 shadow-lg transform hover:scale-105 transition-all duration-200"
             onClick={handleCreatePost}
           >
             <div className="text-center">
-              <Brain size={24} className="mx-auto mb-1" />
-              <div className="text-sm font-bold">🧠 AI Write Summary</div>
-              <div className="text-xs opacity-90">Perfect excerpts</div>
+              <Brain size={20} className="mx-auto mb-1" />
+              <div className="text-xs font-bold">🧠 AI Summary</div>
+              <div className="text-xs opacity-90">Excerpts</div>
             </div>
           </Button>
           
           <Button 
-            className="h-20 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white border-0 shadow-lg transform hover:scale-105 transition-all duration-200"
+            className="h-24 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white border-0 shadow-lg transform hover:scale-105 transition-all duration-200"
             onClick={handleCreatePost}
           >
             <div className="text-center">
-              <FileText size={24} className="mx-auto mb-1" />
-              <div className="text-sm font-bold">📝 AI Full Article</div>
-              <div className="text-xs opacity-90">Complete posts</div>
+              <FileText size={20} className="mx-auto mb-1" />
+              <div className="text-xs font-bold">📝 AI Article</div>
+              <div className="text-xs opacity-90">Full posts</div>
             </div>
           </Button>
           
           <Button 
-            className="h-20 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white border-0 shadow-lg transform hover:scale-105 transition-all duration-200"
+            className="h-24 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white border-0 shadow-lg transform hover:scale-105 transition-all duration-200"
             onClick={handleCreatePost}
           >
             <div className="text-center">
-              <Image size={24} className="mx-auto mb-1" />
-              <div className="text-sm font-bold">🖼️ AI Create Image</div>
-              <div className="text-xs opacity-90">Blog photos</div>
+              <Image size={20} className="mx-auto mb-1" />
+              <div className="text-xs font-bold">🖼️ AI Image</div>
+              <div className="text-xs opacity-90">Photos</div>
             </div>
           </Button>
           
           <Button 
-            className="h-20 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white border-0 shadow-lg transform hover:scale-105 transition-all duration-200"
+            className="h-24 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white border-0 shadow-lg transform hover:scale-105 transition-all duration-200"
             onClick={handleCreatePost}
           >
             <div className="text-center">
-              <Upload size={24} className="mx-auto mb-1" />
-              <div className="text-sm font-bold">📷 Upload Photo</div>
-              <div className="text-xs opacity-90">Add your images</div>
+              <Upload size={20} className="mx-auto mb-1" />
+              <div className="text-xs font-bold">📷 Upload</div>
+              <div className="text-xs opacity-90">Images</div>
             </div>
           </Button>
           
           <Button 
-            className="h-20 bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white border-0 shadow-lg transform hover:scale-105 transition-all duration-200"
+            className="h-24 bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white border-0 shadow-lg transform hover:scale-105 transition-all duration-200"
             onClick={handleCreatePost}
           >
             <div className="text-center">
-              <Video size={24} className="mx-auto mb-1" />
-              <div className="text-sm font-bold">🎥 Upload Video</div>
-              <div className="text-xs opacity-90">Add your videos</div>
+              <Video size={20} className="mx-auto mb-1" />
+              <div className="text-xs font-bold">🎥 Video</div>
+              <div className="text-xs opacity-90">Upload</div>
             </div>
           </Button>
         </div>
