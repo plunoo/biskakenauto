@@ -11,6 +11,13 @@ const JobsPageV4Working: React.FC = () => {
   const [selectedJob, setSelectedJob] = useState<Job | null>(null);
   const [aiDiagnosis, setAiDiagnosis] = useState<string>('');
   const [isDiagnosing, setIsDiagnosing] = useState(false);
+  const [isNewJobModalOpen, setIsNewJobModalOpen] = useState(false);
+  const [newJobData, setNewJobData] = useState({
+    customerId: '',
+    customerName: '',
+    vehicleInfo: '',
+    issueDescription: ''
+  });
 
   const filteredJobs = jobs.filter(j => {
     const matchesTab = activeTab === 'ALL' || j.status === activeTab;
@@ -68,6 +75,46 @@ Confidence Level: 85%`;
     alert(`📸 Photo upload for ${job.customerName}'s ${job.vehicleInfo}\n\nThis would open a photo upload dialog where mechanics can:\n• Take photos of the problem\n• Upload existing photos\n• Get AI visual analysis\n• Enhance diagnosis accuracy`);
   };
 
+  const handleNewJobWithAI = () => {
+    setIsNewJobModalOpen(true);
+    setNewJobData({
+      customerId: '',
+      customerName: '',
+      vehicleInfo: '',
+      issueDescription: ''
+    });
+  };
+
+  const handleCreateJobWithAI = () => {
+    if (!newJobData.customerName || !newJobData.issueDescription) {
+      alert('Please fill in customer name and issue description');
+      return;
+    }
+
+    const newJob: Job = {
+      id: `J${Math.floor(Math.random() * 1000)}`,
+      customerId: newJobData.customerId || `C${Math.floor(Math.random() * 100)}`,
+      customerName: newJobData.customerName,
+      vehicleInfo: newJobData.vehicleInfo || 'Vehicle details to be added',
+      issueDescription: newJobData.issueDescription,
+      status: JobStatus.PENDING,
+      priority: Priority.MEDIUM,
+      estimatedCost: 0,
+      parts: [],
+      laborHours: 0,
+      laborRate: 50,
+      createdAt: new Date().toISOString()
+    };
+
+    addJob(newJob);
+    setIsNewJobModalOpen(false);
+    
+    // Automatically start AI diagnosis for the new job
+    setTimeout(() => {
+      handleAIDiagnose(newJob);
+    }, 500);
+  };
+
   const handleQuickDiagnostic = (type: string) => {
     switch(type) {
       case 'photo':
@@ -94,6 +141,7 @@ Confidence Level: 85%`;
           <p className="text-gray-500">Manage ongoing and upcoming repair works.</p>
         </div>
         <button 
+          onClick={handleNewJobWithAI}
           className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:from-purple-700 hover:to-blue-700 font-bold shadow-lg"
         >
           <Sparkles size={20} />
@@ -329,6 +377,93 @@ Confidence Level: 85%`;
                   </button>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* New Job with AI Modal */}
+      {isNewJobModalOpen && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-bold text-gray-900">
+                  🤖 Create New Job with AI Diagnosis
+                </h3>
+                <button 
+                  onClick={() => setIsNewJobModalOpen(false)}
+                  className="text-gray-400 hover:text-gray-600"
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Customer Name *
+                  </label>
+                  <input
+                    type="text"
+                    value={newJobData.customerName}
+                    onChange={(e) => setNewJobData(prev => ({...prev, customerName: e.target.value}))}
+                    placeholder="Enter customer name"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Vehicle Information
+                  </label>
+                  <input
+                    type="text"
+                    value={newJobData.vehicleInfo}
+                    onChange={(e) => setNewJobData(prev => ({...prev, vehicleInfo: e.target.value}))}
+                    placeholder="e.g., 2020 Toyota Camry, License: ABC123"
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Issue Description *
+                  </label>
+                  <textarea
+                    value={newJobData.issueDescription}
+                    onChange={(e) => setNewJobData(prev => ({...prev, issueDescription: e.target.value}))}
+                    placeholder="Describe the problem in detail. What symptoms is the customer experiencing?"
+                    rows={4}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                  <h4 className="font-bold text-blue-900 mb-2">🤖 What happens next:</h4>
+                  <ul className="text-sm text-blue-800 space-y-1">
+                    <li>• Job will be created with PENDING status</li>
+                    <li>• AI will automatically analyze the problem</li>
+                    <li>• Get instant diagnosis and repair recommendations</li>
+                    <li>• Estimated costs and time will be provided</li>
+                  </ul>
+                </div>
+
+                <div className="flex gap-3 pt-4">
+                  <button
+                    onClick={() => setIsNewJobModalOpen(false)}
+                    className="flex-1 px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleCreateJobWithAI}
+                    className="flex-1 px-4 py-2 bg-gradient-to-r from-purple-600 to-blue-600 text-white rounded-lg hover:from-purple-700 hover:to-blue-700 font-semibold"
+                  >
+                    🚀 Create Job + AI Diagnose
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
