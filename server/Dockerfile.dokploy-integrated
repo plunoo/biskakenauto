@@ -10,7 +10,9 @@ RUN apk add --no-cache postgresql postgresql-contrib postgresql-dev supervisor
 RUN mkdir -p /var/lib/postgresql/data \
     /var/log/postgresql \
     /etc/supervisor/conf.d \
-    /app
+    /app \
+    /tmp
+RUN chmod 1777 /tmp
 
 # Initialize PostgreSQL (postgres user already exists from package installation)
 RUN chown -R postgres:postgres /var/lib/postgresql
@@ -24,6 +26,7 @@ RUN initdb -D /var/lib/postgresql/data
 RUN echo "host all all 0.0.0.0/0 md5" >> /var/lib/postgresql/data/pg_hba.conf
 RUN echo "listen_addresses='*'" >> /var/lib/postgresql/data/postgresql.conf
 RUN echo "port=5432" >> /var/lib/postgresql/data/postgresql.conf
+RUN echo "unix_socket_directories='/tmp'" >> /var/lib/postgresql/data/postgresql.conf
 
 # Switch back to root
 USER root
@@ -37,7 +40,7 @@ logfile=/var/log/supervisord.log
 pidfile=/var/run/supervisord.pid
 
 [program:postgresql]
-command=su postgres -c 'postgres -D /var/lib/postgresql/data'
+command=su postgres -c 'postgres -D /var/lib/postgresql/data -k /tmp'
 autostart=true
 autorestart=true
 user=root
@@ -73,9 +76,9 @@ RUN addgroup -g 1001 -S nodejs && \
 RUN cat > /setup-db.sh << 'EOF'
 #!/bin/sh
 # Wait for PostgreSQL to be ready
-sleep 5
-su postgres -c "createdb biskaken_auto" || true
-su postgres -c "psql -c \"ALTER USER postgres PASSWORD '${DB_PASSWORD:-3coinsltd}';\"" || true
+sleep 10
+su postgres -c "createdb biskaken_auto -h /tmp" || true
+su postgres -c "psql -h /tmp -c \"ALTER USER postgres PASSWORD '${DB_PASSWORD:-3coinsltd}';\"" || true
 echo "Database setup complete"
 EOF
 RUN chmod +x /setup-db.sh
