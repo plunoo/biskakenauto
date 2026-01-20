@@ -12,8 +12,7 @@ RUN mkdir -p /var/lib/postgresql/data \
     /etc/supervisor/conf.d \
     /app
 
-# Initialize PostgreSQL
-RUN adduser -D postgres
+# Initialize PostgreSQL (postgres user already exists from package installation)
 RUN chown -R postgres:postgres /var/lib/postgresql
 RUN chmod 700 /var/lib/postgresql/data
 
