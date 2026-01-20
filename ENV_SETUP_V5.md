@@ -10,8 +10,8 @@ NODE_ENV=production
 PORT=3000
 VITE_BUILD_TARGET=production
 
-# Backend API URL (Internal Dokploy container communication)
-VITE_API_URL=https://biskakenend-biskakenback-yifz9h-abad91-168-231-117-165.traefik.me
+# Backend API URL (Points to working backend domain)
+VITE_API_URL=https://bisadmin.rpnmore.com
 
 # Public app URL
 VITE_APP_URL=https://biskakenauto.rpnmore.com

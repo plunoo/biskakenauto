@@ -25,7 +25,7 @@ Public Domain: biskakenauto.rpnmore.com
 ### **Environment Variables:**
 ```env
 NODE_ENV=production
-VITE_API_URL=https://biskakenend-biskakenback-yifz9h-abad91-168-231-117-165.traefik.me
+VITE_API_URL=https://bisadmin.rpnmore.com
 VITE_APP_URL=https://biskakenauto.rpnmore.com
 VITE_BUILD_TARGET=production
 VITE_GEMINI_API_KEY=AIzaSyBnytBpJhjxrogjD2QGCOmd2wt_anQ758Q
