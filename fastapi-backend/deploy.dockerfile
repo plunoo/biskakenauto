@@ -43,7 +43,7 @@ logfile=/var/log/supervisor/supervisord.log\n\
 pidfile=/var/run/supervisord.pid\n\
 \n\
 [program:postgresql]\n\
-command=/usr/lib/postgresql/*/bin/postgres -D /var/lib/postgresql/*/main -c config_file=/etc/postgresql/*/main/postgresql.conf\n\
+command=/usr/lib/postgresql/17/bin/postgres -D /var/lib/postgresql/17/main -c config_file=/etc/postgresql/17/main/postgresql.conf\n\
 user=postgres\n\
 autostart=true\n\
 autorestart=true\n\
