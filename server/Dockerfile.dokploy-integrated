@@ -53,7 +53,7 @@ directory=/app
 autostart=true
 autorestart=true
 user=nodejs
-environment=NODE_ENV=production,PORT=5000,DB_HOST=localhost,DB_PORT=5432,DB_NAME=biskaken_auto,DB_USER=postgres,DB_PASSWORD=%(ENV_DB_PASSWORD)s
+environment=NODE_ENV=production,PORT=5000,DB_HOST=localhost,DB_PORT=5432,DB_NAME=biskaken_auto,DB_USER=postgres,DB_PASSWORD=3coinsltd
 stdout_logfile=/var/log/nodejs.log
 stderr_logfile=/var/log/nodejs.log
 EOF
@@ -75,10 +75,22 @@ RUN addgroup -g 1001 -S nodejs && \
 # Create database setup script
 RUN cat > /setup-db.sh << 'EOF'
 #!/bin/sh
-# Wait for PostgreSQL to be ready
-sleep 10
+echo "Waiting for PostgreSQL to start..."
+sleep 15
+
+# Check if PostgreSQL is running
+for i in {1..30}; do
+  if su postgres -c "pg_isready -h /tmp"; then
+    echo "PostgreSQL is ready!"
+    break
+  fi
+  echo "Waiting for PostgreSQL... attempt $i"
+  sleep 2
+done
+
+# Create database and user
 su postgres -c "createdb biskaken_auto -h /tmp" || true
-su postgres -c "psql -h /tmp -c \"ALTER USER postgres PASSWORD '${DB_PASSWORD:-3coinsltd}';\"" || true
+su postgres -c "psql -h /tmp -c \"ALTER USER postgres PASSWORD '3coinsltd';\"" || true
 echo "Database setup complete"
 EOF
 RUN chmod +x /setup-db.sh
@@ -91,4 +103,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=30s --retries=3 \
   CMD node -e "const http=require('http');const req=http.request({host:'localhost',port:5000,path:'/health',timeout:5000},(res)=>process.exit(res.statusCode===200?0:1));req.on('error',()=>process.exit(1));req.end();" || exit 1
 
 # Start services with supervisor
-CMD ["/bin/sh", "-c", "/setup-db.sh & supervisord -c /etc/supervisor/conf.d/supervisord.conf"]
+CMD ["/bin/sh", "-c", "echo 'Starting services...' && /setup-db.sh & echo 'Starting supervisor...' && supervisord -c /etc/supervisor/conf.d/supervisord.conf"]
