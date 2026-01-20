@@ -39,7 +39,7 @@ deploy*.sh
 docker-compose*.yml
 dokploy*.yml
 Dockerfile.*
-package.*.json
+# package.*.json  # Commented out - we need package.frontend.json for build
 check-dashboard.js
 
 # Ignore environment files (security)

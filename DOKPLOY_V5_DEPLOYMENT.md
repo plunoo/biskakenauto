@@ -1,4 +1,4 @@
-# 🚀 V5 Dokploy Deployment - Complete AI System with PostgreSQL
+# 🚀 V5 Dokploy Deployment - Integrated Backend + Database Architecture
 
 ## 📦 **REPOSITORY CONFIGURATION**
 ```
@@ -13,7 +13,7 @@ Authentication: Use your GitHub token in Dokploy
 
 ### **Service Configuration:**
 ```yaml
-Service Name: biskaken-frontend-v5
+Service Name: biskaken-frontend
 Service Type: Application
 Build Context: / (root directory)
 Dockerfile: Dockerfile.frontend
@@ -33,18 +33,18 @@ VITE_GEMINI_API_KEY=AIzaSyBnytBpJhjxrogjD2QGCOmd2wt_anQ758Q
 
 ---
 
-## ⚙️ **BACKEND SERVICE (Node.js API)**
+## ⚙️ **BACKEND + DATABASE SERVICE (Integrated Node.js + PostgreSQL)**
 
 ### **Service Configuration:**
 ```yaml
-Service Name: biskaken-backend-v5
+Service Name: biskaken-backend-integrated
 Service Type: Application
 Build Context: /server
-Dockerfile: server/Dockerfile
+Dockerfile: server/Dockerfile.dokploy-integrated
 Container Port: 5000
 Public Port: 5000
 Public Domain: bisadmin.rpnmore.com
-Entry Point: app.js
+Entry Point: Managed by Supervisor (PostgreSQL + Node.js)
 ```
 
 ### **Environment Variables:**
@@ -52,12 +52,12 @@ Entry Point: app.js
 NODE_ENV=production
 PORT=5000
 HOST=0.0.0.0
-DB_HOST=biskakenend-postgres-kbcgia
+DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=biskaken_auto
 DB_USER=postgres
 DB_PASSWORD=3coinsltd
-DATABASE_URL=postgresql://postgres:3coinsltd@biskakenend-postgres-kbcgia:5432/biskaken_auto
+DATABASE_URL=postgresql://postgres:3coinsltd@localhost:5432/biskaken_auto
 JWT_SECRET=biskaken-super-secure-jwt-secret-2026-v5
 JWT_EXPIRES_IN=7d
 CORS_ORIGINS=https://biskakenauto.rpnmore.com,https://bisadmin.rpnmore.com
@@ -65,41 +65,43 @@ DEMO_MODE=false
 GEMINI_API_KEY=AIzaSyBnytBpJhjxrogjD2QGCOmd2wt_anQ758Q
 ```
 
----
-
-## 🗄️ **POSTGRESQL DATABASE (Already Running)**
+### **Volume Configuration:**
 ```yaml
-Service Name: biskakenend-postgres-kbcgia
-Database: biskaken_auto
-User: postgres
-Password: 3coinsltd
-Internal Port: 5432
+Volumes:
+  - /var/lib/postgresql/data (for database persistence)
 ```
 
 ---
 
-## 🚀 **DEPLOYMENT STEPS**
+## 🚀 **DEPLOYMENT STEPS - Integrated Architecture**
 
-### **Step 1: Update Repository**
-- Change from `bisadmin.git` to `biskakenauto.git`
-- Set branch to `v5-complete-ai-system`
+### **Step 1: Remove Separate Database Service**
+- **Delete** the existing PostgreSQL service (`biskakenend-postgres-kbcgia`)
+- Database will now run **inside** the backend container
 
-### **Step 2: Backend Service**
-1. **Create/Update** backend service
-2. **Set build context** to `/server`
-3. **Add environment variables** from above
-4. **Deploy**
+### **Step 2: Update Repository Configuration**
+- Repository: `https://github.com/plunoo/biskakenauto.git`
+- Branch: `v5-complete-ai-system`
 
-### **Step 3: Frontend Service**  
-1. **Create/Update** frontend service
-2. **Set build context** to `/` (root)
-3. **Add environment variables** from above
-4. **Deploy**
+### **Step 3: Create/Update Integrated Backend Service**
+1. **Service Name**: `biskaken-backend-integrated`
+2. **Build Context**: `/server`
+3. **Dockerfile**: `server/Dockerfile.dokploy-integrated`
+4. **Container Port**: `5000`
+5. **Add environment variables** from above (localhost DB_HOST)
+6. **Configure volume** for PostgreSQL data persistence
+7. **Deploy**
 
-### **Step 4: Verify Deployment**
+### **Step 4: Update Frontend Service**  
+1. **Keep existing** frontend service configuration
+2. **Ensure API URL** points to integrated backend
+3. **Deploy**
+
+### **Step 5: Verify Integrated Deployment**
 - **Backend Health**: `https://bisadmin.rpnmore.com/health`
 - **Frontend Access**: `https://biskakenauto.rpnmore.com`
 - **Database Status**: `https://bisadmin.rpnmore.com/api/db-status`
+- **Services**: Only 2 services running (Frontend + Integrated Backend)
 
 ---
 
@@ -127,8 +129,9 @@ Internal Port: 5432
     "status": "connected",
     "connected": true,
     "mode": "production",
-    "host": "biskakenend-postgres-kbcgia",
-    "database": "biskaken_auto"
+    "host": "localhost",
+    "database": "biskaken_auto",
+    "architecture": "integrated"
   }
 }
 ```

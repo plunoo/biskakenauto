@@ -1,6 +1,6 @@
-# 🔧 V5 Environment Setup Guide
+# 🔧 V5 Environment Setup Guide - Integrated Backend + Database
 
-## Required Environment Files for Full System Functionality
+## Required Environment Files for Simplified 2-Service Architecture
 
 ### 🎯 **Frontend Environment** (Dokploy Frontend Service)
 **File**: `.env.production`
@@ -20,7 +20,7 @@ VITE_APP_URL=https://biskakenauto.rpnmore.com
 VITE_GEMINI_API_KEY=AIzaSyBnytBpJhjxrogjD2QGCOmd2wt_anQ758Q
 ```
 
-### 🗄️ **Backend Environment** (Dokploy Backend Service)
+### 🗄️ **Backend + Database Environment** (Dokploy Integrated Service)
 **File**: `.env.production`
 ```env
 # Server Configuration
@@ -28,15 +28,15 @@ NODE_ENV=production
 PORT=5000
 HOST=0.0.0.0
 
-# PostgreSQL Database Configuration (From Image)
-DB_HOST=biskakenend-postgres-kbcgia
+# Internal PostgreSQL Database Configuration (Integrated Container)
+DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=biskaken_auto
 DB_USER=postgres
 DB_PASSWORD=3coinsltd
 
 # Full database connection URL
-DATABASE_URL=postgresql://postgres:3coinsltd@biskakenend-postgres-kbcgia:5432/biskaken_auto
+DATABASE_URL=postgresql://postgres:3coinsltd@localhost:5432/biskaken_auto
 
 # Security Configuration
 JWT_SECRET=biskaken-super-secure-jwt-secret-2026-v5
@@ -45,23 +45,24 @@ JWT_EXPIRES_IN=7d
 # CORS Configuration (Frontend URLs)
 CORS_ORIGINS=https://biskakenauto.rpnmore.com,https://bisadmin.rpnmore.com
 
-# Database Mode (false = use real database, true = demo mode)
+# Database Mode (false = use integrated database, true = demo mode)
 DEMO_MODE=false
 
 # AI Configuration (Gemini API)
 GEMINI_API_KEY=AIzaSyBnytBpJhjxrogjD2QGCOmd2wt_anQ758Q
 ```
 
-## 📊 **PostgreSQL Database Setup** (Already Running)
+## 📊 **Integrated PostgreSQL Database Setup**
 
-Based on the image provided, your PostgreSQL service is configured as:
+The new architecture includes PostgreSQL **inside** the backend container:
 
-- **Service Name**: `biskakenend-postgres-kbcgia`
+- **Service Architecture**: Single container with Node.js + PostgreSQL
+- **Database Host**: `localhost` (internal to container)
 - **Database**: `biskaken_auto`
 - **User**: `postgres`
 - **Password**: `3coinsltd`
 - **Internal Port**: `5432`
-- **Connection URL**: `postgresql://postgres:3coinsltd@biskakenend-postgres-kbcgia:5432/biskaken_auto`
+- **Connection URL**: `postgresql://postgres:3coinsltd@localhost:5432/biskaken_auto`
 
 ## 🔄 **Database Auto-Initialization**
 
@@ -84,20 +85,24 @@ When V5 backend starts, it will automatically:
    - If database connection fails, runs in demo mode
    - All API endpoints still work with demo data
 
-## 🚀 **Deployment Steps**
+## 🚀 **Deployment Steps - Integrated Architecture**
 
-### Step 1: Update Backend Environment
-In Dokploy backend service, set these environment variables:
+### Step 1: Update/Create Integrated Backend Service
+In Dokploy, create or update backend service with:
+
+**Dockerfile**: Use `server/Dockerfile.dokploy-integrated`
+
+**Environment Variables**:
 ```
 NODE_ENV=production
 PORT=5000
 HOST=0.0.0.0
-DB_HOST=biskakenend-postgres-kbcgia
+DB_HOST=localhost
 DB_PORT=5432
 DB_NAME=biskaken_auto
 DB_USER=postgres
 DB_PASSWORD=3coinsltd
-DATABASE_URL=postgresql://postgres:3coinsltd@biskakenend-postgres-kbcgia:5432/biskaken_auto
+DATABASE_URL=postgresql://postgres:3coinsltd@localhost:5432/biskaken_auto
 JWT_SECRET=biskaken-super-secure-jwt-secret-2026-v5
 JWT_EXPIRES_IN=7d
 CORS_ORIGINS=https://biskakenauto.rpnmore.com,https://bisadmin.rpnmore.com
@@ -116,13 +121,17 @@ VITE_BUILD_TARGET=production
 VITE_GEMINI_API_KEY=AIzaSyBnytBpJhjxrogjD2QGCOmd2wt_anQ758Q
 ```
 
-### Step 3: Deploy V5 Branch
+### Step 3: Remove Separate Database Service
+- **Delete** the separate PostgreSQL service (`biskakenend-postgres-kbcgia`)
+- The database now runs **inside** the backend container
+
+### Step 4: Deploy V5 Branch
 Deploy from: `v5-complete-ai-system` branch
 
-### Step 4: Verify Database Connection
+### Step 5: Verify Integrated Setup
 Check endpoints:
-- `GET /health` - Should show database status
-- `GET /api/db-status` - Should show "connected" status
+- `GET /health` - Should show integrated database status
+- `GET /api/db-status` - Should show "connected" status  
 - `GET /api/status` - Should show database mode as "production"
 
 ## 🔍 **Testing Database Integration**
