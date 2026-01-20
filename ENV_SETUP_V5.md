@@ -90,7 +90,7 @@ When V5 backend starts, it will automatically:
 ### Step 1: Update/Create Integrated Backend Service
 In Dokploy, create or update backend service with:
 
-**Dockerfile**: Use `server/Dockerfile.dokploy-integrated`
+**Dockerfile**: Use `Dockerfile.dokploy-integrated` (relative to `/server` build context)
 
 **Environment Variables**:
 ```

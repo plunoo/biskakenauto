@@ -40,7 +40,7 @@ VITE_GEMINI_API_KEY=AIzaSyBnytBpJhjxrogjD2QGCOmd2wt_anQ758Q
 Service Name: biskaken-backend-integrated
 Service Type: Application
 Build Context: /server
-Dockerfile: server/Dockerfile.dokploy-integrated
+Dockerfile: Dockerfile.dokploy-integrated
 Container Port: 5000
 Public Port: 5000
 Public Domain: bisadmin.rpnmore.com
@@ -86,7 +86,7 @@ Volumes:
 ### **Step 3: Create/Update Integrated Backend Service**
 1. **Service Name**: `biskaken-backend-integrated`
 2. **Build Context**: `/server`
-3. **Dockerfile**: `server/Dockerfile.dokploy-integrated`
+3. **Dockerfile**: `Dockerfile.dokploy-integrated`
 4. **Container Port**: `5000`
 5. **Add environment variables** from above (localhost DB_HOST)
 6. **Configure volume** for PostgreSQL data persistence
