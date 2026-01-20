@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y \
 # Set up PostgreSQL
 USER postgres
 RUN /etc/init.d/postgresql start && \
-    psql --command "CREATE USER postgres WITH SUPERUSER PASSWORD '3coinsltd';" && \
+    psql --command "ALTER USER postgres PASSWORD '3coinsltd';" && \
     createdb -O postgres biskaken_auto
 
 # Switch back to root
