@@ -13,6 +13,7 @@ COPY vite.config.ts ./
 RUN npm ci
 
 # Copy source code (excluding server directory)
+COPY App.tsx ./
 COPY components/ ./components/
 COPY pages/ ./pages/
 COPY services/ ./services/
