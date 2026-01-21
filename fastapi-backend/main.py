@@ -360,6 +360,178 @@ async def logout():
     response.delete_cookie("access_token")
     return response
 
+# =============================================================================
+# SYSTEM FUNCTIONALITY ROUTES - All the missing system pages
+# =============================================================================
+
+def get_demo_user(email: str):
+    """Helper to get demo user data"""
+    for user in DEMO_USERS:
+        if user["email"] == email:
+            return user
+    return None
+
+def get_demo_user_from_token(token: str):
+    """Helper to extract user from token"""
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return get_demo_user(payload.get("sub"))
+    except:
+        return None
+
+@app.get("/jobs", response_class=HTMLResponse)
+async def jobs_page(request: Request):
+    token = request.cookies.get("access_token")
+    if not token:
+        return RedirectResponse(url="/login")
+    
+    user_data = get_demo_user_from_token(token)
+    if not user_data:
+        return RedirectResponse(url="/login")
+    
+    # Return simple page for now - need to create template
+    return HTMLResponse("""
+    <html><head><title>Jobs - Biskaken Auto</title></head>
+    <body><h1>Jobs Management</h1>
+    <p>Welcome, """ + user_data["name"] + """!</p>
+    <p><a href="/dashboard">Back to Dashboard</a></p>
+    <p>Jobs functionality will be implemented here.</p>
+    </body></html>
+    """)
+
+@app.get("/customers", response_class=HTMLResponse)
+async def customers_page(request: Request):
+    token = request.cookies.get("access_token")
+    if not token:
+        return RedirectResponse(url="/login")
+    
+    user_data = get_demo_user_from_token(token)
+    if not user_data:
+        return RedirectResponse(url="/login")
+    
+    return HTMLResponse("""
+    <html><head><title>Customers - Biskaken Auto</title></head>
+    <body><h1>Customer Management</h1>
+    <p>Welcome, """ + user_data["name"] + """!</p>
+    <p><a href="/dashboard">Back to Dashboard</a></p>
+    <p>Customer functionality will be implemented here.</p>
+    </body></html>
+    """)
+
+@app.get("/inventory", response_class=HTMLResponse)
+async def inventory_page(request: Request):
+    token = request.cookies.get("access_token")
+    if not token:
+        return RedirectResponse(url="/login")
+    
+    user_data = get_demo_user_from_token(token)
+    if not user_data:
+        return RedirectResponse(url="/login")
+    
+    return HTMLResponse("""
+    <html><head><title>Inventory - Biskaken Auto</title></head>
+    <body><h1>Inventory Management</h1>
+    <p>Welcome, """ + user_data["name"] + """!</p>
+    <p><a href="/dashboard">Back to Dashboard</a></p>
+    <p>Inventory functionality will be implemented here.</p>
+    </body></html>
+    """)
+
+@app.get("/admin", response_class=HTMLResponse)
+async def admin_page(request: Request):
+    token = request.cookies.get("access_token")
+    if not token:
+        return RedirectResponse(url="/login")
+    
+    user_data = get_demo_user_from_token(token)
+    if not user_data or user_data["role"] != "ADMIN":
+        return RedirectResponse(url="/dashboard")
+    
+    return HTMLResponse("""
+    <html><head><title>Admin - Biskaken Auto</title></head>
+    <body><h1>Admin Panel</h1>
+    <p>Welcome, """ + user_data["name"] + """!</p>
+    <p><a href="/dashboard">Back to Dashboard</a></p>
+    <p>Admin functionality will be implemented here.</p>
+    </body></html>
+    """)
+
+@app.get("/reports", response_class=HTMLResponse)
+async def reports_page(request: Request):
+    token = request.cookies.get("access_token")
+    if not token:
+        return RedirectResponse(url="/login")
+    
+    user_data = get_demo_user_from_token(token)
+    if not user_data:
+        return RedirectResponse(url="/login")
+    
+    return HTMLResponse("""
+    <html><head><title>Reports - Biskaken Auto</title></head>
+    <body><h1>Reports & Analytics</h1>
+    <p>Welcome, """ + user_data["name"] + """!</p>
+    <p><a href="/dashboard">Back to Dashboard</a></p>
+    <p>Reports functionality will be implemented here.</p>
+    </body></html>
+    """)
+
+@app.get("/settings", response_class=HTMLResponse)
+async def settings_page(request: Request):
+    token = request.cookies.get("access_token")
+    if not token:
+        return RedirectResponse(url="/login")
+    
+    user_data = get_demo_user_from_token(token)
+    if not user_data:
+        return RedirectResponse(url="/login")
+    
+    return HTMLResponse("""
+    <html><head><title>Settings - Biskaken Auto</title></head>
+    <body><h1>System Settings</h1>
+    <p>Welcome, """ + user_data["name"] + """!</p>
+    <p><a href="/dashboard">Back to Dashboard</a></p>
+    <p>Settings functionality will be implemented here.</p>
+    </body></html>
+    """)
+
+@app.get("/blog", response_class=HTMLResponse)
+async def blog_page(request: Request):
+    token = request.cookies.get("access_token")
+    if not token:
+        return RedirectResponse(url="/login")
+    
+    user_data = get_demo_user_from_token(token)
+    if not user_data:
+        return RedirectResponse(url="/login")
+    
+    return HTMLResponse("""
+    <html><head><title>Blog Management - Biskaken Auto</title></head>
+    <body><h1>Blog Management</h1>
+    <p>Welcome, """ + user_data["name"] + """!</p>
+    <p><a href="/dashboard">Back to Dashboard</a></p>
+    <p>Blog functionality will be implemented here.</p>
+    </body></html>
+    """)
+
+@app.get("/invoices", response_class=HTMLResponse)
+async def invoices_page(request: Request):
+    token = request.cookies.get("access_token")
+    if not token:
+        return RedirectResponse(url="/login")
+    
+    user_data = get_demo_user_from_token(token)
+    if not user_data:
+        return RedirectResponse(url="/login")
+    
+    return HTMLResponse("""
+    <html><head><title>Invoices - Biskaken Auto</title></head>
+    <body><h1>Invoice Management</h1>
+    <p>Welcome, """ + user_data["name"] + """!</p>
+    <p><a href="/dashboard">Back to Dashboard</a></p>
+    <p>Invoice functionality will be implemented here.</p>
+    </body></html>
+    """)
+
 # API Routes
 @app.get("/api/status")
 async def api_status():
