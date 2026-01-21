@@ -4,9 +4,12 @@ Biskaken Auto FastAPI Backend
 Professional automotive services management system
 """
 
-from fastapi import FastAPI, Depends, HTTPException, status
+from fastapi import FastAPI, Depends, HTTPException, status, Form, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import HTMLResponse, RedirectResponse
 from sqlalchemy import create_engine, Column, Integer, String, DateTime, Text, DECIMAL, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
@@ -47,6 +50,9 @@ app = FastAPI(
     docs_url="/api/docs",
     redoc_url="/api/redoc"
 )
+
+# Templates setup
+templates = Jinja2Templates(directory="templates")
 
 # CORS middleware
 app.add_middleware(
@@ -242,9 +248,121 @@ async def startup_event():
     except Exception as e:
         logger.error(f"❌ Database initialization failed: {e}")
 
+# HTML Routes
+@app.get("/", response_class=HTMLResponse)
+async def root_redirect():
+    return RedirectResponse(url="/login", status_code=302)
+
+@app.get("/login", response_class=HTMLResponse)
+async def login_page(request: Request, error: str = None, email: str = None):
+    return templates.TemplateResponse("login.html", {
+        "request": request, 
+        "error": error,
+        "email": email
+    })
+
+@app.post("/login")
+async def login_form(
+    request: Request,
+    email: str = Form(...),
+    password: str = Form(...),
+    db: Session = Depends(get_db)
+):
+    user = authenticate_user(db, email, password)
+    if not user:
+        return templates.TemplateResponse("login.html", {
+            "request": request,
+            "error": "Invalid email or password. Please try again.",
+            "email": email
+        })
+    
+    # Create session token (simplified - in production use secure sessions)
+    access_token = create_access_token(data={"sub": user["email"] if isinstance(user, dict) else user.email})
+    
+    # Redirect to dashboard with token (simplified - use secure cookies in production)
+    response = RedirectResponse(url="/dashboard", status_code=302)
+    response.set_cookie("access_token", access_token, max_age=7*24*60*60)  # 7 days
+    return response
+
+@app.get("/dashboard", response_class=HTMLResponse)
+async def dashboard(request: Request, db: Session = Depends(get_db)):
+    # Get token from cookie
+    token = request.cookies.get("access_token")
+    if not token:
+        return RedirectResponse(url="/login?error=Please login first", status_code=302)
+    
+    try:
+        # Verify token
+        from jose import jwt
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        email = payload.get("sub")
+        if not email:
+            raise Exception("Invalid token")
+        
+        # Get user info
+        user = None
+        for demo_user in DEMO_USERS:
+            if demo_user["email"] == email:
+                user = demo_user
+                break
+        
+        if not user:
+            db_user = db.query(User).filter(User.email == email, User.status == "ACTIVE").first()
+            if db_user:
+                user = {
+                    "email": db_user.email,
+                    "name": db_user.name,
+                    "role": db_user.role
+                }
+        
+        if not user:
+            return RedirectResponse(url="/login?error=Invalid session", status_code=302)
+        
+        # Get dashboard data
+        try:
+            total_customers = db.query(Customer).count()
+            total_jobs = db.query(Job).count()
+            pending_jobs = db.query(Job).filter(Job.status == "PENDING").count()
+            recent_jobs = [
+                {"id": 1, "customer": "Kwame Asante", "issue": "Engine oil change", "status": "COMPLETED"},
+                {"id": 2, "customer": "Akosua Mensah", "issue": "Brake inspection", "status": "IN_PROGRESS"}
+            ]
+        except:
+            # Demo data if DB fails
+            total_customers = 25
+            total_jobs = 15
+            pending_jobs = 5
+            recent_jobs = [
+                {"id": 1, "customer": "Kwame Asante", "issue": "Engine oil change", "status": "COMPLETED"},
+                {"id": 2, "customer": "Akosua Mensah", "issue": "Brake inspection", "status": "IN_PROGRESS"}
+            ]
+        
+        stats = {
+            "total_customers": total_customers,
+            "total_jobs": total_jobs,
+            "pending_jobs": pending_jobs,
+            "revenue": 15750.00
+        }
+        
+        return templates.TemplateResponse("dashboard.html", {
+            "request": request,
+            "user": user,
+            "stats": stats,
+            "recent_jobs": recent_jobs
+        })
+        
+    except Exception as e:
+        return RedirectResponse(url="/login?error=Session expired", status_code=302)
+
+@app.get("/logout")
+async def logout():
+    response = RedirectResponse(url="/login", status_code=302)
+    response.delete_cookie("access_token")
+    return response
+
 # API Routes
-@app.get("/")
-async def root():
+@app.get("/api/status")
+async def api_status():
     return {
         "success": True,
         "message": "Biskaken Auto FastAPI v5.0 is running!",
