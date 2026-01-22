@@ -12,7 +12,7 @@ const getApiBaseUrl = () => {
   }
   
   // Development fallback
-  return 'http://localhost:5002';
+  return 'http://localhost:5000';
 };
 
 const API_BASE_URL = getApiBaseUrl();
