@@ -47,8 +47,8 @@ EOF
 # Initialize PostgreSQL
 USER postgres
 RUN /etc/init.d/postgresql start && \
-    psql --command "CREATE USER postgres WITH SUPERUSER PASSWORD '3coinsltd';" && \
-    createdb -O postgres biskaken_auto
+    createdb biskaken_auto && \
+    psql --command "ALTER USER postgres PASSWORD '3coinsltd';"
 
 USER root
 
