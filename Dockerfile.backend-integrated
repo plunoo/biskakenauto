@@ -49,13 +49,13 @@ EOF
 USER postgres
 RUN mkdir -p /var/lib/postgresql/data && \
     chown -R postgres:postgres /var/lib/postgresql && \
-    initdb -D /var/lib/postgresql/data && \
+    /usr/lib/postgresql/17/bin/initdb -D /var/lib/postgresql/data && \
     echo "host all all 0.0.0.0/0 md5" >> /var/lib/postgresql/data/pg_hba.conf && \
     echo "listen_addresses='*'" >> /var/lib/postgresql/data/postgresql.conf && \
-    pg_ctl -D /var/lib/postgresql/data start && \
-    createdb biskaken_auto && \
-    psql --command "ALTER USER postgres PASSWORD '3coinsltd';" && \
-    pg_ctl -D /var/lib/postgresql/data stop
+    /usr/lib/postgresql/17/bin/pg_ctl -D /var/lib/postgresql/data start && \
+    /usr/lib/postgresql/17/bin/createdb biskaken_auto && \
+    /usr/lib/postgresql/17/bin/psql --command "ALTER USER postgres PASSWORD '3coinsltd';" && \
+    /usr/lib/postgresql/17/bin/pg_ctl -D /var/lib/postgresql/data stop
 
 USER root
 
@@ -66,7 +66,7 @@ COPY <<EOF /start.sh
 service postgresql start
 
 # Wait for PostgreSQL to be ready
-until pg_isready -h localhost -p 5432 -U postgres; do
+until /usr/lib/postgresql/17/bin/pg_isready -h localhost -p 5432 -U postgres; do
   echo "Waiting for PostgreSQL..."
   sleep 2
 done
