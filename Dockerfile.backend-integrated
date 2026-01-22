@@ -27,11 +27,12 @@ nodaemon=true
 user=root
 
 [program:postgresql]
-command=/usr/lib/postgresql/13/bin/postgres -D /var/lib/postgresql/13/main -c config_file=/etc/postgresql/13/main/postgresql.conf
+command=/usr/bin/postgres -D /var/lib/postgresql/data
 user=postgres
 autostart=true
 autorestart=true
 redirect_stderr=true
+environment=PGDATA="/var/lib/postgresql/data"
 
 [program:fastapi]
 command=python main.py
@@ -46,9 +47,15 @@ EOF
 
 # Initialize PostgreSQL
 USER postgres
-RUN /etc/init.d/postgresql start && \
+RUN mkdir -p /var/lib/postgresql/data && \
+    chown -R postgres:postgres /var/lib/postgresql && \
+    initdb -D /var/lib/postgresql/data && \
+    echo "host all all 0.0.0.0/0 md5" >> /var/lib/postgresql/data/pg_hba.conf && \
+    echo "listen_addresses='*'" >> /var/lib/postgresql/data/postgresql.conf && \
+    pg_ctl -D /var/lib/postgresql/data start && \
     createdb biskaken_auto && \
-    psql --command "ALTER USER postgres PASSWORD '3coinsltd';"
+    psql --command "ALTER USER postgres PASSWORD '3coinsltd';" && \
+    pg_ctl -D /var/lib/postgresql/data stop
 
 USER root
 
