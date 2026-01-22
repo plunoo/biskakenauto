@@ -1,25 +1,34 @@
 #!/bin/bash
-set -e
 
+# FastAPI Deployment Script for Dokploy
 echo "🚀 Deploying FastAPI Backend to Dokploy..."
 
-# Push changes to repository
-echo "📤 Pushing FastAPI backend to repository..."
-git push origin v5-complete-ai-system
+# Configuration
+REPO_URL="https://github.com/plunoo/biskakenauto.git"
+BRANCH="v5-complete-ai-system"
 
-echo "✅ FastAPI backend pushed successfully!"
-echo ""
-echo "📋 Next steps:"
-echo "1. Go to your Dokploy dashboard"
-echo "2. Update the backend service to use the fastapi-backend directory"
-echo "3. Set Dockerfile path to: fastapi-backend/Dockerfile.integrated"
-echo "4. Set build context to: fastapi-backend"
-echo "5. Environment variables:"
-echo "   - DATABASE_URL=postgresql://postgres:3coinsltd@localhost:5432/biskaken_auto"
-echo "   - JWT_SECRET=biskaken-super-secure-jwt-secret-2026-v5"
-echo ""
-echo "🔧 FastAPI Backend Configuration:"
-echo "   - Port: 5000"
-echo "   - Health Check: /health"
-echo "   - Admin Login: admin@biskaken.com / admin123"
-echo "   - Database Status: /api/db-status"
+echo "📦 Repository: $REPO_URL"
+echo "🌿 Branch: $BRANCH"
+
+# Check if we're in production
+if [ "$NODE_ENV" = "production" ]; then
+    echo "🏭 Production mode detected"
+    # Use PostgreSQL database
+    export DATABASE_URL="postgresql://postgres:3coinsltd@localhost:5432/biskaken_auto"
+    export PORT=5000
+else
+    echo "🛠️ Development mode"
+    # Use SQLite for development
+    export DATABASE_URL="sqlite:///./test.db"
+    export PORT=5002
+fi
+
+echo "🔧 Environment:"
+echo "  - DATABASE_URL: $DATABASE_URL"
+echo "  - PORT: $PORT"
+echo "  - JWT_SECRET: [HIDDEN]"
+
+# Start FastAPI server
+echo "▶️ Starting FastAPI server..."
+cd fastapi-backend
+python main.py

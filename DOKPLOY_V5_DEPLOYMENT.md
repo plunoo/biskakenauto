@@ -33,36 +33,29 @@ VITE_GEMINI_API_KEY=AIzaSyBnytBpJhjxrogjD2QGCOmd2wt_anQ758Q
 
 ---
 
-## ⚙️ **BACKEND + DATABASE SERVICE (Integrated Node.js + PostgreSQL)**
+## ⚙️ **FASTAPI BACKEND + DATABASE SERVICE (FastAPI + PostgreSQL)**
 
 ### **Service Configuration:**
 ```yaml
-Service Name: biskaken-backend-integrated
+Service Name: biskaken-fastapi-backend
 Service Type: Application
-Build Context: /server
-Dockerfile: Dockerfile.dokploy-integrated
+Build Context: / (root directory)
+Dockerfile: Dockerfile.fastapi
 Container Port: 5000
 Public Port: 5000
 Public Domain: bisadmin.rpnmore.com
-Entry Point: Managed by Supervisor (PostgreSQL + Node.js)
+Entry Point: FastAPI with PostgreSQL integration
 ```
 
 ### **Environment Variables:**
 ```env
 NODE_ENV=production
 PORT=5000
-HOST=0.0.0.0
-DB_HOST=localhost
-DB_PORT=5432
-DB_NAME=biskaken_auto
-DB_USER=postgres
-DB_PASSWORD=3coinsltd
-DATABASE_URL=postgresql://postgres:3coinsltd@localhost:5432/biskaken_auto
+DATABASE_URL=postgresql://postgres:3coinsltd@biskaken-postgres:5432/biskaken_auto
 JWT_SECRET=biskaken-super-secure-jwt-secret-2026-v5
-JWT_EXPIRES_IN=7d
 CORS_ORIGINS=https://biskakenauto.rpnmore.com,https://bisadmin.rpnmore.com
-DEMO_MODE=false
 GEMINI_API_KEY=AIzaSyBnytBpJhjxrogjD2QGCOmd2wt_anQ758Q
+DEMO_MODE=false
 ```
 
 ### **Volume Configuration:**

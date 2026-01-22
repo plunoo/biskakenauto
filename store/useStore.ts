@@ -114,39 +114,9 @@ const initializeStore = () => {
     }
   }
   
-  // Auto-login demo user ONLY for localhost development
-  if ((window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && import.meta.env.DEV) {
-    console.log('🏠 Localhost development detected, auto-logging v3 demo user...');
-    
-    // Clear old data stack
-    localStorage.removeItem('authToken');
-    localStorage.removeItem('user');
-    localStorage.removeItem('demo_customers');
-    localStorage.removeItem('demo_jobs');
-    localStorage.removeItem('demo_inventory');
-    localStorage.removeItem('demo_invoices');
-    localStorage.removeItem('demo_reports');
-    
-    const demoUser = {
-      id: 'admin@biskaken-v3.com',
-      name: 'Admin V3 User',
-      email: 'admin@biskaken-v3.com',
-      role: 'ADMIN'
-    };
-    const demoToken = `v3_demo_token_${Date.now()}`;
-    
-    localStorage.setItem('authToken', demoToken);
-    localStorage.setItem('user', JSON.stringify(demoUser));
-    
-    // Load data after auto-login
-    setTimeout(() => {
-      const store = useStore.getState();
-      console.log('📊 Loading data after auto-login...');
-      store.loadAllData();
-    }, 100);
-    
-    return { user: demoUser };
-  }
+  // Auto-login disabled - proper authentication required
+  // Use the login page to authenticate with FastAPI backend
+  console.log('🔐 Authentication required - redirecting to login page...');
   
   return { user: null };
 };

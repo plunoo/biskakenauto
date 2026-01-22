@@ -27,6 +27,9 @@ SECRET_KEY = os.getenv("JWT_SECRET", "biskaken-super-secure-jwt-secret-2026-v5")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_DAYS = 7
 
+# Production/Development mode detection
+PRODUCTION_MODE = os.getenv("NODE_ENV", "development") == "production"
+
 # Logging setup
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -54,17 +57,22 @@ app = FastAPI(
 # Templates setup
 templates = Jinja2Templates(directory="templates")
 
-# CORS middleware
+# CORS middleware - Development and Production origins
+allowed_origins = [
+    "http://localhost:3000",  # React app (development)
+    "http://localhost:5173",  # Vite dev server (development)
+    "https://biskakenauto.rpnmore.com",  # Frontend (production)
+    "https://bisadmin.rpnmore.com",      # Backend API (production)
+]
+
+# Add custom CORS origins if specified
+cors_origins = os.getenv("CORS_ORIGINS", "").split(",")
+if cors_origins and cors_origins[0]:
+    allowed_origins.extend([origin.strip() for origin in cors_origins])
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "https://biskakenauto.rpnmore.com",
-        "https://bisadmin.rpnmore.com", 
-        "http://localhost:3000",
-        "http://localhost:5173",
-        "*.rpnmore.com",
-        "*.traefik.me"
-    ],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -389,15 +397,10 @@ async def jobs_page(request: Request):
     if not user_data:
         return RedirectResponse(url="/login")
     
-    # Return simple page for now - need to create template
-    return HTMLResponse("""
-    <html><head><title>Jobs - Biskaken Auto</title></head>
-    <body><h1>Jobs Management</h1>
-    <p>Welcome, """ + user_data["name"] + """!</p>
-    <p><a href="/dashboard">Back to Dashboard</a></p>
-    <p>Jobs functionality will be implemented here.</p>
-    </body></html>
-    """)
+    return templates.TemplateResponse("jobs.html", {
+        "request": request,
+        "user": user_data
+    })
 
 @app.get("/customers", response_class=HTMLResponse)
 async def customers_page(request: Request):
@@ -698,6 +701,203 @@ async def get_dashboard(db: Session = Depends(get_db), current_user: User = Depe
         }
     }
 
+# Test API Endpoints for React App
+@app.get("/api/test/customers")
+async def get_test_customers():
+    return {
+        "success": True,
+        "data": [
+            {"id": "1", "name": "John Doe", "phone": "0244123456", "email": "john@example.com", "address": "Accra, Ghana"},
+            {"id": "2", "name": "Jane Smith", "phone": "0200987654", "email": "jane@example.com", "address": "Kumasi, Ghana"},
+            {"id": "3", "name": "Kwame Asante", "phone": "0246789012", "email": "kwame@example.com", "address": "Tema, Ghana"},
+            {"id": "4", "name": "Akosua Mensah", "phone": "0543210987", "email": "akosua@example.com", "address": "Takoradi, Ghana"}
+        ]
+    }
+
+@app.get("/api/test/inventory")
+async def get_test_inventory():
+    return {
+        "success": True,
+        "data": [
+            {"id": "1", "name": "Engine Oil", "sku": "EO001", "stock": 25, "minStock": 10, "price": 45, "category": "Oils"},
+            {"id": "2", "name": "Brake Pads", "sku": "BP001", "stock": 8, "minStock": 5, "price": 120, "category": "Brake Parts"},
+            {"id": "3", "name": "Air Filter", "sku": "AF001", "stock": 15, "minStock": 8, "price": 35, "category": "Filters"},
+            {"id": "4", "name": "Spark Plugs", "sku": "SP001", "stock": 20, "minStock": 12, "price": 25, "category": "Engine Parts"}
+        ]
+    }
+
+@app.get("/api/test/jobs")
+async def get_test_jobs():
+    return {
+        "success": True,
+        "data": [
+            {"id": "1", "customerId": "1", "title": "Oil Change", "description": "Regular maintenance", "status": "IN_PROGRESS", "priority": "MEDIUM"},
+            {"id": "2", "customerId": "2", "title": "Brake Repair", "description": "Replace brake pads", "status": "PENDING", "priority": "HIGH"},
+            {"id": "3", "customerId": "3", "title": "Engine Diagnostic", "description": "Check engine light", "status": "COMPLETED", "priority": "HIGH"},
+            {"id": "4", "customerId": "4", "title": "AC Service", "description": "AC not cooling", "status": "PENDING", "priority": "MEDIUM"}
+        ]
+    }
+
+@app.get("/api/test/invoices")
+async def get_test_invoices():
+    return {
+        "success": True,
+        "data": [
+            {"id": "1", "customerId": "1", "jobId": "1", "items": [], "subtotal": 200, "tax": 30, "grandTotal": 230, "status": "PENDING", "payments": []},
+            {"id": "2", "customerId": "2", "jobId": "2", "items": [], "subtotal": 350, "tax": 52.5, "grandTotal": 402.5, "status": "PAID", "payments": []},
+            {"id": "3", "customerId": "3", "jobId": "3", "items": [], "subtotal": 125, "tax": 18.75, "grandTotal": 143.75, "status": "PAID", "payments": []},
+            {"id": "4", "customerId": "4", "jobId": "4", "items": [], "subtotal": 275, "tax": 41.25, "grandTotal": 316.25, "status": "PENDING", "payments": []}
+        ]
+    }
+
+@app.post("/api/test/ai-diagnosis")
+async def test_ai_diagnosis(request: Request):
+    data = await request.json()
+    complaint = data.get("complaint", "")
+    
+    # Mock AI diagnosis based on complaint keywords
+    if "engine" in complaint.lower():
+        diagnosis = "Possible engine oil leak or spark plug issues. Recommend engine inspection."
+    elif "brake" in complaint.lower():
+        diagnosis = "Brake system may need inspection. Check brake pads and brake fluid levels."
+    elif "noise" in complaint.lower():
+        diagnosis = "Unusual sounds may indicate worn bearings or loose components. Inspection recommended."
+    else:
+        diagnosis = "General diagnostic recommended. Multiple systems should be checked for optimal performance."
+    
+    return {
+        "success": True,
+        "data": {
+            "diagnosis": diagnosis,
+            "confidence": 85,
+            "recommendations": [
+                "Schedule a detailed inspection",
+                "Check vehicle maintenance history",
+                "Consider preventive maintenance"
+            ],
+            "estimated_cost": "GHS 150 - GHS 500"
+        }
+    }
+
+@app.get("/api/test/blog")
+async def get_test_blog():
+    return {
+        "success": True,
+        "data": [
+            {
+                "id": "1",
+                "title": "Essential Car Maintenance Tips for Ghana's Roads",
+                "excerpt": "Learn how to keep your car running smoothly in Ghana's unique conditions",
+                "content": "Full blog content here...",
+                "status": "published",
+                "created_at": "2026-01-20T10:00:00Z"
+            },
+            {
+                "id": "2", 
+                "title": "Understanding Your Car's Warning Lights",
+                "excerpt": "What those dashboard lights really mean",
+                "content": "Full blog content here...",
+                "status": "published",
+                "created_at": "2026-01-15T14:30:00Z"
+            }
+        ]
+    }
+
+@app.get("/api/test/endpoints")
+async def get_test_endpoints():
+    return {
+        "success": True,
+        "endpoints": {
+            "customers": "/api/test/customers",
+            "inventory": "/api/test/inventory", 
+            "jobs": "/api/test/jobs",
+            "invoices": "/api/test/invoices",
+            "ai_diagnosis": "/api/test/ai-diagnosis",
+            "blog": "/api/test/blog"
+        }
+    }
+
+# Additional Login Endpoints for React App Integration
+@app.post("/api/auth/admin-login")
+async def admin_login(user_login: UserLogin):
+    # Demo credentials for admin login
+    demo_users = [
+        {"email": "admin@biskaken.com", "password": "admin123", "role": "ADMIN", "name": "Admin User"},
+        {"email": "staff@biskaken.com", "password": "staff123", "role": "STAFF", "name": "Staff User"},
+        {"email": "manager@biskaken.com", "password": "manager123", "role": "SUB_ADMIN", "name": "Manager User"}
+    ]
+    
+    user = None
+    for demo_user in demo_users:
+        if demo_user["email"] == user_login.email and demo_user["password"] == user_login.password:
+            user = demo_user
+            break
+    
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid credentials"
+        )
+    
+    access_token = create_access_token(data={"sub": user["email"]})
+    
+    return {
+        "success": True,
+        "data": {
+            "user": {
+                "id": hash(user["email"]) % 100000,
+                "name": user["name"],
+                "email": user["email"],
+                "role": user["role"]
+            },
+            "token": access_token
+        }
+    }
+
+@app.post("/api/test/auth/login")
+async def test_auth_login(user_login: UserLogin):
+    # Same as admin login for test endpoints
+    demo_users = [
+        {"email": "admin@biskaken.com", "password": "admin123", "role": "ADMIN", "name": "Admin User"},
+        {"email": "staff@biskaken.com", "password": "staff123", "role": "STAFF", "name": "Staff User"},
+        {"email": "manager@biskaken.com", "password": "manager123", "role": "SUB_ADMIN", "name": "Manager User"}
+    ]
+    
+    user = None
+    for demo_user in demo_users:
+        if demo_user["email"] == user_login.email and demo_user["password"] == user_login.password:
+            user = demo_user
+            break
+    
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid credentials"
+        )
+    
+    access_token = create_access_token(data={"sub": user["email"]})
+    
+    return {
+        "success": True,
+        "data": {
+            "user": {
+                "id": hash(user["email"]) % 100000,
+                "name": user["name"],
+                "email": user["email"],
+                "role": user["role"]
+            },
+            "token": access_token
+        }
+    }
+
+@app.get("/api/test/auth/me")
+async def get_current_user_test(current_user: dict = Depends(get_current_user)):
+    return {
+        "success": True,
+        "data": current_user
+    }
+
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=5000)
+    port = int(os.getenv("PORT", 5002))
+    uvicorn.run(app, host="0.0.0.0", port=port)
