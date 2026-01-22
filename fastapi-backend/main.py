@@ -59,10 +59,10 @@ templates = Jinja2Templates(directory="templates")
 
 # CORS middleware - Development and Production origins
 allowed_origins = [
-    "http://localhost:3000",  # React app (development)
-    "http://localhost:5173",  # Vite dev server (development)
-    "https://biskakenauto.rpnmore.com",  # Frontend (production)
-    "https://bisadmin.rpnmore.com",      # Backend API (production)
+    "http://localhost:3000",  # React app (development only)
+    "http://localhost:5173",  # Vite dev server (development only)
+    "https://biskakenauto.rpnmore.com",  # Blog/Landing frontend (production)
+    "https://bisadmin.rpnmore.com",      # Admin dashboard served by FastAPI (production)
 ]
 
 # Add custom CORS origins if specified
@@ -352,7 +352,7 @@ async def dashboard(request: Request, db: Session = Depends(get_db)):
             "revenue": 15750.00
         }
         
-        return templates.TemplateResponse("dashboard.html", {
+        return templates.TemplateResponse("admin-dashboard.html", {
             "request": request,
             "user": user,
             "stats": stats,

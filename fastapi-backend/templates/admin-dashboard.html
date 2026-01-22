@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biskaken Auto - Admin Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/lucide-react@latest/dist/umd/lucide-react.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body class="bg-gray-50">
+    <!-- Admin Dashboard Container -->
+    <div id="admin-dashboard"></div>
+    
+    <!-- Admin Dashboard React App -->
+    <script>
+        const { useState, useEffect } = React;
+        const { Car, Users, Package, FileText, BarChart3, Settings, LogOut, Menu, X } = lucide;
+
+        // API Service
+        const apiService = {
+            baseURL: window.location.origin,
+            
+            async request(endpoint, options = {}) {
+                try {
+                    const response = await axios({
+                        url: `${this.baseURL}${endpoint}`,
+                        ...options,
+                        headers: {
+                            'Content-Type': 'application/json',
+                            ...options.headers,
+                        },
+                    });
+                    return response.data;
+                } catch (error) {
+                    console.error('API Error:', error);
+                    throw error;
+                }
+            },
+
+            async getCustomers() {
+                return this.request('/api/test/customers');
+            },
+
+            async getJobs() {
+                return this.request('/api/test/jobs');
+            },
+
+            async getInventory() {
+                return this.request('/api/test/inventory');
+            },
+
+            async getStatus() {
+                return this.request('/api/status');
+            },
+
+            async getDBStatus() {
+                return this.request('/api/db-status');
+            },
+
+            async logout() {
+                // Clear any session data and redirect
+                window.location.href = '/login';
+            }
+        };
+
+        // Dashboard Component
+        function AdminDashboard() {
+            const [activeTab, setActiveTab] = useState('dashboard');
+            const [sidebarOpen, setSidebarOpen] = useState(false);
+            const [data, setData] = useState({
+                customers: [],
+                jobs: [],
+                inventory: [],
+                status: null,
+                dbStatus: null
+            });
+
+            useEffect(() => {
+                loadData();
+            }, []);
+
+            const loadData = async () => {
+                try {
+                    const [customers, jobs, inventory, status, dbStatus] = await Promise.all([
+                        apiService.getCustomers(),
+                        apiService.getJobs(),
+                        apiService.getInventory(),
+                        apiService.getStatus(),
+                        apiService.getDBStatus()
+                    ]);
+
+                    setData({
+                        customers: customers.data || [],
+                        jobs: jobs.data || [],
+                        inventory: inventory.data || [],
+                        status: status,
+                        dbStatus: dbStatus
+                    });
+                } catch (error) {
+                    console.error('Failed to load data:', error);
+                }
+            };
+
+            const menuItems = [
+                { id: 'dashboard', label: 'Dashboard', icon: BarChart3 },
+                { id: 'customers', label: 'Customers', icon: Users },
+                { id: 'jobs', label: 'Jobs', icon: Car },
+                { id: 'inventory', label: 'Inventory', icon: Package },
+                { id: 'reports', label: 'Reports', icon: FileText },
+                { id: 'settings', label: 'Settings', icon: Settings },
+            ];
+
+            const renderContent = () => {
+                switch (activeTab) {
+                    case 'dashboard':
+                        return React.createElement(DashboardContent, { data });
+                    case 'customers':
+                        return React.createElement(CustomersContent, { customers: data.customers });
+                    case 'jobs':
+                        return React.createElement(JobsContent, { jobs: data.jobs });
+                    case 'inventory':
+                        return React.createElement(InventoryContent, { inventory: data.inventory });
+                    case 'reports':
+                        return React.createElement(ReportsContent, { data });
+                    case 'settings':
+                        return React.createElement(SettingsContent, { status: data.status, dbStatus: data.dbStatus });
+                    default:
+                        return React.createElement('div', { className: 'p-6' }, 'Page not found');
+                }
+            };
+
+            return React.createElement('div', { className: 'flex h-screen bg-gray-50' },
+                // Sidebar
+                React.createElement('div', { 
+                    className: `fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-200 ease-in-out lg:translate-x-0 lg:static lg:inset-0`
+                },
+                    React.createElement('div', { className: 'flex items-center justify-center h-16 px-4 bg-orange-600' },
+                        React.createElement('h1', { className: 'text-xl font-bold text-white' }, 'Biskaken Auto')
+                    ),
+                    React.createElement('nav', { className: 'mt-8' },
+                        menuItems.map(item =>
+                            React.createElement('button', {
+                                key: item.id,
+                                onClick: () => {
+                                    setActiveTab(item.id);
+                                    setSidebarOpen(false);
+                                },
+                                className: `flex items-center w-full px-6 py-3 text-left transition-colors ${
+                                    activeTab === item.id 
+                                        ? 'bg-orange-50 text-orange-600 border-r-2 border-orange-600' 
+                                        : 'text-gray-600 hover:bg-gray-50'
+                                }`
+                            },
+                                React.createElement(item.icon, { size: 20, className: 'mr-3' }),
+                                item.label
+                            )
+                        )
+                    ),
+                    React.createElement('div', { className: 'absolute bottom-0 left-0 right-0 p-4' },
+                        React.createElement('button', {
+                            onClick: apiService.logout,
+                            className: 'flex items-center w-full px-4 py-2 text-red-600 hover:bg-red-50 rounded transition-colors'
+                        },
+                            React.createElement(LogOut, { size: 20, className: 'mr-3' }),
+                            'Sign Out'
+                        )
+                    )
+                ),
+
+                // Main Content
+                React.createElement('div', { className: 'flex-1 flex flex-col overflow-hidden lg:ml-0' },
+                    // Header
+                    React.createElement('header', { className: 'bg-white shadow-sm border-b' },
+                        React.createElement('div', { className: 'flex items-center justify-between px-6 py-4' },
+                            React.createElement('button', {
+                                onClick: () => setSidebarOpen(!sidebarOpen),
+                                className: 'lg:hidden p-2 rounded-md text-gray-600 hover:bg-gray-100'
+                            },
+                                React.createElement(Menu, { size: 24 })
+                            ),
+                            React.createElement('h2', { className: 'text-xl font-semibold text-gray-800' },
+                                menuItems.find(item => item.id === activeTab)?.label || 'Dashboard'
+                            ),
+                            React.createElement('div', { className: 'flex items-center space-x-4' },
+                                React.createElement('span', { className: 'text-sm text-gray-600' }, 'Admin User'),
+                                React.createElement('div', { className: 'w-8 h-8 bg-orange-600 rounded-full flex items-center justify-center text-white font-bold' }, 'A')
+                            )
+                        )
+                    ),
+
+                    // Content
+                    React.createElement('main', { className: 'flex-1 overflow-auto' },
+                        renderContent()
+                    )
+                )
+            );
+        }
+
+        // Dashboard Content Components
+        function DashboardContent({ data }) {
+            const stats = [
+                { label: 'Total Customers', value: data.customers.length, color: 'bg-blue-600' },
+                { label: 'Active Jobs', value: data.jobs.filter(j => j.status === 'IN_PROGRESS').length, color: 'bg-orange-600' },
+                { label: 'Pending Jobs', value: data.jobs.filter(j => j.status === 'PENDING').length, color: 'bg-yellow-600' },
+                { label: 'Low Stock Items', value: data.inventory.filter(i => i.stock <= i.minStock).length, color: 'bg-red-600' }
+            ];
+
+            return React.createElement('div', { className: 'p-6' },
+                React.createElement('div', { className: 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8' },
+                    stats.map((stat, index) =>
+                        React.createElement('div', { key: index, className: 'bg-white rounded-lg shadow p-6' },
+                            React.createElement('div', { className: `w-12 h-12 ${stat.color} rounded-lg flex items-center justify-center mb-4` },
+                                React.createElement('span', { className: 'text-2xl font-bold text-white' }, stat.value)
+                            ),
+                            React.createElement('h3', { className: 'text-lg font-semibold text-gray-900' }, stat.label)
+                        )
+                    )
+                ),
+                
+                React.createElement('div', { className: 'bg-white rounded-lg shadow p-6' },
+                    React.createElement('h3', { className: 'text-lg font-semibold mb-4' }, 'Recent Jobs'),
+                    React.createElement('div', { className: 'space-y-4' },
+                        data.jobs.slice(0, 5).map((job, index) =>
+                            React.createElement('div', { key: index, className: 'flex items-center justify-between p-4 bg-gray-50 rounded-lg' },
+                                React.createElement('div', {},
+                                    React.createElement('h4', { className: 'font-medium' }, job.title),
+                                    React.createElement('p', { className: 'text-sm text-gray-600' }, job.description)
+                                ),
+                                React.createElement('span', { 
+                                    className: `px-3 py-1 rounded-full text-xs font-medium ${
+                                        job.status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
+                                        job.status === 'IN_PROGRESS' ? 'bg-orange-100 text-orange-800' :
+                                        'bg-yellow-100 text-yellow-800'
+                                    }`
+                                }, job.status)
+                            )
+                        )
+                    )
+                )
+            );
+        }
+
+        function CustomersContent({ customers }) {
+            return React.createElement('div', { className: 'p-6' },
+                React.createElement('div', { className: 'bg-white rounded-lg shadow' },
+                    React.createElement('div', { className: 'px-6 py-4 border-b' },
+                        React.createElement('h3', { className: 'text-lg font-semibold' }, 'Customer List')
+                    ),
+                    React.createElement('div', { className: 'overflow-x-auto' },
+                        React.createElement('table', { className: 'w-full' },
+                            React.createElement('thead', { className: 'bg-gray-50' },
+                                React.createElement('tr', {},
+                                    ['Name', 'Phone', 'Email', 'Address'].map(header =>
+                                        React.createElement('th', { key: header, className: 'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase' }, header)
+                                    )
+                                )
+                            ),
+                            React.createElement('tbody', { className: 'divide-y divide-gray-200' },
+                                customers.map((customer, index) =>
+                                    React.createElement('tr', { key: index },
+                                        React.createElement('td', { className: 'px-6 py-4 whitespace-nowrap font-medium' }, customer.name),
+                                        React.createElement('td', { className: 'px-6 py-4 whitespace-nowrap text-gray-600' }, customer.phone),
+                                        React.createElement('td', { className: 'px-6 py-4 whitespace-nowrap text-gray-600' }, customer.email),
+                                        React.createElement('td', { className: 'px-6 py-4 text-gray-600' }, customer.address)
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            );
+        }
+
+        function JobsContent({ jobs }) {
+            return React.createElement('div', { className: 'p-6' },
+                React.createElement('div', { className: 'bg-white rounded-lg shadow' },
+                    React.createElement('div', { className: 'px-6 py-4 border-b' },
+                        React.createElement('h3', { className: 'text-lg font-semibold' }, 'Jobs Management')
+                    ),
+                    React.createElement('div', { className: 'p-6' },
+                        React.createElement('div', { className: 'grid gap-4' },
+                            jobs.map((job, index) =>
+                                React.createElement('div', { key: index, className: 'border rounded-lg p-4' },
+                                    React.createElement('div', { className: 'flex justify-between items-start mb-2' },
+                                        React.createElement('h4', { className: 'font-semibold' }, job.title),
+                                        React.createElement('span', { 
+                                            className: `px-2 py-1 rounded text-xs font-medium ${
+                                                job.priority === 'HIGH' ? 'bg-red-100 text-red-800' :
+                                                job.priority === 'MEDIUM' ? 'bg-orange-100 text-orange-800' :
+                                                'bg-gray-100 text-gray-800'
+                                            }`
+                                        }, job.priority)
+                                    ),
+                                    React.createElement('p', { className: 'text-gray-600 mb-2' }, job.description),
+                                    React.createElement('div', { className: 'flex justify-between items-center' },
+                                        React.createElement('span', { className: 'text-sm text-gray-500' }, `Customer ID: ${job.customerId}`),
+                                        React.createElement('span', { 
+                                            className: `px-3 py-1 rounded-full text-xs font-medium ${
+                                                job.status === 'COMPLETED' ? 'bg-green-100 text-green-800' :
+                                                job.status === 'IN_PROGRESS' ? 'bg-orange-100 text-orange-800' :
+                                                'bg-yellow-100 text-yellow-800'
+                                            }`
+                                        }, job.status)
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            );
+        }
+
+        function InventoryContent({ inventory }) {
+            return React.createElement('div', { className: 'p-6' },
+                React.createElement('div', { className: 'bg-white rounded-lg shadow' },
+                    React.createElement('div', { className: 'px-6 py-4 border-b' },
+                        React.createElement('h3', { className: 'text-lg font-semibold' }, 'Inventory Management')
+                    ),
+                    React.createElement('div', { className: 'overflow-x-auto' },
+                        React.createElement('table', { className: 'w-full' },
+                            React.createElement('thead', { className: 'bg-gray-50' },
+                                React.createElement('tr', {},
+                                    ['Item', 'SKU', 'Stock', 'Min Stock', 'Price', 'Category', 'Status'].map(header =>
+                                        React.createElement('th', { key: header, className: 'px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase' }, header)
+                                    )
+                                )
+                            ),
+                            React.createElement('tbody', { className: 'divide-y divide-gray-200' },
+                                inventory.map((item, index) =>
+                                    React.createElement('tr', { key: index },
+                                        React.createElement('td', { className: 'px-6 py-4 whitespace-nowrap font-medium' }, item.name),
+                                        React.createElement('td', { className: 'px-6 py-4 whitespace-nowrap text-gray-600' }, item.sku),
+                                        React.createElement('td', { className: 'px-6 py-4 whitespace-nowrap' }, item.stock),
+                                        React.createElement('td', { className: 'px-6 py-4 whitespace-nowrap text-gray-600' }, item.minStock),
+                                        React.createElement('td', { className: 'px-6 py-4 whitespace-nowrap' }, `GHS ${item.price}`),
+                                        React.createElement('td', { className: 'px-6 py-4 whitespace-nowrap text-gray-600' }, item.category),
+                                        React.createElement('td', { className: 'px-6 py-4 whitespace-nowrap' },
+                                            React.createElement('span', { 
+                                                className: `px-2 py-1 rounded-full text-xs font-medium ${
+                                                    item.stock <= item.minStock ? 'bg-red-100 text-red-800' : 'bg-green-100 text-green-800'
+                                                }`
+                                            }, item.stock <= item.minStock ? 'Low Stock' : 'In Stock')
+                                        )
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
+            );
+        }
+
+        function ReportsContent({ data }) {
+            return React.createElement('div', { className: 'p-6' },
+                React.createElement('div', { className: 'grid grid-cols-1 lg:grid-cols-2 gap-6' },
+                    React.createElement('div', { className: 'bg-white rounded-lg shadow p-6' },
+                        React.createElement('h3', { className: 'text-lg font-semibold mb-4' }, 'Job Status Report'),
+                        React.createElement('div', { className: 'space-y-3' },
+                            ['PENDING', 'IN_PROGRESS', 'COMPLETED'].map(status => {
+                                const count = data.jobs.filter(j => j.status === status).length;
+                                const percentage = data.jobs.length ? (count / data.jobs.length) * 100 : 0;
+                                return React.createElement('div', { key: status },
+                                    React.createElement('div', { className: 'flex justify-between items-center mb-1' },
+                                        React.createElement('span', { className: 'text-sm font-medium' }, status),
+                                        React.createElement('span', { className: 'text-sm text-gray-600' }, `${count} (${percentage.toFixed(1)}%)`)
+                                    ),
+                                    React.createElement('div', { className: 'w-full bg-gray-200 rounded-full h-2' },
+                                        React.createElement('div', { 
+                                            className: `h-2 rounded-full ${
+                                                status === 'COMPLETED' ? 'bg-green-600' :
+                                                status === 'IN_PROGRESS' ? 'bg-orange-600' :
+                                                'bg-yellow-600'
+                                            }`,
+                                            style: { width: `${percentage}%` }
+                                        })
+                                    )
+                                );
+                            })
+                        )
+                    ),
+                    React.createElement('div', { className: 'bg-white rounded-lg shadow p-6' },
+                        React.createElement('h3', { className: 'text-lg font-semibold mb-4' }, 'Inventory Status'),
+                        React.createElement('div', { className: 'space-y-3' },
+                            data.inventory.filter(item => item.stock <= item.minStock).map((item, index) =>
+                                React.createElement('div', { key: index, className: 'flex justify-between items-center p-3 bg-red-50 rounded-lg' },
+                                    React.createElement('span', { className: 'font-medium' }, item.name),
+                                    React.createElement('span', { className: 'text-sm text-red-600' }, `${item.stock}/${item.minStock}`)
+                                )
+                            )
+                        )
+                    )
+                )
+            );
+        }
+
+        function SettingsContent({ status, dbStatus }) {
+            return React.createElement('div', { className: 'p-6' },
+                React.createElement('div', { className: 'grid gap-6' },
+                    React.createElement('div', { className: 'bg-white rounded-lg shadow p-6' },
+                        React.createElement('h3', { className: 'text-lg font-semibold mb-4' }, 'System Status'),
+                        React.createElement('div', { className: 'space-y-4' },
+                            React.createElement('div', { className: 'flex justify-between items-center' },
+                                React.createElement('span', {}, 'API Status'),
+                                React.createElement('span', { className: 'px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800' }, 
+                                    status ? 'Online' : 'Offline'
+                                )
+                            ),
+                            React.createElement('div', { className: 'flex justify-between items-center' },
+                                React.createElement('span', {}, 'Database Status'),
+                                React.createElement('span', { 
+                                    className: `px-3 py-1 rounded-full text-xs font-medium ${
+                                        dbStatus?.success ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                                    }`
+                                }, 
+                                    dbStatus?.success ? 'Connected' : 'Disconnected'
+                                )
+                            ),
+                            React.createElement('div', { className: 'flex justify-between items-center' },
+                                React.createElement('span', {}, 'Version'),
+                                React.createElement('span', { className: 'text-gray-600' }, status?.version || 'Unknown')
+                            )
+                        )
+                    ),
+                    React.createElement('div', { className: 'bg-white rounded-lg shadow p-6' },
+                        React.createElement('h3', { className: 'text-lg font-semibold mb-4' }, 'Account Settings'),
+                        React.createElement('div', { className: 'space-y-4' },
+                            React.createElement('div', { className: 'flex justify-between items-center' },
+                                React.createElement('span', {}, 'Email'),
+                                React.createElement('span', { className: 'text-gray-600' }, 'admin@biskaken.com')
+                            ),
+                            React.createElement('div', { className: 'flex justify-between items-center' },
+                                React.createElement('span', {}, 'Role'),
+                                React.createElement('span', { className: 'text-gray-600' }, 'Administrator')
+                            ),
+                            React.createElement('div', { className: 'flex justify-between items-center' },
+                                React.createElement('span', {}, 'Last Login'),
+                                React.createElement('span', { className: 'text-gray-600' }, new Date().toLocaleDateString())
+                            )
+                        )
+                    )
+                )
+            );
+        }
+
+        // Render the admin dashboard
+        ReactDOM.render(React.createElement(AdminDashboard), document.getElementById('admin-dashboard'));
+    </script>
+</body>
+</html>
