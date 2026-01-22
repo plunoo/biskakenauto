@@ -1,4 +1,4 @@
-# 🚀 FastAPI + PostgreSQL Deployment on Dokploy
+# 🚀 React Admin Dashboard + FastAPI API + PostgreSQL Deployment on Dokploy
 
 ## 📦 **REPOSITORY CONFIGURATION**
 ```
@@ -37,17 +37,18 @@ Persistent Storage: Yes
 
 ---
 
-## ⚙️ **STEP 2: Deploy FastAPI Backend**
+## ⚙️ **STEP 2: Deploy FastAPI API Backend**
 
 ### **Service Configuration:**
 ```yaml
-Service Name: biskaken-fastapi-backend
+Service Name: biskaken-api-backend
 Service Type: Application
 Build Context: / (root directory)
 Dockerfile: Dockerfile.fastapi
 Container Port: 5000
 Public Port: 5000
-Public Domain: bisadmin.rpnmore.com
+Public Domain: api.biskakenauto.rpnmore.com
+Purpose: API Endpoints Only (No HTML/Dashboard)
 ```
 
 ### **Environment Variables:**
@@ -63,26 +64,26 @@ DEMO_MODE=false
 
 ---
 
-## 🎨 **STEP 3: Deploy Blog/Landing Frontend**
+## 🎨 **STEP 3: Deploy React Admin Dashboard**
 
 ### **Service Configuration:**
 ```yaml
-Service Name: biskaken-blog-frontend
+Service Name: biskaken-admin-frontend
 Service Type: Application
 Build Context: / (root directory)
-Dockerfile: Dockerfile.blog
+Dockerfile: Dockerfile.frontend
 Container Port: 80
 Public Port: 80
-Public Domain: biskakenauto.rpnmore.com
-Purpose: Blog and Landing Page Only
+Public Domain: bisadmin.rpnmore.com
+Purpose: Complete Admin Dashboard with Login (http://localhost:3000 equivalent)
 ```
 
 ### **Environment Variables:**
 ```env
 NODE_ENV=production
-VITE_API_URL=https://bisadmin.rpnmore.com
-VITE_APP_URL=https://biskakenauto.rpnmore.com
-VITE_BUILD_TARGET=blog-only
+VITE_API_URL=https://api.biskakenauto.rpnmore.com
+VITE_APP_URL=https://bisadmin.rpnmore.com
+VITE_BUILD_TARGET=admin
 VITE_GEMINI_API_KEY=AIzaSyBnytBpJhjxrogjD2QGCOmd2wt_anQ758Q
 ```
 
@@ -95,41 +96,41 @@ VITE_GEMINI_API_KEY=AIzaSyBnytBpJhjxrogjD2QGCOmd2wt_anQ758Q
 2. Wait for database to be ready
 3. Verify database connection
 
-### **Step 2: Deploy FastAPI Backend (Admin Dashboard + API)** 
-1. Create FastAPI service: `biskaken-fastapi-backend`
-2. Link to PostgreSQL database service
+### **Step 2: Deploy FastAPI API Backend** 
+1. Create FastAPI service: `biskaken-api-backend`
+2. Link to PostgreSQL database service  
 3. Set environment variables
-4. Deploy and verify health
-5. Test admin login at: https://bisadmin.rpnmore.com/login
+4. Deploy and verify API health
+5. Test API endpoints (no HTML/dashboard served)
 
-### **Step 3: Deploy Blog/Landing Frontend**
-1. Create React service: `biskaken-blog-frontend` 
-2. Configure for blog and landing pages only
-3. Set API URL to backend for any API calls
-4. Deploy and test public access
+### **Step 3: Deploy React Admin Dashboard Frontend**
+1. Create React service: `biskaken-admin-frontend`
+2. Point VITE_API_URL to FastAPI backend
+3. Deploy complete admin dashboard (equivalent to localhost:3000)
+4. Test admin login at: https://bisadmin.rpnmore.com/login
 
 ---
 
 ## ✅ **VERIFICATION & TESTING**
 
-### **Backend Health Checks:**
+### **API Health Checks:**
 ```bash
 # API Status
-curl https://bisadmin.rpnmore.com/api/status
+curl https://api.biskakenauto.rpnmore.com/api/status
 
-# Database Status
-curl https://bisadmin.rpnmore.com/api/db-status
+# Database Status  
+curl https://api.biskakenauto.rpnmore.com/api/db-status
 
-# Test Login
-curl -X POST https://bisadmin.rpnmore.com/api/auth/admin-login \
+# Test Login API
+curl -X POST https://api.biskakenauto.rpnmore.com/api/auth/admin-login \
   -H "Content-Type: application/json" \
   -d '{"email": "admin@biskaken.com", "password": "admin123"}'
 ```
 
-### **Frontend Access:**
-- **Blog/Landing**: https://biskakenauto.rpnmore.com (public access)
-- **Admin Login**: https://bisadmin.rpnmore.com/login (admin only)
-- **Admin Dashboard**: https://bisadmin.rpnmore.com/dashboard (admin only)
+### **Admin Dashboard Access:**
+- **Admin Login**: https://bisadmin.rpnmore.com/login  
+- **Admin Dashboard**: https://bisadmin.rpnmore.com/dashboard
+- **Complete Interface**: Equivalent to http://localhost:3000
 
 ### **Login Credentials:**
 - **Email**: admin@biskaken.com
@@ -179,7 +180,7 @@ curl -X POST https://bisadmin.rpnmore.com/api/auth/admin-login \
 | Service | Type | Domain | Port | Purpose |
 |---------|------|--------|------|---------|
 | biskaken-postgres | PostgreSQL | Internal | 5432 | Database |
-| biskaken-fastapi-backend | FastAPI | bisadmin.rpnmore.com | 5000 | Admin Dashboard + API |
-| biskaken-blog-frontend | React | biskakenauto.rpnmore.com | 80 | Blog + Landing Pages |
+| biskaken-api-backend | FastAPI | api.biskakenauto.rpnmore.com | 5000 | API Endpoints Only |
+| biskaken-admin-frontend | React | bisadmin.rpnmore.com | 80 | Admin Dashboard (localhost:3000 equivalent) |
 
 **Complete FastAPI + PostgreSQL + React deployment ready! 🎉**
