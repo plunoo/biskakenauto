@@ -61,8 +61,8 @@ templates = Jinja2Templates(directory="templates")
 allowed_origins = [
     "http://localhost:3000",  # React admin dashboard (development)
     "http://localhost:5173",  # Vite dev server (development)
-    "https://bisadmin.rpnmore.com",      # React admin dashboard (production)
-    "https://biskakenauto.rpnmore.com",  # Alternative domain for admin dashboard
+    "https://biskakenauto.rpnmore.com",  # React admin dashboard (production frontend)
+    "https://bisadmin.rpnmore.com",      # FastAPI backend domain (production backend)
 ]
 
 # Add custom CORS origins if specified

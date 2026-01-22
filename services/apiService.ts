@@ -6,9 +6,9 @@ const getApiBaseUrl = () => {
     return import.meta.env.VITE_API_URL;
   }
   
-  // Production fallback - use API subdomain as backend
+  // Production fallback - use bisadmin.rpnmore.com as backend
   if (import.meta.env.PROD) {
-    return 'https://api.biskakenauto.rpnmore.com';
+    return 'https://bisadmin.rpnmore.com';
   }
   
   // Development fallback

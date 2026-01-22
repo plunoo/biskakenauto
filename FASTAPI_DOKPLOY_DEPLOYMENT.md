@@ -47,7 +47,7 @@ Build Context: / (root directory)
 Dockerfile: Dockerfile.fastapi
 Container Port: 5000
 Public Port: 5000
-Public Domain: api.biskakenauto.rpnmore.com
+Public Domain: bisadmin.rpnmore.com
 Purpose: API Endpoints Only (No HTML/Dashboard)
 ```
 
@@ -74,15 +74,15 @@ Build Context: / (root directory)
 Dockerfile: Dockerfile.frontend
 Container Port: 80
 Public Port: 80
-Public Domain: bisadmin.rpnmore.com
+Public Domain: biskakenauto.rpnmore.com
 Purpose: Complete Admin Dashboard with Login (http://localhost:3000 equivalent)
 ```
 
 ### **Environment Variables:**
 ```env
 NODE_ENV=production
-VITE_API_URL=https://api.biskakenauto.rpnmore.com
-VITE_APP_URL=https://bisadmin.rpnmore.com
+VITE_API_URL=https://bisadmin.rpnmore.com
+VITE_APP_URL=https://biskakenauto.rpnmore.com
 VITE_BUILD_TARGET=admin
 VITE_GEMINI_API_KEY=AIzaSyBnytBpJhjxrogjD2QGCOmd2wt_anQ758Q
 ```
@@ -105,9 +105,9 @@ VITE_GEMINI_API_KEY=AIzaSyBnytBpJhjxrogjD2QGCOmd2wt_anQ758Q
 
 ### **Step 3: Deploy React Admin Dashboard Frontend**
 1. Create React service: `biskaken-admin-frontend`
-2. Point VITE_API_URL to FastAPI backend
+2. Point VITE_API_URL to FastAPI backend (bisadmin.rpnmore.com)
 3. Deploy complete admin dashboard (equivalent to localhost:3000)
-4. Test admin login at: https://bisadmin.rpnmore.com/login
+4. Test admin login at: https://biskakenauto.rpnmore.com/login
 
 ---
 
@@ -116,20 +116,20 @@ VITE_GEMINI_API_KEY=AIzaSyBnytBpJhjxrogjD2QGCOmd2wt_anQ758Q
 ### **API Health Checks:**
 ```bash
 # API Status
-curl https://api.biskakenauto.rpnmore.com/api/status
+curl https://bisadmin.rpnmore.com/api/status
 
 # Database Status  
-curl https://api.biskakenauto.rpnmore.com/api/db-status
+curl https://bisadmin.rpnmore.com/api/db-status
 
 # Test Login API
-curl -X POST https://api.biskakenauto.rpnmore.com/api/auth/admin-login \
+curl -X POST https://bisadmin.rpnmore.com/api/auth/admin-login \
   -H "Content-Type: application/json" \
   -d '{"email": "admin@biskaken.com", "password": "admin123"}'
 ```
 
 ### **Admin Dashboard Access:**
-- **Admin Login**: https://bisadmin.rpnmore.com/login  
-- **Admin Dashboard**: https://bisadmin.rpnmore.com/dashboard
+- **Admin Login**: https://biskakenauto.rpnmore.com/login  
+- **Admin Dashboard**: https://biskakenauto.rpnmore.com/dashboard
 - **Complete Interface**: Equivalent to http://localhost:3000
 
 ### **Login Credentials:**
@@ -180,7 +180,7 @@ curl -X POST https://api.biskakenauto.rpnmore.com/api/auth/admin-login \
 | Service | Type | Domain | Port | Purpose |
 |---------|------|--------|------|---------|
 | biskaken-postgres | PostgreSQL | Internal | 5432 | Database |
-| biskaken-api-backend | FastAPI | api.biskakenauto.rpnmore.com | 5000 | API Endpoints Only |
-| biskaken-admin-frontend | React | bisadmin.rpnmore.com | 80 | Admin Dashboard (localhost:3000 equivalent) |
+| biskaken-api-backend | FastAPI | bisadmin.rpnmore.com | 5000 | API Endpoints Only |
+| biskaken-admin-frontend | React | biskakenauto.rpnmore.com | 80 | Admin Dashboard (localhost:3000 equivalent) |
 
 **Complete FastAPI + PostgreSQL + React deployment ready! 🎉**
