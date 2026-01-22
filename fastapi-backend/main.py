@@ -300,12 +300,20 @@ async def dashboard(request: Request, db: Session = Depends(get_db)):
         return RedirectResponse(url="/login?error=Please login first", status_code=302)
     
     try:
-        # Verify token
-        from jose import jwt
+        # Verify token with better error handling
+        from jose import jwt, JWTError
+        
+        # Debug logging for production
+        print(f"Dashboard access attempt with token: {token[:50]}...")
+        print(f"Using SECRET_KEY: {SECRET_KEY[:10]}... and ALGORITHM: {ALGORITHM}")
+        
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         email = payload.get("sub")
         if not email:
-            raise Exception("Invalid token")
+            print("JWT payload missing 'sub' field")
+            raise Exception("Invalid token - no email")
+        
+        print(f"JWT decoded successfully for email: {email}")
         
         # Get user info
         user = None
@@ -360,7 +368,20 @@ async def dashboard(request: Request, db: Session = Depends(get_db)):
         })
         
     except Exception as e:
-        return RedirectResponse(url="/login?error=Session expired", status_code=302)
+        # Better error handling for JWT validation
+        print(f"Dashboard JWT validation error: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        
+        error_msg = "Session expired"
+        if "expired" in str(e).lower():
+            error_msg = "Session expired"
+        elif "signature" in str(e).lower():
+            error_msg = "Invalid session signature"
+        elif "jose" in str(e).lower() or "jwt" in str(e).lower():
+            error_msg = "Session validation failed"
+        
+        return RedirectResponse(url=f"/login?error={error_msg}", status_code=302)
 
 @app.get("/logout")
 async def logout():
