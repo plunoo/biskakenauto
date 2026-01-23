@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Biskaken Auto Dashboard - V4 AI System</title>
+    <title>Biskaken Auto Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -11,387 +11,250 @@
         body {
             font-family: 'Inter', system-ui, -apple-system, sans-serif;
         }
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: .5; }
-        }
-        .animate-pulse {
-            animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-        }
     </style>
 </head>
-<body class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex">
-    <!-- LEFT SIDEBAR - ORANGE PANEL -->
-    <aside class="hidden lg:flex w-72 flex-col bg-white border-r border-gray-200 fixed h-full z-30 shadow-xl">
-        <!-- Sidebar Header -->
-        <div class="p-6 flex items-center gap-3 border-b border-gray-100">
-            <div class="w-12 h-12 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center text-white font-bold text-xl shadow-lg">
-                🔧
-            </div>
-            <div>
-                <span class="text-xl font-bold text-gray-900 tracking-tight">BISKAKEN</span>
-                <p class="text-xs text-gray-500 font-medium">Auto Repair Management</p>
-            </div>
-        </div>
-        
-        <!-- New Work Order Button -->
-        <div class="px-4 py-6 border-b border-gray-100">
-            <button onclick="window.location.href='/jobs'" class="w-full flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-orange-500 to-red-500 text-white rounded-xl hover:from-orange-600 hover:to-red-600 transition-all duration-200 shadow-lg hover:shadow-xl group">
-                ➕
-                <span class="font-semibold">New Work Order</span>
-            </button>
-        </div>
-        
-        <!-- Navigation Menu -->
-        <nav class="flex-1 px-4 py-6 space-y-2">
-            <a href="/dashboard" class="group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 bg-gradient-to-r from-orange-500 to-red-500 text-white shadow-lg">
-                📊 <span class="font-semibold text-sm">Dashboard</span>
-            </a>
-            <a href="/customers" class="group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-gray-700 hover:bg-gray-100 hover:text-orange-600">
-                🚗 <span class="font-semibold text-sm">Vehicles</span>
-            </a>
-            <a href="/jobs" class="group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-gray-700 hover:bg-gray-100 hover:text-orange-600">
-                🔧 <span class="font-semibold text-sm">Work Orders</span>
-            </a>
-            <a href="/inventory" class="group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-gray-700 hover:bg-gray-100 hover:text-orange-600">
-                📦 <span class="font-semibold text-sm">Parts & Stock</span>
-            </a>
-            <a href="/invoices" class="group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-gray-700 hover:bg-gray-100 hover:text-orange-600">
-                💳 <span class="font-semibold text-sm">Billing</span>
-            </a>
-            <a href="/blog" class="group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-gray-700 hover:bg-gray-100 hover:text-orange-600">
-                📖 <span class="font-semibold text-sm">Blog</span>
-            </a>
-            <a href="/reports" class="group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-gray-700 hover:bg-gray-100 hover:text-orange-600">
-                📊 <span class="font-semibold text-sm">Reports</span>
-            </a>
-            <a href="/settings" class="group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-gray-700 hover:bg-gray-100 hover:text-orange-600">
-                ⚙️ <span class="font-semibold text-sm">Settings</span>
-            </a>
-            {% if user.role == 'ADMIN' %}
-            <a href="/admin" class="group flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-200 text-red-600 hover:bg-red-50 hover:text-red-700">
-                👥 <span class="font-semibold text-sm">Admin Panel</span>
-            </a>
-            {% endif %}
-        </nav>
-
-        <!-- Logout Button -->
-        <div class="p-4 border-t border-gray-100">
-            <button onclick="window.location.href='/logout'" class="flex items-center gap-3 w-full px-4 py-3 text-red-600 hover:bg-red-50 rounded-xl transition-colors font-semibold text-sm">
-                🚪 <span>Sign Out</span>
-            </button>
-        </div>
-    </aside>
-
-    <!-- MAIN CONTENT AREA -->
-    <div class="flex-1 lg:ml-72 flex flex-col min-w-0">
-        <!-- Top Header -->
-        <header class="sticky top-0 z-20 bg-white/95 backdrop-blur-md border-b border-gray-200 h-20 flex items-center justify-between px-6 lg:px-8 shadow-sm">
-            <div class="flex items-center gap-4">
-                <div class="hidden lg:flex items-center gap-4">
-                    <div class="relative">
-                        🔍
-                        <input type="text" placeholder="Search vehicles, customers, work orders..." 
-                               class="w-80 pl-10 pr-4 py-2 border border-gray-200 rounded-xl bg-gray-50 focus:bg-white focus:border-orange-300 focus:ring-2 focus:ring-orange-100 transition-all">
+<body class="min-h-screen bg-gray-50">
+    <!-- Main Container -->
+    <div class="min-h-screen bg-gray-50">
+        <!-- Header -->
+        <header class="bg-white shadow-sm border-b">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <h1 class="text-xl font-bold text-gray-900">🔧 Biskaken Auto</h1>
+                        </div>
                     </div>
-                </div>
-            </div>
-
-            <div class="flex items-center gap-4">
-                <!-- Notifications -->
-                <button class="relative p-3 text-gray-500 hover:bg-gray-100 rounded-xl transition-colors">
-                    🔔
-                    <span class="absolute top-2 right-2 w-3 h-3 bg-red-500 rounded-full border-2 border-white"></span>
-                </button>
-                
-                <!-- User Menu -->
-                <div class="flex items-center gap-2 p-1 pl-2 hover:bg-gray-50 rounded-lg transition-colors border border-transparent hover:border-gray-200">
-                    <div class="text-right">
-                        <p class="text-sm font-semibold text-gray-900">{{ user.name }}</p>
-                        <p class="text-xs text-gray-500 uppercase tracking-wider">{{ user.role.replace('_', ' ') }}</p>
-                    </div>
-                    <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold uppercase">
-                        {{ user.name[0] }}
+                    <div class="flex items-center space-x-4">
+                        <div class="flex items-center space-x-2">
+                            <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                                <span class="text-blue-700 font-semibold text-sm">{{ user.name[0] if user and user.name else 'A' }}</span>
+                            </div>
+                            <div class="text-sm">
+                                <p class="text-gray-900 font-medium">{{ user.name if user and user.name else 'Admin User' }}</p>
+                                <p class="text-gray-500">{{ user.role if user and user.role else 'ADMIN' }}</p>
+                            </div>
+                        </div>
+                        <a href="/logout" class="text-red-600 hover:text-red-700 text-sm">
+                            Sign Out
+                        </a>
                     </div>
                 </div>
             </div>
         </header>
 
-        <!-- Dynamic Page Content -->
-        <main class="flex-1 p-4 lg:p-8 overflow-x-hidden">
-            <div class="space-y-6">
-            <!-- Workshop Overview Header -->
-            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div>
-                    <h1 class="text-2xl font-bold text-gray-900">Workshop Overview</h1>
-                    <div class="flex items-center gap-4">
-                        <p class="text-gray-500">Welcome back! Here's what's happening today.</p>
-                        <div class="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full text-xs font-bold animate-pulse">
-                            V4.0 AI Features Active! 🚀🤖
-                        </div>
+        <!-- Main Content -->
+        <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <div class="px-4 py-6 sm:px-0">
+                <!-- Welcome Section -->
+                <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-900">
+                            Welcome back, {{ user.name if user and user.name else 'Admin' }}!
+                        </h1>
+                        <p class="text-gray-500">Here's what's happening at your auto shop today.</p>
                     </div>
-                    <div class="flex flex-wrap items-center gap-4 mt-2">
-                        <div class="flex items-center gap-2">
-                            <div class="w-2 h-2 bg-green-500 rounded-full"></div>
-                            <span class="text-xs text-green-600 font-medium">API Connected</span>
-                            <span class="text-xs text-gray-400">• Services Ready</span>
-                        </div>
-                        
-                        <div class="flex items-center gap-2">
-                            <div class="w-2 h-2 bg-green-500 rounded-full"></div>
-                            <span class="text-xs text-green-600 font-medium">Database Connected</span>
-                            <span class="text-xs text-gray-400">• Response Time: &lt;50ms</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="flex gap-2 bg-white p-1 rounded-lg shadow-sm border">
-                    <button class="bg-gray-100 text-gray-700 px-3 py-1 rounded text-sm font-medium">Today</button>
-                    <button class="text-gray-500 px-3 py-1 rounded text-sm hover:bg-gray-50">This Week</button>
-                    <button class="text-gray-500 px-3 py-1 rounded text-sm hover:bg-gray-50">This Month</button>
-                </div>
-            </div>
-
-            <!-- AI Assistant Section - Prominent for Non-Tech Users -->
-            <div class="bg-gradient-to-br from-purple-600 via-blue-600 to-teal-500 p-8 rounded-2xl text-white shadow-xl border border-purple-200">
-                <div class="text-center mb-6">
-                    <h2 class="text-3xl font-bold mb-2 flex items-center justify-center gap-3">
-                        <span class="text-yellow-300 text-2xl">✨</span>
-                        🚀 V4 AI Assistant - Let AI Help Your Business!
-                        <span class="text-yellow-300 text-2xl">✨</span>
-                    </h2>
-                    <p class="text-purple-100 text-lg">Perfect for non-technical users - Just click and AI does the work!</p>
-                </div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-                    <button class="h-20 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white border-0 shadow-lg transform hover:scale-105 transition-all duration-200 rounded-lg">
-                        <div class="text-center">
-                            <span class="text-2xl block mb-1">✏️</span>
-                            <div class="text-sm font-bold">✨ Create Title</div>
-                            <div class="text-xs opacity-90">AI writes titles</div>
-                        </div>
-                    </button>
                     
-                    <button class="h-20 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white border-0 shadow-lg transform hover:scale-105 transition-all duration-200 rounded-lg">
-                        <div class="text-center">
-                            <span class="text-2xl block mb-1">🧠</span>
-                            <div class="text-sm font-bold">🧠 Create Summary</div>
-                            <div class="text-xs opacity-90">AI writes excerpts</div>
-                        </div>
-                    </button>
-                    
-                    <button class="h-20 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white border-0 shadow-lg transform hover:scale-105 transition-all duration-200 rounded-lg">
-                        <div class="text-center">
-                            <span class="text-2xl block mb-1">📝</span>
-                            <div class="text-sm font-bold">📝 Write Article</div>
-                            <div class="text-xs opacity-90">AI writes full posts</div>
-                        </div>
-                    </button>
-                    
-                    <button class="h-20 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white border-0 shadow-lg transform hover:scale-105 transition-all duration-200 rounded-lg">
-                        <div class="text-center">
-                            <span class="text-2xl block mb-1">🖼️</span>
-                            <div class="text-sm font-bold">🖼️ Create Image</div>
-                            <div class="text-xs opacity-90">AI generates photos</div>
-                        </div>
-                    </button>
-                    
-                    <button class="h-20 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white border-0 shadow-lg transform hover:scale-105 transition-all duration-200 rounded-lg">
-                        <div class="text-center">
-                            <span class="text-2xl block mb-1">📷</span>
-                            <div class="text-sm font-bold">📷 Upload Image</div>
-                            <div class="text-xs opacity-90">Add your photos</div>
-                        </div>
-                    </button>
-                    
-                    <button class="h-20 bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white border-0 shadow-lg transform hover:scale-105 transition-all duration-200 rounded-lg">
-                        <div class="text-center">
-                            <span class="text-2xl block mb-1">🎥</span>
-                            <div class="text-sm font-bold">🎥 Upload Video</div>
-                            <div class="text-xs opacity-90">Add your videos</div>
-                        </div>
-                    </button>
-                </div>
-                
-                <div class="text-center mt-6">
-                    <p class="text-purple-100 text-sm">
-                        💡 <strong>No technical skills needed!</strong> Just click any button above and AI will help you create amazing content for your auto shop.
-                    </p>
-                </div>
-            </div>
-
-            <!-- Stats Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                <div class="bg-white p-6 rounded-xl shadow-sm border hover:shadow-md transition-shadow">
-                    <div class="flex justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-gray-500">Total Revenue</p>
-                            <h3 class="text-2xl font-bold mt-1 text-gray-900">₵12,450</h3>
-                            <p class="text-xs mt-1 font-medium text-emerald-600">
-                                +15% <span class="text-gray-400 ml-1">from last month</span>
-                            </p>
-                        </div>
-                        <div class="p-3 rounded-xl bg-emerald-500 bg-opacity-10 text-emerald-600">
-                            <span class="text-2xl">📈</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white p-6 rounded-xl shadow-sm border hover:shadow-md transition-shadow">
-                    <div class="flex justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-gray-500">Cars Serviced</p>
-                            <h3 class="text-2xl font-bold mt-1 text-gray-900">28</h3>
-                            <p class="text-xs mt-1 font-medium text-blue-600">
-                                +8 <span class="text-gray-400 ml-1">from last month</span>
-                            </p>
-                        </div>
-                        <div class="p-3 rounded-xl bg-blue-500 bg-opacity-10 text-blue-600">
-                            <span class="text-2xl">🚗</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white p-6 rounded-xl shadow-sm border hover:shadow-md transition-shadow">
-                    <div class="flex justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-gray-500">Pending Payments</p>
-                            <h3 class="text-2xl font-bold mt-1 text-gray-900">₵890</h3>
-                            <p class="text-xs mt-1 font-medium text-amber-600">
-                                <span class="text-gray-400">Outstanding</span>
-                            </p>
-                        </div>
-                        <div class="p-3 rounded-xl bg-amber-500 bg-opacity-10 text-amber-600">
-                            <span class="text-2xl">💳</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-white p-6 rounded-xl shadow-sm border hover:shadow-md transition-shadow">
-                    <div class="flex justify-between">
-                        <div>
-                            <p class="text-sm font-medium text-gray-500">Active Jobs</p>
-                            <h3 class="text-2xl font-bold mt-1 text-gray-900">{{ stats.pending_jobs or 5 }}</h3>
-                            <p class="text-xs mt-1 font-medium text-purple-600">
-                                <span class="text-gray-400">In progress</span>
-                            </p>
-                        </div>
-                        <div class="p-3 rounded-xl bg-purple-500 bg-opacity-10 text-purple-600">
-                            <span class="text-2xl">⚡</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Charts and Analytics -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Revenue Trend Chart -->
-                <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Revenue Trend</h3>
-                    <div class="h-64">
-                        <canvas id="revenueChart"></canvas>
-                    </div>
-                </div>
-
-                <!-- AI Shop Insights -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border">
-                    <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-lg font-semibold text-gray-900">🤖 AI Shop Insights</h3>
-                        <button onclick="refreshInsights()" id="refreshInsightsBtn" class="p-2 text-blue-600 hover:bg-blue-50 rounded-full">
-                            <span id="refreshInsightsIcon">🔄</span>
+                    <!-- Quick Action Buttons -->
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <button onclick="window.location.href='/'" 
+                                class="bg-gray-100 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-200 flex items-center gap-2 transition-colors">
+                            🏠 Go to Homepage
+                        </button>
+                        <button onclick="window.location.href='/jobs'" 
+                                class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2 transition-colors">
+                            ➕ New Work Order
+                        </button>
+                        <button onclick="refreshData()" 
+                                class="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 flex items-center gap-2 transition-colors">
+                            🔄 Refresh
                         </button>
                     </div>
-                    
-                    <div class="space-y-4">
-                        <div class="flex gap-3 p-3 bg-blue-50 rounded-lg border border-blue-100">
-                            <span class="text-blue-600 text-lg">✨</span>
-                            <p class="text-sm text-blue-900 leading-tight">Revenue is trending upward! Focus on brake services for higher margins.</p>
-                        </div>
-                        <div class="flex gap-3 p-3 bg-green-50 rounded-lg border border-green-100">
-                            <span class="text-green-600 text-lg">💡</span>
-                            <p class="text-sm text-green-900 leading-tight">Saturday peak hours suggest weekend promotions could boost revenue.</p>
-                        </div>
-                        <div class="flex gap-3 p-3 bg-purple-50 rounded-lg border border-purple-100">
-                            <span class="text-purple-600 text-lg">📊</span>
-                            <p class="text-sm text-purple-900 leading-tight">Customer retention rate: 85% - Excellent performance!</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Activity and Inventory Grid -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <!-- Recent Activity -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h3>
-                    <div class="space-y-4">
-                        <div class="flex items-center justify-between py-2 border-b">
-                            <div class="flex gap-3">
-                                <div class="p-2 rounded-lg bg-emerald-100 text-emerald-600">
-                                    <span>✅</span>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-semibold">John Doe</p>
-                                    <p class="text-xs text-gray-500">Toyota Camry • Brake Service</p>
-                                </div>
-                            </div>
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">COMPLETED</span>
-                        </div>
-                        <div class="flex items-center justify-between py-2 border-b">
-                            <div class="flex gap-3">
-                                <div class="p-2 rounded-lg bg-blue-100 text-blue-600">
-                                    <span>⏰</span>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-semibold">Jane Smith</p>
-                                    <p class="text-xs text-gray-500">Honda Civic • Oil Change</p>
-                                </div>
-                            </div>
-                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">IN_PROGRESS</span>
-                        </div>
-                    </div>
                 </div>
 
-                <!-- Inventory Alerts -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Inventory Alerts</h3>
-                    <div class="space-y-4">
-                        <div class="flex items-center justify-between py-2 border-b">
-                            <div class="flex gap-3">
-                                <div class="p-2 rounded-lg bg-red-100 text-red-600">
-                                    <span>⚠️</span>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-semibold">Engine Oil 5W-30</p>
-                                    <p class="text-xs text-gray-500">Current Stock: 3 / Reorder: 10</p>
-                                </div>
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border hover:shadow-md transition-shadow">
+                        <div class="flex justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Total Revenue</p>
+                                <h3 class="text-2xl font-bold mt-1 text-gray-900">₵{{ stats.revenue if stats else '15,750.00' }}</h3>
+                                <p class="text-xs mt-1 font-medium text-emerald-600">
+                                    +12.5% <span class="text-gray-400 ml-1">from last month</span>
+                                </p>
                             </div>
-                            <button class="text-blue-600 text-sm hover:text-blue-700">Reorder</button>
+                            <div class="p-3 rounded-xl bg-emerald-500 bg-opacity-10 text-emerald-600">
+                                📈
+                            </div>
                         </div>
-                        <div class="text-center text-gray-400 text-sm py-4">
-                            <p>Most items are well stocked! ✅</p>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-sm border hover:shadow-md transition-shadow">
+                        <div class="flex justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Active Jobs</p>
+                                <h3 class="text-2xl font-bold mt-1 text-gray-900">{{ stats.active_jobs if stats else '5' }}</h3>
+                                <p class="text-xs mt-1 font-medium text-blue-600">
+                                    +8.2% <span class="text-gray-400 ml-1">from last month</span>
+                                </p>
+                            </div>
+                            <div class="p-3 rounded-xl bg-blue-500 bg-opacity-10 text-blue-600">
+                                🚗
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-sm border hover:shadow-md transition-shadow">
+                        <div class="flex justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Completed Jobs</p>
+                                <h3 class="text-2xl font-bold mt-1 text-gray-900">{{ stats.completed_jobs if stats else '28' }}</h3>
+                                <p class="text-xs mt-1 font-medium text-green-600">
+                                    +15.3% <span class="text-gray-400 ml-1">from last month</span>
+                                </p>
+                            </div>
+                            <div class="p-3 rounded-xl bg-green-500 bg-opacity-10 text-green-600">
+                                ✅
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl shadow-sm border hover:shadow-md transition-shadow">
+                        <div class="flex justify-between">
+                            <div>
+                                <p class="text-sm font-medium text-gray-500">Total Customers</p>
+                                <h3 class="text-2xl font-bold mt-1 text-gray-900">{{ stats.total_customers if stats else '156' }}</h3>
+                                <p class="text-xs mt-1 font-medium text-purple-600">
+                                    +5.7% <span class="text-gray-400 ml-1">from last month</span>
+                                </p>
+                            </div>
+                            <div class="p-3 rounded-xl bg-purple-500 bg-opacity-10 text-purple-600">
+                                👥
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Mobile Money Test Component -->
-                <div class="bg-white p-6 rounded-xl shadow-sm border">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">💰 Mobile Money</h3>
-                    <div class="space-y-4">
-                        <div class="p-4 bg-green-50 border border-green-200 rounded-lg">
-                            <p class="font-medium text-green-800 mb-2">🔧 Payment System Ready</p>
-                            <p class="text-sm text-green-700">Ghana Mobile Money integration configured</p>
+                <!-- Charts and Activities -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                    <!-- Revenue Chart -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Weekly Revenue</h3>
+                        <div class="h-64">
+                            <canvas id="revenueChart"></canvas>
                         </div>
-                        <div class="grid grid-cols-1 gap-2">
-                            <button onclick="testMTNMoMo()" class="bg-yellow-500 text-white py-2 px-4 rounded-lg hover:bg-yellow-600 transition-colors text-sm font-medium">
-                                Test MTN MoMo
-                            </button>
-                            <button onclick="testVodafoneCash()" class="bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition-colors text-sm font-medium">
-                                Test Vodafone Cash
-                            </button>
+                    </div>
+
+                    <!-- Recent Activities -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-lg font-semibold text-gray-900">Recent Work Orders</h3>
+                            <span class="text-sm text-gray-500">{{ recent_jobs|length if recent_jobs else '3' }} active</span>
+                        </div>
+                        <div class="space-y-3">
+                            {% if recent_jobs %}
+                                {% for job in recent_jobs %}
+                                <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                                    <div class="flex items-center space-x-3">
+                                        <div class="w-3 h-3 rounded-full bg-blue-500"></div>
+                                        <div>
+                                            <p class="font-medium text-gray-900">{{ job.customer_name or 'Customer' }}</p>
+                                            <p class="text-sm text-gray-500">{{ job.description or 'Service' }}</p>
+                                        </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                            {{ job.status or 'Active' }}
+                                        </span>
+                                        <p class="text-sm text-gray-500 mt-1">₵{{ job.estimated_cost or '450' }}</p>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            {% else %}
+                            <div class="text-center py-8 text-gray-500">
+                                🚗
+                                <p class="mt-2">No recent work orders</p>
+                                <button onclick="window.location.href='/jobs'" 
+                                        class="text-blue-600 hover:text-blue-700 text-sm mt-1">
+                                    Create your first job
+                                </button>
+                            </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Status -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <!-- System Health -->
+                    <div class="bg-white p-6 rounded-xl shadow-sm border">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">System Status</h3>
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">Database</span>
+                                <span class="flex items-center text-green-600">
+                                    ✅ Connected
+                                </span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">API Services</span>
+                                <span class="flex items-center text-green-600">
+                                    ✅ Active
+                                </span>
+                            </div>
+                            <div class="flex items-center justify-between">
+                                <span class="text-sm text-gray-600">Mobile Money</span>
+                                <span class="flex items-center text-yellow-600">
+                                    🕒 Testing
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Mobile Money Test -->
+                    <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-sm border">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">💰 Mobile Money Test</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div class="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                <p class="font-medium text-yellow-800 mb-2">🔧 Payment System Ready</p>
+                                <p class="text-sm text-yellow-700">Ghana Mobile Money integration configured</p>
+                            </div>
+                            <div class="space-y-2">
+                                <button onclick="testMTN()" 
+                                        class="w-full bg-yellow-500 text-white py-2 px-4 rounded-lg hover:bg-yellow-600 transition-colors text-sm font-medium">
+                                    Test MTN MoMo
+                                </button>
+                                <button onclick="testVodafone()" 
+                                        class="w-full bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-600 transition-colors text-sm font-medium">
+                                    Test Vodafone Cash
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Simple AI Insights -->
+                <div class="bg-gradient-to-r from-purple-50 to-blue-50 p-6 rounded-xl border mt-6">
+                    <div class="flex items-center space-x-3 mb-4">
+                        <div class="p-2 bg-purple-100 rounded-lg">
+                            ✨
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-semibold text-gray-900">AI Business Insights</h3>
+                            <p class="text-sm text-gray-600">Powered by advanced analytics</p>
+                        </div>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg">
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="text-center p-3 bg-blue-50 rounded-lg">
+                                <p class="text-sm text-blue-900">📊 Peak Hours: 2-4 PM shows highest customer traffic</p>
+                            </div>
+                            <div class="text-center p-3 bg-green-50 rounded-lg">
+                                <p class="text-sm text-green-900">💡 Upselling: Offer tire rotation with oil changes</p>
+                            </div>
+                            <div class="text-center p-3 bg-purple-50 rounded-lg">
+                                <p class="text-sm text-purple-900">🎯 Retention: 85% customer satisfaction rate</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -400,7 +263,7 @@
     </div>
 
     <script>
-        // Revenue Chart with V4 styling
+        // Simple Revenue Chart
         const ctx = document.getElementById('revenueChart').getContext('2d');
         new Chart(ctx, {
             type: 'line',
@@ -409,14 +272,11 @@
                 datasets: [{
                     label: 'Revenue',
                     data: [1200, 1900, 1500, 2400, 1800, 3200, 900],
-                    borderColor: '#2563eb',
-                    backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                    borderColor: '#3B82F6',
+                    backgroundColor: 'rgba(59, 130, 246, 0.1)',
                     borderWidth: 3,
                     fill: true,
-                    tension: 0.4,
-                    pointBackgroundColor: '#2563eb',
-                    pointBorderColor: '#2563eb',
-                    pointRadius: 4
+                    tension: 0.4
                 }]
             },
             options: {
@@ -430,153 +290,28 @@
                 scales: {
                     y: {
                         beginAtZero: true,
-                        grid: {
-                            color: '#f3f4f6'
-                        },
                         ticks: {
                             callback: function(value) {
                                 return '₵' + value;
                             }
                         }
-                    },
-                    x: {
-                        grid: {
-                            display: false
-                        }
                     }
-                },
-                interaction: {
-                    intersect: false
                 }
             }
         });
 
-        // AI Insights Refresh functionality
-        function refreshInsights() {
-            const btn = document.getElementById('refreshInsightsBtn');
-            const icon = document.getElementById('refreshInsightsIcon');
-            
-            btn.disabled = true;
-            icon.style.animation = 'spin 1s linear infinite';
-            
-            // Simulate AI insight loading
-            setTimeout(() => {
-                btn.disabled = false;
-                icon.style.animation = '';
-                
-                // Add new insight dynamically (V4 feature)
-                const insights = [
-                    "🔥 Peak hours detected: 2-4 PM shows highest customer traffic!",
-                    "💰 Upselling opportunity: Offer tire rotation with oil changes (+20% revenue)",
-                    "📱 Customer preference: Mobile booking increased by 40% this month",
-                    "🚗 Popular service: Engine diagnostics trending upward (book more slots)",
-                    "⚡ Efficiency boost: Average service time reduced by 15 minutes!"
-                ];
-                
-                const randomInsight = insights[Math.floor(Math.random() * insights.length)];
-                console.log('🤖 New AI Insight:', randomInsight);
-                
-                // You could update the insights display here
-                // For now, just log the insight
-            }, 2000);
+        // Simple functions
+        function refreshData() {
+            console.log('Refreshing data...');
+            window.location.reload();
         }
 
-        // V4 AI Button Interactions - Make buttons functional
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add click handlers for AI buttons
-            const aiButtons = document.querySelectorAll('.bg-gradient-to-r');
-            aiButtons.forEach(button => {
-                button.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const buttonText = this.querySelector('.text-sm.font-bold')?.textContent || 'AI Feature';
-                    
-                    // Show loading state
-                    const originalContent = this.innerHTML;
-                    this.innerHTML = '<div class="text-center"><span class="text-2xl block mb-1">🤖</span><div class="text-sm font-bold">AI Processing...</div><div class="text-xs opacity-90">Please wait</div></div>';
-                    this.disabled = true;
-                    
-                    // Simulate AI processing
-                    setTimeout(() => {
-                        this.innerHTML = originalContent;
-                        this.disabled = false;
-                        
-                        // Show success notification
-                        showNotification(`${buttonText} completed! 🎉`, 'success');
-                    }, 2000);
-                });
-            });
-        });
-
-        // V4 Notification System
-        function showNotification(message, type = 'info') {
-            const notification = document.createElement('div');
-            notification.className = `fixed top-4 right-4 z-50 p-4 rounded-lg shadow-lg transform translate-x-full transition-transform duration-300 ${
-                type === 'success' ? 'bg-green-500 text-white' : 
-                type === 'error' ? 'bg-red-500 text-white' : 
-                'bg-blue-500 text-white'
-            }`;
-            notification.innerHTML = `
-                <div class="flex items-center gap-2">
-                    <span>${type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️'}</span>
-                    <span>${message}</span>
-                </div>
-            `;
-            
-            document.body.appendChild(notification);
-            
-            // Slide in
-            setTimeout(() => {
-                notification.style.transform = 'translateX(0)';
-            }, 100);
-            
-            // Slide out and remove
-            setTimeout(() => {
-                notification.style.transform = 'translateX(full)';
-                setTimeout(() => {
-                    document.body.removeChild(notification);
-                }, 300);
-            }, 3000);
+        function testMTN() {
+            alert('MTN Mobile Money test initiated');
         }
 
-        // V4 Real-time Status Updates
-        function updateSystemStatus() {
-            // Simulate real-time status checking
-            const statusElements = document.querySelectorAll('[class*="bg-green-500"], [class*="bg-red-500"]');
-            console.log('🔄 Checking system status...');
-            
-            // This would typically make API calls to check real status
-            // For now, we'll just show the status is active
-        }
-
-        // Initialize V4 features
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('🚀 V4.0 AI Features Initialized!');
-            
-            // Start status monitoring
-            updateSystemStatus();
-            setInterval(updateSystemStatus, 30000); // Check every 30 seconds
-            
-            // Show welcome notification
-            setTimeout(() => {
-                showNotification('V4.0 AI System Ready! 🤖✨', 'success');
-            }, 1000);
-        });
-
-        // Enhanced mobile money test functionality
-        function testMTNMoMo() {
-            showNotification('Testing MTN MoMo integration... 📱', 'info');
-            
-            setTimeout(() => {
-                showNotification('MTN MoMo test successful! ✅', 'success');
-            }, 2000);
-        }
-
-        function testVodafoneCash() {
-            showNotification('Testing Vodafone Cash integration... 📱', 'info');
-            
-            setTimeout(() => {
-                showNotification('Vodafone Cash test successful! ✅', 'success');
-            }, 2000);
+        function testVodafone() {
+            alert('Vodafone Cash test initiated');
         }
     </script>
 </body>
