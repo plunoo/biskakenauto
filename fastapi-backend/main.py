@@ -9,7 +9,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, RedirectResponse, Response
 from sqlalchemy import create_engine, Column, Integer, String, DateTime, Text, DECIMAL, Boolean
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
@@ -628,7 +628,7 @@ async def database_status(db: Session = Depends(get_db)):
         }
 
 @app.post("/api/auth/login", response_model=Token)
-async def login(user_login: UserLogin, db: Session = Depends(get_db)):
+async def login(user_login: UserLogin, response: Response, db: Session = Depends(get_db)):
     user = authenticate_user(db, user_login.email, user_login.password)
     if not user:
         raise HTTPException(
@@ -652,6 +652,9 @@ async def login(user_login: UserLogin, db: Session = Depends(get_db)):
             "email": user.email,
             "role": user.role
         }
+    
+    # Set cookie for dashboard access
+    response.set_cookie("access_token", access_token, max_age=7*24*60*60)  # 7 days
     
     return {
         "access_token": access_token,
@@ -841,7 +844,7 @@ async def get_test_endpoints():
 
 # Additional Login Endpoints for React App Integration
 @app.post("/api/auth/admin-login")
-async def admin_login(user_login: UserLogin):
+async def admin_login(user_login: UserLogin, response: Response):
     # Demo credentials for admin login
     demo_users = [
         {"email": "admin@biskaken.com", "password": "admin123", "role": "ADMIN", "name": "Admin User"},
@@ -862,6 +865,9 @@ async def admin_login(user_login: UserLogin):
         )
     
     access_token = create_access_token(data={"sub": user["email"]})
+    
+    # Set cookie for dashboard access
+    response.set_cookie("access_token", access_token, max_age=7*24*60*60)  # 7 days
     
     return {
         "success": True,
