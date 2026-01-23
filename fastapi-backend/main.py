@@ -240,7 +240,8 @@ async def startup_event():
         try:
             admin_user = db.query(User).filter(User.email == "admin@biskaken.com").first()
             if not admin_user:
-                hashed_password = get_password_hash("admin123")
+                password = "admin123"[:72]  # Ensure password is under bcrypt limit
+                hashed_password = get_password_hash(password)
                 admin_user = User(
                     name="Admin User",
                     email="admin@biskaken.com",
@@ -360,7 +361,7 @@ async def dashboard(request: Request, db: Session = Depends(get_db)):
             "revenue": 15750.00
         }
         
-        return templates.TemplateResponse("admin-dashboard.html", {
+        return templates.TemplateResponse("dashboard.html", {
             "request": request,
             "user": user,
             "stats": stats,
