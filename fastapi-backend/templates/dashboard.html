@@ -323,7 +323,7 @@
                     </div>
                     
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-                        <button onclick="window.location.href='/blog'" 
+                        <button onclick="generateTitle()" 
                                 class="h-20 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white border-0 shadow-lg transform hover:scale-105 transition-all duration-200 rounded-lg">
                             <div class="text-center">
                                 <span class="text-2xl block mb-1">✏️</span>
@@ -332,7 +332,7 @@
                             </div>
                         </button>
                         
-                        <button onclick="window.location.href='/blog'" 
+                        <button onclick="generateSummary()" 
                                 class="h-20 bg-gradient-to-r from-blue-500 to-cyan-500 hover:from-blue-600 hover:to-cyan-600 text-white border-0 shadow-lg transform hover:scale-105 transition-all duration-200 rounded-lg">
                             <div class="text-center">
                                 <span class="text-2xl block mb-1">🧠</span>
@@ -341,7 +341,7 @@
                             </div>
                         </button>
                         
-                        <button onclick="window.location.href='/blog'" 
+                        <button onclick="generateArticle()" 
                                 class="h-20 bg-gradient-to-r from-green-500 to-emerald-500 hover:from-green-600 hover:to-emerald-600 text-white border-0 shadow-lg transform hover:scale-105 transition-all duration-200 rounded-lg">
                             <div class="text-center">
                                 <span class="text-2xl block mb-1">📝</span>
@@ -350,7 +350,7 @@
                             </div>
                         </button>
                         
-                        <button onclick="window.location.href='/blog'" 
+                        <button onclick="generateImage()" 
                                 class="h-20 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white border-0 shadow-lg transform hover:scale-105 transition-all duration-200 rounded-lg">
                             <div class="text-center">
                                 <span class="text-2xl block mb-1">🖼️</span>
@@ -359,7 +359,7 @@
                             </div>
                         </button>
                         
-                        <button onclick="window.location.href='/blog'" 
+                        <button onclick="uploadImage()" 
                                 class="h-20 bg-gradient-to-r from-purple-500 to-indigo-500 hover:from-purple-600 hover:to-indigo-600 text-white border-0 shadow-lg transform hover:scale-105 transition-all duration-200 rounded-lg">
                             <div class="text-center">
                                 <span class="text-2xl block mb-1">📷</span>
@@ -368,7 +368,7 @@
                             </div>
                         </button>
                         
-                        <button onclick="window.location.href='/blog'" 
+                        <button onclick="uploadVideo()" 
                                 class="h-20 bg-gradient-to-r from-teal-500 to-cyan-500 hover:from-teal-600 hover:to-cyan-600 text-white border-0 shadow-lg transform hover:scale-105 transition-all duration-200 rounded-lg">
                             <div class="text-center">
                                 <span class="text-2xl block mb-1">🎥</span>
@@ -478,6 +478,149 @@
 
         function testVodafone() {
             alert('Vodafone Cash test initiated');
+        }
+
+        // AI Assistant Functions
+        async function generateTitle() {
+            try {
+                const topic = prompt('What topic do you want to create a title for?') || 'car maintenance';
+                const response = await fetch('/api/ai/generate-title', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ topic })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    alert('Generated Title: ' + result.data.title);
+                } else {
+                    alert('Failed to generate title. Please try again.');
+                }
+            } catch (error) {
+                alert('Error generating title: ' + error.message);
+            }
+        }
+
+        async function generateSummary() {
+            try {
+                const content = prompt('Enter content to summarize:') || 'brake system maintenance';
+                const response = await fetch('/api/ai/generate-summary', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    alert('Generated Summary: ' + result.data.summary);
+                } else {
+                    alert('Failed to generate summary. Please try again.');
+                }
+            } catch (error) {
+                alert('Error generating summary: ' + error.message);
+            }
+        }
+
+        async function generateArticle() {
+            try {
+                const title = prompt('Enter article title:') || 'Car Maintenance Tips';
+                const topic = prompt('Enter topic:') || 'general maintenance';
+                const response = await fetch('/api/ai/generate-article', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, topic })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    // Create a new window to show the article
+                    const newWindow = window.open('', '_blank');
+                    newWindow.document.write(`
+                        <html>
+                        <head><title>${result.data.title}</title>
+                        <style>body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }</style>
+                        </head>
+                        <body>
+                        <h1>${result.data.title}</h1>
+                        <p><strong>Word Count:</strong> ${result.data.word_count}</p>
+                        <hr>
+                        ${result.data.content}
+                        </body></html>
+                    `);
+                    newWindow.document.close();
+                } else {
+                    alert('Failed to generate article. Please try again.');
+                }
+            } catch (error) {
+                alert('Error generating article: ' + error.message);
+            }
+        }
+
+        async function generateImage() {
+            try {
+                const description = prompt('Describe the image you want to generate:') || 'auto repair shop';
+                const response = await fetch('/api/ai/generate-image', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ description })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    // Show image in new window
+                    const newWindow = window.open('', '_blank');
+                    newWindow.document.write(`
+                        <html>
+                        <head><title>Generated Image</title>
+                        <style>body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }</style>
+                        </head>
+                        <body>
+                        <h2>AI Generated Image</h2>
+                        <p><strong>Description:</strong> ${description}</p>
+                        <img src="${result.data.image_url}" alt="${result.data.alt_text}" style="max-width: 100%; height: auto;">
+                        </body></html>
+                    `);
+                    newWindow.document.close();
+                } else {
+                    alert('Failed to generate image. Please try again.');
+                }
+            } catch (error) {
+                alert('Error generating image: ' + error.message);
+            }
+        }
+
+        async function uploadImage() {
+            try {
+                const filename = prompt('Enter image filename:') || 'my-image.jpg';
+                const response = await fetch('/api/ai/upload-image', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ filename })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    alert(`Image uploaded successfully!\nFilename: ${result.data.filename}\nSize: ${result.data.size}\nURL: ${result.data.uploaded_url}`);
+                } else {
+                    alert('Failed to upload image. Please try again.');
+                }
+            } catch (error) {
+                alert('Error uploading image: ' + error.message);
+            }
+        }
+
+        async function uploadVideo() {
+            try {
+                const filename = prompt('Enter video filename:') || 'my-video.mp4';
+                const response = await fetch('/api/ai/upload-video', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ filename })
+                });
+                const result = await response.json();
+                if (result.success) {
+                    alert(`Video uploaded successfully!\nFilename: ${result.data.filename}\nSize: ${result.data.size}\nDuration: ${result.data.duration}\nURL: ${result.data.uploaded_url}`);
+                } else {
+                    alert('Failed to upload video. Please try again.');
+                }
+            } catch (error) {
+                alert('Error uploading video: ' + error.message);
+            }
         }
     </script>
 </body>

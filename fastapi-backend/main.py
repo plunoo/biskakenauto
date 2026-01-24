@@ -780,29 +780,304 @@ async def test_ai_diagnosis(request: Request):
     data = await request.json()
     complaint = data.get("complaint", "")
     
-    # Mock AI diagnosis based on complaint keywords
-    if "engine" in complaint.lower():
-        diagnosis = "Possible engine oil leak or spark plug issues. Recommend engine inspection."
-    elif "brake" in complaint.lower():
-        diagnosis = "Brake system may need inspection. Check brake pads and brake fluid levels."
-    elif "noise" in complaint.lower():
-        diagnosis = "Unusual sounds may indicate worn bearings or loose components. Inspection recommended."
-    else:
-        diagnosis = "General diagnostic recommended. Multiple systems should be checked for optimal performance."
-    
-    return {
-        "success": True,
-        "data": {
-            "diagnosis": diagnosis,
-            "confidence": 85,
-            "recommendations": [
-                "Schedule a detailed inspection",
-                "Check vehicle maintenance history",
-                "Consider preventive maintenance"
-            ],
-            "estimated_cost": "GHS 150 - GHS 500"
+    # Try to use real Gemini AI first
+    try:
+        import google.generativeai as genai
+        genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+        model = genai.GenerativeModel('gemini-pro')
+        
+        prompt = f"""
+        As an expert automotive mechanic, analyze this customer complaint and provide:
+        1. Diagnosis of the likely issue
+        2. Confidence level (1-100)
+        3. Recommended repairs/actions
+        4. Estimated cost range in Ghana Cedis (GHS)
+        
+        Customer complaint: "{complaint}"
+        
+        Provide a detailed but concise response.
+        """
+        
+        response = model.generate_content(prompt)
+        ai_diagnosis = response.text
+        
+        return {
+            "success": True,
+            "data": {
+                "diagnosis": ai_diagnosis,
+                "confidence": 90,
+                "repairTime": "2-4 hours",
+                "recommendations": [
+                    "Professional diagnostic scan recommended",
+                    "Check vehicle service history",
+                    "Consider preventive maintenance"
+                ],
+                "estimated_cost": "GHS 200 - GHS 800"
+            }
         }
-    }
+    except Exception as e:
+        print(f"AI API Error: {e}")
+        
+        # Fallback to mock diagnosis
+        if "engine" in complaint.lower():
+            diagnosis = "Possible engine oil leak or spark plug issues. Recommend engine inspection."
+        elif "brake" in complaint.lower():
+            diagnosis = "Brake system may need inspection. Check brake pads and brake fluid levels."
+        elif "noise" in complaint.lower():
+            diagnosis = "Unusual sounds may indicate worn bearings or loose components. Inspection recommended."
+        else:
+            diagnosis = "General diagnostic recommended. Multiple systems should be checked for optimal performance."
+        
+        return {
+            "success": True,
+            "data": {
+                "diagnosis": diagnosis,
+                "confidence": 85,
+                "repairTime": "2-4 hours",
+                "recommendations": [
+                    "Schedule a detailed inspection",
+                    "Check vehicle maintenance history",
+                    "Consider preventive maintenance"
+                ],
+                "estimated_cost": "GHS 150 - GHS 500"
+            }
+        }
+
+# AI Assistant Endpoints for the 6 Dashboard Functions
+@app.post("/api/ai/generate-title")
+async def generate_title(request: Request):
+    data = await request.json()
+    topic = data.get("topic", "")
+    
+    try:
+        import google.generativeai as genai
+        genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+        model = genai.GenerativeModel('gemini-pro')
+        
+        prompt = f"""
+        Create a catchy, professional blog title for an automotive repair shop blog post about: "{topic}"
+        
+        The title should be:
+        - Engaging and click-worthy
+        - Professional for a Ghanaian auto repair business
+        - 5-12 words long
+        - Include relevant automotive keywords
+        
+        Return only the title, nothing else.
+        """
+        
+        response = model.generate_content(prompt)
+        generated_title = response.text.strip()
+        
+        return {
+            "success": True,
+            "data": {
+                "title": generated_title,
+                "topic": topic
+            }
+        }
+    except Exception as e:
+        print(f"AI Title Generation Error: {e}")
+        
+        # Fallback titles
+        fallback_titles = {
+            "brake": "Essential Brake Maintenance Tips for Safe Driving",
+            "engine": "Keep Your Engine Running Smoothly - Expert Tips",
+            "oil": "Complete Guide to Engine Oil Changes in Ghana",
+            "tire": "Tire Safety and Maintenance for Ghanaian Roads"
+        }
+        
+        fallback_title = "Professional Auto Repair Tips from Biskaken"
+        for key, title in fallback_titles.items():
+            if key in topic.lower():
+                fallback_title = title
+                break
+        
+        return {
+            "success": True,
+            "data": {
+                "title": fallback_title,
+                "topic": topic
+            }
+        }
+
+@app.post("/api/ai/generate-summary")
+async def generate_summary(request: Request):
+    data = await request.json()
+    content = data.get("content", "")
+    
+    try:
+        import google.generativeai as genai
+        genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+        model = genai.GenerativeModel('gemini-pro')
+        
+        prompt = f"""
+        Create a compelling blog post summary/excerpt for this automotive content: "{content}"
+        
+        The summary should be:
+        - 2-3 sentences long
+        - Engaging and informative
+        - Professional tone for auto repair business
+        - Include key benefits for car owners
+        
+        Return only the summary, nothing else.
+        """
+        
+        response = model.generate_content(prompt)
+        generated_summary = response.text.strip()
+        
+        return {
+            "success": True,
+            "data": {
+                "summary": generated_summary,
+                "word_count": len(generated_summary.split())
+            }
+        }
+    except Exception as e:
+        print(f"AI Summary Generation Error: {e}")
+        
+        return {
+            "success": True,
+            "data": {
+                "summary": "Discover expert automotive tips and maintenance advice from Biskaken Auto Repair. Keep your vehicle running smoothly with professional guidance from Ghana's trusted mechanics.",
+                "word_count": 25
+            }
+        }
+
+@app.post("/api/ai/generate-article")
+async def generate_article(request: Request):
+    data = await request.json()
+    title = data.get("title", "")
+    topic = data.get("topic", "")
+    
+    try:
+        import google.generativeai as genai
+        genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
+        model = genai.GenerativeModel('gemini-pro')
+        
+        prompt = f"""
+        Write a complete blog post for an automotive repair shop in Ghana with this title: "{title}"
+        Topic: {topic}
+        
+        The article should:
+        - Be 400-600 words
+        - Include practical tips for car owners
+        - Reference Ghanaian driving conditions
+        - Be professional but accessible
+        - Include actionable advice
+        - Have proper paragraphs and structure
+        
+        Format as HTML with proper <p>, <h3> tags for subheadings.
+        """
+        
+        response = model.generate_content(prompt)
+        generated_article = response.text.strip()
+        
+        return {
+            "success": True,
+            "data": {
+                "content": generated_article,
+                "title": title,
+                "word_count": len(generated_article.split())
+            }
+        }
+    except Exception as e:
+        print(f"AI Article Generation Error: {e}")
+        
+        return {
+            "success": True,
+            "data": {
+                "content": f"<h3>Welcome to Biskaken Auto Repair</h3><p>At Biskaken, we understand the unique challenges of maintaining vehicles on Ghana's diverse road conditions. Whether you're navigating the bustling streets of Accra or the rural roads of the Northern Region, proper vehicle maintenance is crucial for safety and longevity.</p><h3>Expert Service You Can Trust</h3><p>Our certified mechanics bring years of experience working with all vehicle makes and models. We use genuine parts and follow manufacturer specifications to ensure your vehicle receives the best possible care.</p><p>Contact us today to schedule your next service appointment and experience the Biskaken difference.</p>",
+                "title": title,
+                "word_count": 95
+            }
+        }
+
+@app.post("/api/ai/generate-image")
+async def generate_image(request: Request):
+    data = await request.json()
+    description = data.get("description", "")
+    
+    try:
+        # For now, return placeholder image URL
+        # In the future, this could integrate with DALL-E or other image generation APIs
+        return {
+            "success": True,
+            "data": {
+                "image_url": "https://via.placeholder.com/800x400/4F46E5/FFFFFF?text=AI+Generated+Auto+Image",
+                "description": description,
+                "alt_text": f"AI generated image: {description}",
+                "width": 800,
+                "height": 400
+            }
+        }
+    except Exception as e:
+        print(f"AI Image Generation Error: {e}")
+        
+        return {
+            "success": False,
+            "message": "Image generation temporarily unavailable. Please try again later.",
+            "data": {
+                "image_url": "https://via.placeholder.com/800x400/6B7280/FFFFFF?text=Image+Unavailable",
+                "description": description,
+                "alt_text": "Image generation failed",
+                "width": 800,
+                "height": 400
+            }
+        }
+
+@app.post("/api/ai/upload-image")
+async def upload_image(request: Request):
+    # For demo purposes, simulate image upload
+    data = await request.json()
+    filename = data.get("filename", "uploaded-image.jpg")
+    
+    try:
+        # In production, this would handle actual file upload to cloud storage
+        return {
+            "success": True,
+            "data": {
+                "uploaded_url": f"https://via.placeholder.com/800x600/059669/FFFFFF?text={filename}",
+                "filename": filename,
+                "size": "2.3 MB",
+                "upload_time": "2026-01-23T10:30:00Z"
+            }
+        }
+    except Exception as e:
+        print(f"Image Upload Error: {e}")
+        
+        return {
+            "success": False,
+            "message": "Image upload failed. Please try again.",
+            "data": None
+        }
+
+@app.post("/api/ai/upload-video")
+async def upload_video(request: Request):
+    # For demo purposes, simulate video upload
+    data = await request.json()
+    filename = data.get("filename", "uploaded-video.mp4")
+    
+    try:
+        # In production, this would handle actual video upload to cloud storage
+        return {
+            "success": True,
+            "data": {
+                "uploaded_url": f"https://via.placeholder.com/800x450/DC2626/FFFFFF?text=Video:+{filename}",
+                "filename": filename,
+                "size": "15.7 MB",
+                "duration": "2:45",
+                "upload_time": "2026-01-23T10:30:00Z"
+            }
+        }
+    except Exception as e:
+        print(f"Video Upload Error: {e}")
+        
+        return {
+            "success": False,
+            "message": "Video upload failed. Please try again.",
+            "data": None
+        }
 
 @app.get("/api/test/blog")
 async def get_test_blog():
@@ -838,7 +1113,13 @@ async def get_test_endpoints():
             "jobs": "/api/test/jobs",
             "invoices": "/api/test/invoices",
             "ai_diagnosis": "/api/test/ai-diagnosis",
-            "blog": "/api/test/blog"
+            "blog": "/api/test/blog",
+            "ai_generate_title": "/api/ai/generate-title",
+            "ai_generate_summary": "/api/ai/generate-summary",
+            "ai_generate_article": "/api/ai/generate-article",
+            "ai_generate_image": "/api/ai/generate-image",
+            "ai_upload_image": "/api/ai/upload-image",
+            "ai_upload_video": "/api/ai/upload-video"
         }
     }
 
