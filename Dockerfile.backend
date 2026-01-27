@@ -1,0 +1,18 @@
+# Backend Dockerfile for localhost:3000/dashboard API
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copy server package files
+COPY server/package*.json ./
+RUN npm ci --only=production
+
+# Install PostgreSQL client
+RUN apk add --no-cache postgresql-client
+
+# Copy server code
+COPY server/ ./
+
+EXPOSE 5000
+
+CMD ["node", "app.js"]

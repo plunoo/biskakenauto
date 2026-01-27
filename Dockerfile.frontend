@@ -1,0 +1,20 @@
+# Frontend Dockerfile for localhost:3000/dashboard
+FROM node:18-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY package*.json ./
+RUN npm ci --only=production
+
+# Copy source code
+COPY . .
+
+# Build the app
+RUN npm run build
+
+# Serve with simple HTTP server
+RUN npm install -g serve
+EXPOSE 80
+
+CMD ["serve", "-s", "dist", "-l", "80"]
