@@ -11,7 +11,8 @@ import {
   CheckCircle,
   Camera,
   Upload,
-  X
+  X,
+  Mic
 } from 'lucide-react';
 import { JobStatus, Priority, Job, AIDiagnosis } from '../types';
 
@@ -41,8 +42,8 @@ const JobsPage: React.FC = () => {
 
   const filteredJobs = jobs.filter(j => {
     const matchesTab = activeTab === 'ALL' || j.status === activeTab;
-    const matchesSearch = j.customerName.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                         j.vehicleInfo.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch = (j.customerName || '').toLowerCase().includes(searchTerm.toLowerCase()) || 
+                         (j.vehicleInfo || '').toLowerCase().includes(searchTerm.toLowerCase());
     return matchesTab && matchesSearch;
   });
 
@@ -104,7 +105,7 @@ const JobsPage: React.FC = () => {
       id: `J${Math.floor(Math.random() * 1000)}`,
       customerId: customer.id,
       customerName: customer.name,
-      vehicleInfo: `${customer.vehicle.make} ${customer.vehicle.model} (${customer.vehicle.plateNumber})`,
+      vehicleInfo: `${customer.vehicle?.make || 'Unknown'} ${customer.vehicle?.model || 'Unknown'} (${customer.vehicle?.plateNumber || 'No Plate'})`,
       issueDescription: complaint,
       status: JobStatus.PENDING,
       priority: Priority.MEDIUM,
@@ -345,7 +346,7 @@ const JobsPage: React.FC = () => {
             >
               <option value="">-- Choose Customer --</option>
               {customers.map(c => (
-                <option key={c.id} value={c.id}>{c.name} - {c.vehicle.plateNumber}</option>
+                <option key={c.id} value={c.id}>{c.name} - {c.vehicle?.plateNumber || 'No Plate'}</option>
               ))}
             </select>
           </div>

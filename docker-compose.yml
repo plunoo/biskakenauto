@@ -1,0 +1,103 @@
+# Docker Compose for Biskaken Auto Admin Dashboard
+# Use this file with Dokploy
+
+version: '3.8'
+
+services:
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    container_name: biskaken-postgres
+    environment:
+      POSTGRES_DB: ${DB_NAME:-biskaken_auto}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/pgdata
+      - ./api/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - biskaken-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres} -d ${DB_NAME:-biskaken_auto}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # FastAPI Backend
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    container_name: biskaken-api
+    environment:
+      DATABASE_URL: postgresql://${DB_USER:-postgres}:${DB_PASSWORD}@postgres:5432/${DB_NAME:-biskaken_auto}
+      DB_HOST: postgres
+      DB_PORT: 5432
+      DB_NAME: ${DB_NAME:-biskaken_auto}
+      DB_USER: ${DB_USER:-postgres}
+      DB_PASSWORD: ${DB_PASSWORD}
+      ENVIRONMENT: production
+      PORT: 8000
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - biskaken-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/health')"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    labels:
+      # Traefik labels for API routing
+      - "traefik.enable=true"
+      - "traefik.http.routers.biskaken-api.rule=Host(`bisadmin.rpnmore.com`) && (PathPrefix(`/api`) || PathPrefix(`/health`))"
+      - "traefik.http.routers.biskaken-api.tls=true"
+      - "traefik.http.routers.biskaken-api.tls.certresolver=letsencrypt"
+      - "traefik.http.services.biskaken-api.loadbalancer.server.port=8000"
+
+  # React Frontend (Admin Dashboard)
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    container_name: biskaken-frontend
+    environment:
+      VITE_API_URL: https://bisadmin.rpnmore.com
+      VITE_APP_TITLE: Biskaken Auto Admin
+      VITE_ENVIRONMENT: production
+      NODE_ENV: production
+    depends_on:
+      - api
+    networks:
+      - biskaken-network
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+    labels:
+      # Traefik labels for frontend routing
+      - "traefik.enable=true"
+      - "traefik.http.routers.biskaken-frontend.rule=Host(`bisadmin.rpnmore.com`)"
+      - "traefik.http.routers.biskaken-frontend.tls=true"
+      - "traefik.http.routers.biskaken-frontend.tls.certresolver=letsencrypt"
+      - "traefik.http.services.biskaken-frontend.loadbalancer.server.port=3000"
+      # Redirect HTTP to HTTPS
+      - "traefik.http.routers.biskaken-frontend-redirect.rule=Host(`bisadmin.rpnmore.com`)"
+      - "traefik.http.routers.biskaken-frontend-redirect.entrypoints=web"
+      - "traefik.http.routers.biskaken-frontend-redirect.middlewares=redirect-to-https"
+      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  biskaken-network:
+    driver: bridge
+    external: false

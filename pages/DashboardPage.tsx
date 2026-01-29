@@ -20,7 +20,7 @@ import {
   Video
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
-// import { getAIInsights } from '../services/gemini';
+import { getAIInsights } from '../services/gemini';
 import { apiService } from '../services/apiService';
 import { JobStatus } from '../types';
 import MobileMoneyTest from '../components/MobileMoneyTest';
