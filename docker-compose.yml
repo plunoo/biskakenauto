@@ -72,6 +72,8 @@ services:
       NODE_ENV: production
     depends_on:
       - api
+    ports:
+      - "3000:3000"
     networks:
       - biskaken-network
     restart: unless-stopped
@@ -80,18 +82,6 @@ services:
       interval: 30s
       timeout: 10s
       retries: 3
-    labels:
-      # Traefik labels for frontend routing
-      - "traefik.enable=true"
-      - "traefik.http.routers.biskaken-frontend.rule=Host(`bisadmin.rpnmore.com`)"
-      - "traefik.http.routers.biskaken-frontend.tls=true"
-      - "traefik.http.routers.biskaken-frontend.tls.certresolver=letsencrypt"
-      - "traefik.http.services.biskaken-frontend.loadbalancer.server.port=3000"
-      # Redirect HTTP to HTTPS
-      - "traefik.http.routers.biskaken-frontend-redirect.rule=Host(`bisadmin.rpnmore.com`)"
-      - "traefik.http.routers.biskaken-frontend-redirect.entrypoints=web"
-      - "traefik.http.routers.biskaken-frontend-redirect.middlewares=redirect-to-https"
-      - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
 
 volumes:
   postgres_data:
