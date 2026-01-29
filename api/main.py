@@ -12,6 +12,7 @@ from typing import List, Optional
 import os
 import uvicorn
 import asyncpg
+import asyncio
 from datetime import datetime, timedelta
 import json
 import logging
@@ -40,10 +41,11 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Database configuration
+# Database configuration with proper fallbacks
+DB_PASSWORD = os.getenv('DB_PASSWORD') or 'postgres'
 DATABASE_URL = os.getenv(
     "DATABASE_URL", 
-    f"postgresql://{os.getenv('DB_USER', 'postgres')}:{os.getenv('DB_PASSWORD', 'postgres')}@{os.getenv('DB_HOST', 'localhost')}:{os.getenv('DB_PORT', '5432')}/{os.getenv('DB_NAME', 'biskaken_auto')}"
+    f"postgresql://{os.getenv('DB_USER', 'postgres')}:{DB_PASSWORD}@{os.getenv('DB_HOST', 'localhost')}:{os.getenv('DB_PORT', '5432')}/{os.getenv('DB_NAME', 'biskaken_auto')}"
 )
 
 logger.info(f"Database URL configured: {DATABASE_URL.split('@')[0]}@***")
@@ -52,20 +54,38 @@ logger.info(f"Database URL configured: {DATABASE_URL.split('@')[0]}@***")
 db_pool = None
 
 async def init_db():
-    """Initialize database connection pool"""
+    """Initialize database connection pool with retry logic"""
     global db_pool
-    try:
-        db_pool = await asyncpg.create_pool(DATABASE_URL, min_size=2, max_size=10)
-        logger.info("✅ Database connection pool created successfully")
-        
-        # Create tables if they don't exist
-        async with db_pool.acquire() as conn:
-            await create_tables(conn)
-            await seed_demo_data(conn)
+    max_retries = 5
+    retry_delay = 5
+    
+    for attempt in range(max_retries):
+        try:
+            logger.info(f"🔄 Attempting database connection (attempt {attempt + 1}/{max_retries})")
+            db_pool = await asyncpg.create_pool(DATABASE_URL, min_size=2, max_size=10)
+            logger.info("✅ Database connection pool created successfully")
             
-    except Exception as e:
-        logger.error(f"❌ Database connection failed: {e}")
-        raise
+            # Test the connection
+            async with db_pool.acquire() as conn:
+                await conn.fetchval("SELECT 1")
+                logger.info("✅ Database connection tested successfully")
+                
+                # Create tables if they don't exist
+                await create_tables(conn)
+                await seed_demo_data(conn)
+            
+            return  # Success, exit retry loop
+            
+        except Exception as e:
+            logger.error(f"❌ Database connection failed (attempt {attempt + 1}): {e}")
+            
+            if attempt < max_retries - 1:
+                logger.info(f"⏳ Retrying in {retry_delay} seconds...")
+                await asyncio.sleep(retry_delay)
+            else:
+                logger.error("❌ All database connection attempts failed")
+                # Don't raise - allow app to start without database
+                db_pool = None
 
 async def create_tables(conn):
     """Create database tables"""
