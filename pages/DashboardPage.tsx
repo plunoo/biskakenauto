@@ -94,8 +94,15 @@ const DashboardPage: React.FC = () => {
     try {
       const status = await apiService.getStatus();
       setBackendStatus(status);
+      console.log('🌐 Backend status: CONNECTED', status);
     } catch (error) {
-      console.log('Backend not available');
+      console.log('🌐 Backend status: DISCONNECTED', error);
+      setBackendStatus({
+        status: 'offline',
+        error: 'Cannot connect to backend API',
+        timestamp: new Date().toISOString(),
+        environment: 'disconnected'
+      });
     }
   };
 
@@ -103,10 +110,18 @@ const DashboardPage: React.FC = () => {
     try {
       const status = await apiService.getDatabaseStatus();
       setDatabaseStatus(status);
-      console.log('📊 Database status:', status);
+      console.log('📊 Database status: CONNECTED', status);
     } catch (error) {
-      console.log('Database status check failed');
-      setDatabaseStatus({ success: false, data: { status: 'disconnected' } });
+      console.log('📊 Database status: DISCONNECTED', error);
+      setDatabaseStatus({ 
+        success: false, 
+        data: { 
+          status: 'disconnected',
+          message: 'Cannot connect to database via API',
+          responseTime: 'N/A',
+          error: error.message || 'Connection failed'
+        } 
+      });
     }
   };
 
@@ -118,6 +133,15 @@ const DashboardPage: React.FC = () => {
     // Load all data when dashboard mounts
     console.log('📊 Dashboard mounted - loading all data...');
     loadAllData();
+
+    // Set up real-time status checking every 30 seconds
+    const statusInterval = setInterval(() => {
+      checkBackendStatus();
+      checkDatabaseStatus();
+    }, 30000);
+
+    // Cleanup interval on unmount
+    return () => clearInterval(statusInterval);
   }, []);
 
   useEffect(() => {
@@ -144,11 +168,30 @@ const DashboardPage: React.FC = () => {
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-4 mt-2">
+            {/* Show current API URL */}
+            <div className="flex items-center gap-2">
+              <div className="w-2 h-2 bg-blue-500 rounded-full"></div>
+              <span className="text-xs text-blue-600 font-medium">
+                Target: {import.meta.env.VITE_API_URL || 'http://localhost:8000'}
+              </span>
+            </div>
             {backendStatus && (
               <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <span className="text-xs text-green-600 font-medium">API Connected</span>
-                <span className="text-xs text-gray-400">• Services Ready</span>
+                <div className={`w-2 h-2 rounded-full ${
+                  backendStatus.status === 'online' 
+                    ? 'bg-green-500' 
+                    : 'bg-red-500'
+                }`}></div>
+                <span className={`text-xs font-medium ${
+                  backendStatus.status === 'online'
+                    ? 'text-green-600'
+                    : 'text-red-600'
+                }`}>
+                  API {backendStatus.status === 'online' ? 'Connected' : 'Disconnected'}
+                </span>
+                <span className="text-xs text-gray-400">
+                  • {backendStatus.status === 'online' ? backendStatus.environment : 'Backend Offline'}
+                </span>
               </div>
             )}
             
