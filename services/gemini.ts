@@ -39,7 +39,7 @@ export const generateAIContent = async (prompt: string, type: 'title' | 'excerpt
     const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
     
     if (!apiKey) {
-      console.warn('No Gemini API key found, using fallback content');
+      console.log('✅ No Gemini API key found - using intelligent fallback content generation');
       return {
         success: true,
         data: generateFallbackContent(prompt)[0]

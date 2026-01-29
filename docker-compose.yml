@@ -70,6 +70,9 @@ services:
       VITE_APP_TITLE: Biskaken Auto Admin
       VITE_ENVIRONMENT: production
       NODE_ENV: production
+      # Optional AI API Keys (fallback works without them)
+      VITE_GEMINI_API_KEY: ${VITE_GEMINI_API_KEY:-}
+      VITE_OPENAI_API_KEY: ${VITE_OPENAI_API_KEY:-}
     depends_on:
       - api
     ports:
