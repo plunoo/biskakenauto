@@ -11,8 +11,8 @@ const getApiBaseUrl = () => {
     return 'https://bisadmin.rpnmore.com';
   }
   
-  // Development fallback
-  return 'http://localhost:5000';
+  // Development fallback - use port 8000 for FastAPI
+  return 'http://localhost:8000';
 };
 
 const API_BASE_URL = getApiBaseUrl();

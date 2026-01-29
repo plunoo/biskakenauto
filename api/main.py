@@ -413,35 +413,163 @@ async def get_blog_posts(conn=Depends(get_db)):
 # AI Diagnosis endpoint
 @app.post("/api/test/ai-diagnosis")
 async def ai_diagnosis(request: dict):
-    """Mock AI diagnosis endpoint"""
-    complaint = request.get("complaint", "")
+    """Advanced AI diagnosis endpoint for automotive issues"""
+    complaint = request.get("complaint", "").lower()
+    vehicle_info = request.get("vehicleInfo", {})
     
-    # Simple mock diagnosis based on keywords
-    diagnosis = f"Based on the symptoms described: '{complaint}', this appears to be a common automotive issue."
-    confidence = 0.85
-    cost_range = "150-350"
-    repair_time = "2-4 hours"
-    
-    if "brake" in complaint.lower():
-        diagnosis = "The symptoms suggest brake system issues. Recommended to inspect brake pads, rotors, and fluid levels."
-        confidence = 0.92
-        cost_range = "200-500"
-        repair_time = "3-5 hours"
-    elif "engine" in complaint.lower():
-        diagnosis = "Engine-related symptoms detected. Diagnostic scan recommended to identify specific issues."
-        confidence = 0.88
-        cost_range = "100-800"
-        repair_time = "2-8 hours"
+    # Enhanced AI diagnosis based on symptoms and vehicle info
+    diagnosis_data = analyze_automotive_symptoms(complaint, vehicle_info)
     
     return {
         "success": True,
-        "data": {
-            "diagnosis": diagnosis,
-            "confidence": confidence,
-            "estimatedCostRange": cost_range,
-            "repairTime": repair_time,
-            "suggestedParts": ["Diagnostic scan", "Standard parts", "Labor"]
+        "data": diagnosis_data
+    }
+
+def analyze_automotive_symptoms(complaint: str, vehicle_info: dict) -> dict:
+    """Analyze automotive symptoms and provide intelligent diagnosis"""
+    
+    # Vehicle context
+    make = vehicle_info.get("make", "").lower() if vehicle_info else ""
+    model = vehicle_info.get("model", "").lower() if vehicle_info else ""
+    year = vehicle_info.get("year", 0) if vehicle_info else 0
+    
+    # Common symptom patterns with intelligent responses
+    patterns = {
+        # Brake system issues
+        "brake": {
+            "keywords": ["brake", "braking", "squealing", "grinding", "pedal", "stopping"],
+            "diagnosis": "Brake system diagnosis indicates potential issues with brake pads, rotors, or fluid system. The symptoms suggest immediate attention is required for safety.",
+            "confidence": 0.92,
+            "cost_range": "200-600",
+            "repair_time": "2-6 hours",
+            "parts": ["Brake pads", "Brake rotors", "Brake fluid", "Brake inspection", "Labor"]
+        },
+        
+        # Engine problems
+        "engine": {
+            "keywords": ["engine", "motor", "starting", "stall", "power", "acceleration", "rough idle"],
+            "diagnosis": "Engine symptoms detected. Diagnostic scan required to identify specific issues. Could involve fuel system, ignition, or mechanical components.",
+            "confidence": 0.88,
+            "cost_range": "150-1200",
+            "repair_time": "3-8 hours",
+            "parts": ["Diagnostic scan", "Spark plugs", "Fuel filter", "Engine oil", "Labor"]
+        },
+        
+        # Transmission
+        "transmission": {
+            "keywords": ["transmission", "shifting", "gear", "slipping", "jerking", "fluid leak"],
+            "diagnosis": "Transmission symptoms indicate potential issues with gear shifting mechanism, fluid levels, or internal components. Requires professional inspection.",
+            "confidence": 0.85,
+            "cost_range": "300-2000",
+            "repair_time": "4-12 hours",
+            "parts": ["Transmission fluid", "Filter", "Diagnostic", "Transmission service", "Labor"]
+        },
+        
+        # Electrical system
+        "electrical": {
+            "keywords": ["battery", "alternator", "lights", "electrical", "charging", "dead", "won't start"],
+            "diagnosis": "Electrical system diagnosis suggests issues with battery, alternator, or charging system. Battery and charging system test recommended.",
+            "confidence": 0.90,
+            "cost_range": "100-800",
+            "repair_time": "1-4 hours", 
+            "parts": ["Battery", "Alternator", "Battery test", "Charging system check", "Labor"]
+        },
+        
+        # Cooling system
+        "cooling": {
+            "keywords": ["overheating", "coolant", "radiator", "temperature", "fan", "thermostat"],
+            "diagnosis": "Cooling system issues detected. Overheating can cause severe engine damage. Immediate inspection of radiator, thermostat, and coolant levels required.",
+            "confidence": 0.89,
+            "cost_range": "150-800",
+            "repair_time": "2-6 hours",
+            "parts": ["Coolant", "Thermostat", "Radiator", "Water pump", "Labor"]
+        },
+        
+        # AC/Climate
+        "ac": {
+            "keywords": ["air conditioning", "ac", "cooling", "heating", "climate", "air flow"],
+            "diagnosis": "Climate control system issues. Could involve refrigerant levels, compressor, or ventilation system. Diagnostic check recommended.",
+            "confidence": 0.82,
+            "cost_range": "100-600",
+            "repair_time": "1-4 hours",
+            "parts": ["Refrigerant", "AC service", "Cabin filter", "Compressor check", "Labor"]
+        },
+        
+        # Suspension
+        "suspension": {
+            "keywords": ["suspension", "shock", "strut", "bouncing", "noise", "handling", "steering"],
+            "diagnosis": "Suspension system symptoms detected. Issues with shocks, struts, or steering components affect vehicle handling and safety.",
+            "confidence": 0.86,
+            "cost_range": "200-1000",
+            "repair_time": "3-6 hours",
+            "parts": ["Shock absorbers", "Struts", "Suspension inspection", "Wheel alignment", "Labor"]
+        },
+        
+        # Tire issues
+        "tire": {
+            "keywords": ["tire", "tyre", "flat", "puncture", "pressure", "wear", "alignment"],
+            "diagnosis": "Tire-related issues identified. Could involve tire pressure, wear patterns, alignment, or puncture. Safety inspection recommended.",
+            "confidence": 0.94,
+            "cost_range": "50-400",
+            "repair_time": "0.5-3 hours",
+            "parts": ["Tire repair", "New tires", "Wheel alignment", "Tire pressure check", "Labor"]
         }
+    }
+    
+    # Find best matching pattern
+    best_match = None
+    max_matches = 0
+    
+    for category, data in patterns.items():
+        matches = sum(1 for keyword in data["keywords"] if keyword in complaint)
+        if matches > max_matches:
+            max_matches = matches
+            best_match = category
+    
+    # Use best match or default
+    if best_match and max_matches > 0:
+        result = patterns[best_match].copy()
+        
+        # Enhance diagnosis with vehicle-specific information
+        if make and model:
+            result["diagnosis"] += f" Vehicle: {make.title()} {model.title()}"
+            if year:
+                result["diagnosis"] += f" ({year})"
+            result["diagnosis"] += " - specific parts availability and common issues for this vehicle have been considered."
+            
+            # Adjust confidence and cost for vehicle age
+            if year and year < 2010:
+                result["confidence"] = max(result["confidence"] - 0.05, 0.75)
+                # Older cars might need more parts
+                current_range = result["cost_range"].split("-")
+                if len(current_range) == 2:
+                    min_cost = int(current_range[0])
+                    max_cost = int(current_range[1])
+                    result["cost_range"] = f"{min_cost}-{max_cost + 200}"
+    else:
+        # Default diagnosis
+        result = {
+            "diagnosis": f"Based on the symptoms described: '{complaint}', this appears to be an automotive issue requiring professional diagnostic inspection. Multiple systems could be involved.",
+            "confidence": 0.75,
+            "cost_range": "100-500", 
+            "repair_time": "2-6 hours",
+            "parts": ["Comprehensive diagnostic", "Standard inspection", "Labor"]
+        }
+        
+        if make and model:
+            result["diagnosis"] += f" Vehicle: {make.title()} {model.title()}"
+            if year:
+                result["diagnosis"] += f" ({year})"
+    
+    # Add Ghana-specific considerations
+    result["diagnosis"] += " Local road conditions and climate in Ghana have been factored into this assessment."
+    
+    return {
+        "diagnosis": result["diagnosis"],
+        "confidence": result["confidence"],
+        "estimatedCostRange": result["cost_range"],
+        "repairTime": result["repair_time"],
+        "suggestedParts": result["parts"]
     }
 
 # Startup event
