@@ -5,7 +5,7 @@ version: '3.8'
 
 services:
   # PostgreSQL Database
-  postgres:
+  biskaken-postgres:
     image: postgres:15-alpine
     container_name: biskaken-postgres
     environment:
@@ -32,8 +32,8 @@ services:
       dockerfile: Dockerfile
     container_name: biskaken-api
     environment:
-      DATABASE_URL: postgresql://${DB_USER:-postgres}:${DB_PASSWORD}@postgres:5432/${DB_NAME:-biskaken_auto}
-      DB_HOST: postgres
+      DATABASE_URL: postgresql://${DB_USER:-postgres}:${DB_PASSWORD}@biskaken-postgres:5432/${DB_NAME:-biskaken_auto}
+      DB_HOST: biskaken-postgres
       DB_PORT: 5432
       DB_NAME: ${DB_NAME:-biskaken_auto}
       DB_USER: ${DB_USER:-postgres}
@@ -41,7 +41,7 @@ services:
       ENVIRONMENT: production
       PORT: 8000
     depends_on:
-      postgres:
+      biskaken-postgres:
         condition: service_healthy
     networks:
       - biskaken-network

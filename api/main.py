@@ -45,7 +45,7 @@ app.add_middleware(
 DB_PASSWORD = os.getenv('DB_PASSWORD') or 'postgres'
 DATABASE_URL = os.getenv(
     "DATABASE_URL", 
-    f"postgresql://{os.getenv('DB_USER', 'postgres')}:{DB_PASSWORD}@{os.getenv('DB_HOST', 'localhost')}:{os.getenv('DB_PORT', '5432')}/{os.getenv('DB_NAME', 'biskaken_auto')}"
+    f"postgresql://{os.getenv('DB_USER', 'postgres')}:{DB_PASSWORD}@{os.getenv('DB_HOST', 'biskaken-postgres')}:{os.getenv('DB_PORT', '5432')}/{os.getenv('DB_NAME', 'biskaken_auto')}"
 )
 
 logger.info(f"Database URL configured: {DATABASE_URL.split('@')[0]}@***")
