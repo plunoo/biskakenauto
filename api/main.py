@@ -54,38 +54,57 @@ logger.info(f"Database URL configured: {DATABASE_URL.split('@')[0]}@***")
 db_pool = None
 
 async def init_db():
-    """Initialize database connection pool with retry logic"""
+    """Initialize database connection pool with multiple hostname fallbacks"""
     global db_pool
-    max_retries = 5
-    retry_delay = 5
     
-    for attempt in range(max_retries):
-        try:
-            logger.info(f"🔄 Attempting database connection (attempt {attempt + 1}/{max_retries})")
-            db_pool = await asyncpg.create_pool(DATABASE_URL, min_size=2, max_size=10)
-            logger.info("✅ Database connection pool created successfully")
-            
-            # Test the connection
-            async with db_pool.acquire() as conn:
-                await conn.fetchval("SELECT 1")
-                logger.info("✅ Database connection tested successfully")
+    # Multiple hostname options to try
+    db_hosts = [
+        os.getenv('DB_HOST', 'biskaken-postgres'),
+        'biskaken-postgres', 
+        'postgres',
+        'db',
+        'database'
+    ]
+    
+    db_user = os.getenv('DB_USER', 'postgres')
+    db_password = os.getenv('DB_PASSWORD', 'postgres') 
+    db_port = os.getenv('DB_PORT', '5432')
+    db_name = os.getenv('DB_NAME', 'biskaken_auto')
+    
+    logger.info(f"🔍 Network debugging - trying multiple database hosts...")
+    
+    for host in db_hosts:
+        test_url = f"postgresql://{db_user}:{db_password}@{host}:{db_port}/{db_name}"
+        logger.info(f"🔄 Trying database host: {host}")
+        
+        for attempt in range(3):  # 3 attempts per hostname
+            try:
+                logger.info(f"   🔄 Attempt {attempt + 1}/3 for host {host}")
+                db_pool = await asyncpg.create_pool(test_url, min_size=1, max_size=5)
                 
-                # Create tables if they don't exist
-                await create_tables(conn)
-                await seed_demo_data(conn)
-            
-            return  # Success, exit retry loop
-            
-        except Exception as e:
-            logger.error(f"❌ Database connection failed (attempt {attempt + 1}): {e}")
-            
-            if attempt < max_retries - 1:
-                logger.info(f"⏳ Retrying in {retry_delay} seconds...")
-                await asyncio.sleep(retry_delay)
-            else:
-                logger.error("❌ All database connection attempts failed")
-                # Don't raise - allow app to start without database
-                db_pool = None
+                # Test the connection
+                async with db_pool.acquire() as conn:
+                    await conn.fetchval("SELECT 1")
+                    logger.info(f"✅ Database connection successful with host: {host}")
+                    
+                    # Create tables if they don't exist
+                    await create_tables(conn)
+                    await seed_demo_data(conn)
+                
+                return  # Success, exit all loops
+                
+            except Exception as e:
+                logger.error(f"   ❌ Failed connecting to {host} (attempt {attempt + 1}): {e}")
+                if db_pool:
+                    await db_pool.close()
+                    db_pool = None
+                
+                if attempt < 2:  # Not the last attempt for this host
+                    await asyncio.sleep(2)
+    
+    logger.error("❌ All database connection attempts failed with all hostnames")
+    logger.info("🔧 API will start without database - check Docker networking")
+    db_pool = None
 
 async def create_tables(conn):
     """Create database tables"""
@@ -271,15 +290,50 @@ async def get_db():
 async def health_check():
     """Health check endpoint"""
     try:
-        async with db_pool.acquire() as conn:
-            await conn.fetchval("SELECT 1")
-        return {"status": "healthy", "database": "connected", "timestamp": datetime.utcnow()}
+        if db_pool:
+            async with db_pool.acquire() as conn:
+                await conn.fetchval("SELECT 1")
+            return {"status": "healthy", "database": "connected", "timestamp": datetime.utcnow()}
+        else:
+            return {"status": "healthy", "database": "disconnected", "api_only": True, "timestamp": datetime.utcnow()}
     except Exception as e:
         logger.error(f"Health check failed: {e}")
         return JSONResponse(
             status_code=503,
             content={"status": "unhealthy", "database": "disconnected", "error": str(e)}
         )
+
+@app.get("/debug/network")
+async def network_debug():
+    """Network debugging endpoint"""
+    import socket
+    
+    debug_info = {
+        "container_hostname": socket.gethostname(),
+        "environment_vars": {
+            "DB_HOST": os.getenv('DB_HOST'),
+            "DB_PORT": os.getenv('DB_PORT'),
+            "DB_NAME": os.getenv('DB_NAME'),
+            "DB_USER": os.getenv('DB_USER'),
+            "DATABASE_URL_format": f"postgresql://{os.getenv('DB_USER')}:***@{os.getenv('DB_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('DB_NAME')}"
+        },
+        "database_pool_status": "connected" if db_pool else "disconnected",
+        "timestamp": datetime.utcnow()
+    }
+    
+    # Test hostname resolution
+    test_hosts = ['biskaken-postgres', 'postgres', 'db', 'database']
+    dns_resolution = {}
+    
+    for host in test_hosts:
+        try:
+            socket.gethostbyname(host)
+            dns_resolution[host] = "✅ Resolvable"
+        except socket.gaierror:
+            dns_resolution[host] = "❌ Not found"
+    
+    debug_info["dns_resolution"] = dns_resolution
+    return debug_info
 
 @app.get("/api/status")
 async def api_status():
