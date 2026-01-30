@@ -1,65 +1,30 @@
-# Admin Dashboard Only - Clean Deployment
-FROM node:18-alpine as build
+# Simple Admin Dashboard Deployment
+FROM node:18-alpine
 
+# Set working directory
 WORKDIR /app
 
 # Copy package files
-COPY package.json ./
-COPY package-lock.json ./
-COPY tsconfig.json ./
-COPY vite.config.ts ./
+COPY package.json package-lock.json ./
 
 # Install dependencies
-RUN npm ci
+RUN npm ci --production
 
-# Copy all React source code
-COPY App.tsx ./
-COPY index.tsx ./
-COPY index.html ./
-COPY index.css ./
-COPY constants.tsx ./
-COPY types.ts ./
-COPY components/ ./components/
-COPY pages/ ./pages/
-COPY services/ ./services/
-COPY store/ ./store/
-COPY public/ ./public/
+# Copy all source files
+COPY . .
 
 # Build the React application
 RUN npm run build
 
-# Production stage with Nginx
-FROM nginx:alpine
+# Install serve for static hosting
+RUN npm install -g serve
 
-# Create nginx config for React SPA
-RUN echo 'server { \
-    listen 80; \
-    server_name localhost; \
-    root /usr/share/nginx/html; \
-    index index.html; \
-    \
-    # Handle React Router routes \
-    location / { \
-        try_files $uri $uri/ /index.html; \
-    } \
-    \
-    # Health check endpoint \
-    location /health { \
-        return 200 "OK - Biskaken Auto v3"; \
-        add_header Content-Type text/plain; \
-    } \
-    \
-    # API proxy if needed (optional) \
-    location /api { \
-        return 404; \
-    } \
-}' > /etc/nginx/conf.d/default.conf
+# Expose port 3000
+EXPOSE 3000
 
-# Copy built React app
-COPY --from=build /app/dist /usr/share/nginx/html
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:3000/ || exit 1
 
-# Expose port 80
-EXPOSE 80
-
-# Start nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Start the application
+CMD ["serve", "-s", "dist", "-l", "3000"]

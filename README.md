@@ -1,132 +1,66 @@
-# Biskaken Auto Shop Management System
+# 🚗 Biskaken Auto Admin Dashboard
 
-A comprehensive full-stack auto shop management system with React frontend and Node.js/Express backend.
+A React-based admin dashboard for automotive repair shop management.
 
-## 🚀 Quick Start
+## 🚀 Local Development
 
-### Prerequisites
-- Node.js 20+
-- PostgreSQL
-- npm or yarn
-
-### Development Setup
-
-1. **Clone the repository**
-   ```bash
-   git clone <repository-url>
-   cd biskaken-auto
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Environment Setup**
-   Copy `.env.production.example` to `.env.local` and update with your values:
-   ```bash
-   cp .env.production.example .env.local
-   ```
-
-4. **Database Setup**
-   ```bash
-   # Generate Prisma client
-   npx prisma generate
-   
-   # Run migrations
-   npx prisma migrate dev
-   
-   # Seed database
-   npm run db:seed
-   ```
-
-5. **Development**
-   ```bash
-   # Start frontend (development)
-   npm run dev
-   
-   # In another terminal, start backend
-   cd server && npm run dev
-   ```
-
-6. **Production Build**
-   ```bash
-   npm run build
-   npm start
-   ```
-
-## 📁 Project Structure
-
-```
-biskaken-auto/
-├── components/          # React components
-├── pages/              # React pages
-├── services/           # Frontend API services
-├── store/             # Zustand state management
-├── server/            # Backend Node.js application
-│   ├── controllers/   # API controllers
-│   ├── middleware/    # Express middleware
-│   ├── routes/        # API routes
-│   ├── services/      # Backend services
-│   └── utils/         # Utilities
-├── prisma/            # Database schema and migrations
-├── public/            # Static assets
-└── dist/              # Built application
+```bash
+npm install
+npm run dev
 ```
 
-## 🛠 Tech Stack
+Visit: `http://localhost:3000`
 
-### Frontend
-- **React 19** - UI framework
-- **TypeScript** - Type safety
-- **Vite** - Build tool
-- **Zustand** - State management
-- **React Router** - Navigation
-- **Recharts** - Data visualization
-- **Lucide React** - Icons
+## 📦 Dokploy Deployment
 
-### Backend
-- **Node.js 20** - Runtime
-- **Express 5** - Web framework
-- **TypeScript** - Type safety
-- **Prisma** - Database ORM
-- **PostgreSQL** - Database
-- **JWT** - Authentication
-- **Bcrypt** - Password hashing
+### Simple Application Mode
 
-### Services
-- **OpenAI** - AI diagnostics
-- **Twilio** - SMS notifications
-- **Paystack** - Payment processing
-- **Cloudinary** - File uploads
+1. **Create Application** (not Compose) in Dokploy
+2. **Repository**: Your GitHub repo
+3. **Dockerfile**: `Dockerfile` (default)
+4. **Port**: `3000`
+5. **Domain**: `bisadmin.rpnmore.com`
 
-## 🔧 Available Scripts
+### Environment Variables (Optional)
+```
+NODE_ENV=production
+```
 
-- `npm run dev` - Start development server (frontend)
-- `npm run build` - Build for production
-- `npm start` - Start production server
-- `npm run build:frontend` - Build frontend only
-- `npm run build:backend` - Build backend only
-- `npm run db:generate` - Generate Prisma client
-- `npm run db:migrate` - Run database migrations
-- `npm run db:seed` - Seed database
+## ✨ Features
 
-## 🌐 Production Deployment
+- 🎯 **Dashboard Overview** - Business metrics and insights
+- 🚗 **Vehicle Management** - Customer vehicles and service history
+- 📋 **Work Orders** - Job tracking and management
+- 🧾 **Invoicing** - Billing and payment tracking
+- 📦 **Inventory** - Parts and stock management
+- 📰 **Blog Management** - Content creation and publishing
+- ⚙️ **Settings** - User management and configuration
+- 🤖 **AI Features** - Automotive diagnosis and content generation
 
-### Dokploy (Recommended)
-1. Create new Nixpacks application in Dokploy
-2. Connect to your Git repository
-3. Set environment variables
-4. Deploy
+## 🎨 Tech Stack
 
-### Manual Deployment
-1. Set up PostgreSQL database
-2. Configure environment variables
-3. Build and deploy:
-   ```bash
-   npm run build
-   npm start
-   ```
+- **Frontend**: React + TypeScript + Vite
+- **Styling**: Tailwind CSS
+- **State**: Zustand
+- **Charts**: Recharts
+- **Icons**: Lucide React
+
+## 🔧 Built-in Demo Data
+
+The dashboard includes comprehensive demo data:
+- Sample customers and vehicles
+- Example work orders and invoices  
+- Demo inventory items
+- Sample blog posts
+
+Perfect for testing and demonstration purposes!
+
+## 📱 Responsive Design
+
+Fully responsive design that works on:
+- 🖥️ Desktop
+- 📱 Mobile
+- 📱 Tablet
 
 ## 📧 Default Admin Access
 - **Email**: admin@biskaken.com

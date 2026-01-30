@@ -11,39 +11,17 @@ const getApiBaseUrl = () => {
     return 'https://bisadmin.rpnmore.com';
   }
   
-  // Development fallback - use port 8000 for FastAPI
-  return 'http://localhost:8000';
+  // Development fallback - no backend needed
+  return null;
 };
 
 const API_BASE_URL = getApiBaseUrl();
 
 class ApiService {
   private async request(endpoint: string, options: RequestInit = {}) {
-    try {
-      console.log(`🌐 API Request: ${endpoint}`);
-      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
-        ...options,
-        headers: {
-          'Content-Type': 'application/json',
-          'Origin': window.location.origin,
-          ...options.headers,
-        },
-      });
-
-      console.log(`📡 Response status: ${response.status} for ${endpoint}`);
-      
-      if (!response.ok) {
-        console.error(`❌ HTTP error! status: ${response.status} for ${endpoint}`);
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      console.log(`✅ API Success: ${endpoint}`, data);
-      return data;
-    } catch (error) {
-      console.error(`💥 API request failed for ${endpoint}:`, error);
-      throw error;
-    }
+    // Frontend-only mode - always use fallback data
+    console.log(`📱 Frontend-only mode: Using fallback data for ${endpoint}`);
+    throw new Error('Frontend-only mode - using fallback data');
   }
 
   // Health and status
