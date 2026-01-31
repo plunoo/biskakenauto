@@ -3,7 +3,7 @@ version: '3.8'
 
 services:
   # PostgreSQL Database (Internal)
-  postgres:
+  biskaken-postgres:
     image: postgres:15-alpine
     container_name: biskaken-postgres
     environment:
@@ -31,7 +31,7 @@ services:
       - NODE_ENV=production
       # Internal database connection (comment out for external)
       - INTERNAL_DB=true
-      - DB_HOST=postgres
+      - DB_HOST=biskaken-postgres
       - DB_PORT=5432
       - DB_NAME=${DB_NAME:-biskaken_auto}
       - DB_USER=${DB_USER:-postgres}
@@ -40,7 +40,7 @@ services:
       # - VITE_API_URL=${VITE_API_URL}
       # - VITE_EXTERNAL_DB_URL=${VITE_EXTERNAL_DB_URL}
     depends_on:
-      postgres:
+      biskaken-postgres:
         condition: service_healthy
     networks:
       - internal
