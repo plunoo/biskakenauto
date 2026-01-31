@@ -21,8 +21,32 @@ Visit: `http://localhost:3000`
 4. **Port**: `3000`
 5. **Domain**: `bisadmin.rpnmore.com`
 
-### Environment Variables (Optional)
+### Environment Variables
+
+#### Demo Mode (Default)
 ```
+NODE_ENV=production
+```
+
+#### External Database Mode
+```
+NODE_ENV=production
+VITE_API_URL=https://your-external-api.com
+```
+
+#### Popular External Databases
+```
+# Supabase
+VITE_API_URL=https://your-project.supabase.co/rest/v1
+VITE_SUPABASE_KEY=your_supabase_key
+
+# Firebase
+VITE_EXTERNAL_DB_URL=https://your-project-default-rtdb.firebaseio.com
+
+# Custom REST API
+VITE_API_URL=https://api.yourdomain.com
+
+# Demo Mode (No external DB)
 NODE_ENV=production
 ```
 
@@ -54,6 +78,46 @@ The dashboard includes comprehensive demo data:
 - Sample blog posts
 
 Perfect for testing and demonstration purposes!
+
+## 🗄️ External Database Support
+
+Connect to any external database or API:
+
+### Supported Backends
+- **Supabase** - PostgreSQL as a Service
+- **Firebase** - Google's real-time database
+- **Airtable** - Spreadsheet as database
+- **MongoDB Atlas** - Cloud MongoDB
+- **Strapi** - Headless CMS
+- **Custom REST API** - Your own backend
+- **GraphQL** - Any GraphQL endpoint
+
+### Connection Modes
+- **Demo Mode** - Built-in demo data (default)
+- **External API** - Connect to REST/GraphQL APIs
+- **Direct Database** - Connect to database services
+- **Hybrid** - Fallback from external to demo data
+
+### Quick Setup Examples
+
+#### Supabase Connection
+```bash
+# In Dokploy Environment Variables:
+VITE_API_URL=https://your-project.supabase.co/rest/v1
+VITE_SUPABASE_KEY=your_supabase_anon_key
+```
+
+#### Firebase Connection  
+```bash
+VITE_EXTERNAL_DB_URL=https://your-project-default-rtdb.firebaseio.com
+```
+
+#### Custom API
+```bash
+VITE_API_URL=https://api.yourdomain.com
+```
+
+The dashboard automatically detects external connections and falls back to demo data if unavailable.
 
 ## 📱 Responsive Design
 

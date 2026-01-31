@@ -1,17 +1,25 @@
-// API service to connect frontend with backend
-// Supports both internal container communication and external URLs
+// API service to connect frontend with any external backend
+// Supports external database APIs and fallback to demo data
 const getApiBaseUrl = () => {
-  // Check if we're in a Dokploy container environment
+  // Check for external API URL (highest priority)
   if (import.meta.env.VITE_API_URL) {
+    console.log(`🌐 Using external API: ${import.meta.env.VITE_API_URL}`);
     return import.meta.env.VITE_API_URL;
   }
   
-  // Production fallback - use bisadmin.rpnmore.com as backend
+  // Check for external database URL (convert to API format)
+  if (import.meta.env.VITE_EXTERNAL_DB_URL) {
+    console.log(`🗄️ External database mode detected`);
+    return import.meta.env.VITE_EXTERNAL_DB_URL;
+  }
+  
+  // Production fallback - try common API endpoints
   if (import.meta.env.PROD) {
     return 'https://bisadmin.rpnmore.com';
   }
   
-  // Development fallback - no backend needed
+  // Development fallback - use demo data
+  console.log(`📱 Demo mode: Using fallback data`);
   return null;
 };
 
@@ -19,9 +27,37 @@ const API_BASE_URL = getApiBaseUrl();
 
 class ApiService {
   private async request(endpoint: string, options: RequestInit = {}) {
-    // Frontend-only mode - always use fallback data
-    console.log(`📱 Frontend-only mode: Using fallback data for ${endpoint}`);
-    throw new Error('Frontend-only mode - using fallback data');
+    // If no API URL configured, use fallback data
+    if (!API_BASE_URL) {
+      console.log(`📱 Demo mode: Using fallback data for ${endpoint}`);
+      throw new Error('Demo mode - using fallback data');
+    }
+
+    try {
+      console.log(`🌐 API Request: ${API_BASE_URL}${endpoint}`);
+      const response = await fetch(`${API_BASE_URL}${endpoint}`, {
+        ...options,
+        headers: {
+          'Content-Type': 'application/json',
+          'Origin': window.location.origin,
+          ...options.headers,
+        },
+      });
+
+      console.log(`📡 Response status: ${response.status} for ${endpoint}`);
+      
+      if (!response.ok) {
+        console.error(`❌ HTTP error! status: ${response.status} for ${endpoint}`);
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log(`✅ External API Success: ${endpoint}`, data);
+      return data;
+    } catch (error) {
+      console.error(`💥 External API failed for ${endpoint}, using fallback:`, error);
+      throw error; // This will trigger fallback data in the calling methods
+    }
   }
 
   // Health and status
