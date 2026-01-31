@@ -13,41 +13,42 @@ Visit: `http://localhost:3000`
 
 ## 📦 Dokploy Deployment
 
-### Simple Application Mode
+### Compose Mode (Internal PostgreSQL)
 
-1. **Create Application** (not Compose) in Dokploy
+1. **Create Compose Service** (not Application) in Dokploy
 2. **Repository**: Your GitHub repo
-3. **Dockerfile**: `Dockerfile` (default)
-4. **Port**: `3000`
-5. **Domain**: `bisadmin.rpnmore.com`
+3. **Compose File**: `docker-compose.yml`
+4. **Domain**: `bisadmin.rpnmore.com`
 
 ### Environment Variables
 
-#### Demo Mode (Default)
+#### Internal Database (Default)
 ```
 NODE_ENV=production
+DB_NAME=biskaken_auto
+DB_USER=postgres
+DB_PASSWORD=YourSecurePassword123
 ```
 
-#### External Database Mode
+#### Switch to External Database (Later)
+Uncomment in environment variables:
 ```
 NODE_ENV=production
+# Comment out internal DB vars above, then add:
 VITE_API_URL=https://your-external-api.com
 ```
 
-#### Popular External Databases
+#### External Database Examples (Currently Disabled)
 ```
-# Supabase
-VITE_API_URL=https://your-project.supabase.co/rest/v1
-VITE_SUPABASE_KEY=your_supabase_key
+# Supabase (uncomment when ready)
+# VITE_API_URL=https://your-project.supabase.co/rest/v1
+# VITE_SUPABASE_KEY=your_supabase_key
 
-# Firebase
-VITE_EXTERNAL_DB_URL=https://your-project-default-rtdb.firebaseio.com
+# Firebase (uncomment when ready)  
+# VITE_EXTERNAL_DB_URL=https://your-project-default-rtdb.firebaseio.com
 
-# Custom REST API
-VITE_API_URL=https://api.yourdomain.com
-
-# Demo Mode (No external DB)
-NODE_ENV=production
+# Custom API (uncomment when ready)
+# VITE_API_URL=https://api.yourdomain.com
 ```
 
 ## ✨ Features
