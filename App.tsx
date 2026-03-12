@@ -27,13 +27,12 @@ const PlaceholderPage = ({ title }: { title: string }) => (
 const App: React.FC = () => {
   const { user } = useStore();
 
-  // Determine if we're on the admin domain or main domain
+  // Admin domains: bisadmin.rpnmore.com or localhost
+  // Public domains: biskakenauto.rpnmore.com (landing page)
   const isAdminDomain = () => {
-    if (typeof window !== 'undefined') {
-      const hostname = window.location.hostname;
-      return hostname.includes('bisadmin') || hostname.includes('admin');
-    }
-    return false;
+    const hostname = window.location.hostname;
+    const ADMIN_DOMAINS = ['bisadmin.rpnmore.com', 'localhost', '127.0.0.1'];
+    return ADMIN_DOMAINS.some(d => hostname === d || hostname.endsWith(`.${d}`));
   };
 
   return (

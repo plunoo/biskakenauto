@@ -13,9 +13,9 @@ const getApiBaseUrl = () => {
     return import.meta.env.VITE_EXTERNAL_DB_URL;
   }
   
-  // Production fallback - try common API endpoints
+  // Production fallback
   if (import.meta.env.PROD) {
-    return 'https://bisadmin.rpnmore.com';
+    return 'https://api.biskakenauto.rpnmore.com';
   }
   
   // Development fallback - use demo data
