@@ -19,6 +19,32 @@ import { Button } from '../components/UI';
 import { useStore } from '../store/useStore';
 import { apiService } from '../services/apiService';
 
+const FALLBACK_HERO = 'https://images.unsplash.com/photo-1530046339160-ce3e5b0c7a2f?auto=format&fit=crop&q=80&w=1200';
+
+const HeroImage: React.FC = () => {
+  const [src, setSrc] = React.useState<string>(FALLBACK_HERO);
+
+  React.useEffect(() => {
+    apiService.getLandingSettings().then(res => {
+      if (res.success && res.data?.heroImageUrl) {
+        const url = res.data.heroImageUrl;
+        // Prefix API base URL for relative paths
+        const apiBase = (import.meta as any).env?.VITE_API_URL || '';
+        setSrc(url.startsWith('http') ? url : `${apiBase}${url}`);
+      }
+    });
+  }, []);
+
+  return (
+    <img
+      src={src}
+      alt="Modern Auto Workshop"
+      className="rounded-xl object-cover h-[400px] w-full"
+      onError={() => setSrc(FALLBACK_HERO)}
+    />
+  );
+};
+
 const FeatureCard = ({ icon: Icon, title, description }: any) => (
   <div className="p-6 md:p-8 bg-white rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-shadow">
     <div className="w-12 h-12 bg-blue-50 text-blue-600 rounded-xl flex items-center justify-center mb-6">
@@ -185,11 +211,7 @@ const LandingPage: React.FC = () => {
             <div className="hidden lg:block relative">
               <div className="absolute -top-20 -right-20 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl"></div>
               <div className="relative bg-white rounded-2xl shadow-2xl border border-gray-100 p-2 transform rotate-2 hover:rotate-0 transition-transform duration-500">
-                <img 
-                  src="https://images.unsplash.com/photo-1530046339160-ce3e5b0c7a2f?auto=format&fit=crop&q=80&w=1200" 
-                  alt="Modern Auto Workshop" 
-                  className="rounded-xl object-cover h-[400px] w-full"
-                />
+                <HeroImage />
               </div>
             </div>
           </div>

@@ -31,7 +31,7 @@ const App: React.FC = () => {
   const isAdminDomain = () => {
     if (typeof window !== 'undefined') {
       const hostname = window.location.hostname;
-      return hostname.includes('bisadmin') || hostname.includes('admin') || hostname.includes('localhost');
+      return hostname.includes('bisadmin') || hostname.includes('admin');
     }
     return false;
   };

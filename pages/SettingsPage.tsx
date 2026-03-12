@@ -2,12 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { Card, Badge, Button, Input } from '../components/UI';
 import { useStore } from '../store/useStore';
 import { apiService } from '../services/apiService';
-import { 
-  User, 
-  Settings as SettingsIcon, 
-  Bell, 
-  Monitor, 
-  Shield, 
+import DatabaseSettings from '../components/DatabaseSettings';
+import LandingHeroUpload from '../components/LandingHeroUpload';
+import {
+  User,
+  Settings as SettingsIcon,
+  Bell,
+  Monitor,
+  Shield,
   Users,
   Rss,
   Save,
@@ -23,7 +25,8 @@ import {
   Sparkles,
   Stethoscope,
   AlertCircle,
-  CheckCircle
+  CheckCircle,
+  Database
 } from 'lucide-react';
 
 const SettingsPage: React.FC = () => {
@@ -87,7 +90,9 @@ const SettingsPage: React.FC = () => {
     { id: 'security', name: 'Security', icon: Shield },
     ...(user?.role === 'ADMIN' ? [
       { id: 'users', name: 'User Management', icon: Users },
-      { id: 'blog', name: 'Blog Management', icon: Rss }
+      { id: 'blog', name: 'Blog Management', icon: Rss },
+      { id: 'landing', name: 'Landing Page', icon: Monitor },
+      { id: 'database', name: 'Database', icon: Database }
     ] : [])
   ];
 
@@ -1350,6 +1355,8 @@ const SettingsPage: React.FC = () => {
     }
   };
 
+  const renderLandingTab = () => <LandingHeroUpload />;
+
   const renderBlogManagementTab = () => (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -1445,6 +1452,8 @@ const SettingsPage: React.FC = () => {
       case 'security': return renderSecurityTab();
       case 'users': return renderUserManagementTab();
       case 'blog': return renderBlogManagementTab();
+      case 'landing': return renderLandingTab();
+      case 'database': return <DatabaseSettings />;
       default: return renderProfileTab();
     }
   };

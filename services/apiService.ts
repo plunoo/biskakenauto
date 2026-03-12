@@ -611,6 +611,51 @@ class ApiService {
     return options[Math.floor(Math.random() * options.length)];
   }
 
+  // Landing page settings
+  async getLandingSettings() {
+    try {
+      return await this.request('/api/settings/landing');
+    } catch {
+      return { success: false, data: {} };
+    }
+  }
+
+  async uploadHeroImage(file: File) {
+    try {
+      const token = sessionStorage.getItem('authToken');
+      const formData = new FormData();
+      formData.append('image', file);
+      const response = await fetch(`${API_BASE_URL}/api/settings/landing/hero-image`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: formData
+      });
+      return await response.json();
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  }
+
+  // Database provider management (admin panel)
+  async getDatabaseProviderStatus() {
+    try {
+      return await this.request('/api/admin/database/status');
+    } catch {
+      return { success: false, error: 'Backend unreachable' };
+    }
+  }
+
+  async switchDatabaseProvider(provider: 'firebase' | 'postgres') {
+    try {
+      return await this.request('/api/admin/database/provider', {
+        method: 'PATCH',
+        body: JSON.stringify({ provider })
+      });
+    } catch (err: any) {
+      return { success: false, error: err.message };
+    }
+  }
+
   // Landing Page API
   async getLandingHero() {
     return this.request('/api/test/landing/hero');
