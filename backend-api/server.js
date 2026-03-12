@@ -55,6 +55,36 @@ app.get('/health', (req, res) => res.json({
   timestamp: new Date().toISOString()
 }));
 
+// One-time setup endpoint — creates admin user if none exists
+app.post('/api/setup', async (req, res) => {
+  try {
+    const bcrypt = require('bcryptjs');
+    const { getService } = require('./src/services/db.factory');
+    const { signToken } = require('./src/middleware/auth');
+
+    const existing = await getService('auth').findUserByEmail('admin@biskaken.com');
+    if (existing) {
+      return res.json({ success: false, message: 'Admin already exists. Use /api/auth/login.' });
+    }
+
+    const password = req.body.password || 'admin123';
+    const hashed = await bcrypt.hash(password, 12);
+
+    const user = await getService('auth').createUser({
+      name: 'Biskaken Admin',
+      email: 'admin@biskaken.com',
+      password,
+      role: 'ADMIN',
+      status: 'ACTIVE'
+    });
+
+    const token = signToken({ userId: user.id, email: user.email, role: user.role });
+    res.json({ success: true, message: 'Admin created', data: { user, token } });
+  } catch (err) {
+    res.status(500).json({ success: false, error: err.message });
+  }
+});
+
 app.use('/api/auth', authRoutes);
 app.use('/api/customers', customerRoutes);
 app.use('/api/jobs', jobRoutes);
