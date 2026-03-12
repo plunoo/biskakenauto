@@ -4,13 +4,12 @@ RUN apk add --no-cache curl
 
 WORKDIR /app
 
-# Build context is repo root — all paths prefixed with backend-api/
-COPY backend-api/package*.json ./
+COPY package*.json ./
 RUN npm ci --only=production
 
-COPY backend-api/server.js ./
-COPY backend-api/src/ ./src/
-COPY backend-api/models/ ./models/
+COPY server.js ./
+COPY src/ ./src/
+COPY models/ ./models/
 
 RUN mkdir -p public/uploads/tmp
 
