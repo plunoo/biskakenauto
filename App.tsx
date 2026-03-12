@@ -27,13 +27,12 @@ const PlaceholderPage = ({ title }: { title: string }) => (
 const App: React.FC = () => {
   const { user } = useStore();
 
-  // Admin domains: bisadmin.rpnmore.com or localhost
-  // Public domains: biskakenauto.rpnmore.com (landing page)
-  const isAdminDomain = () => {
-    const hostname = window.location.hostname;
-    const ADMIN_DOMAINS = ['bisadmin.rpnmore.com', 'localhost', '127.0.0.1'];
-    return ADMIN_DOMAINS.some(d => hostname === d || hostname.endsWith(`.${d}`));
-  };
+  const hostname = window.location.hostname;
+  // bisadmin.rpnmore.com → admin panel
+  // biskakenauto.rpnmore.com → public landing page
+  // localhost → admin panel (dev)
+  const isAdminDomain = hostname === 'bisadmin.rpnmore.com' || hostname === 'localhost' || hostname === '127.0.0.1';
+  const isPublicDomain = hostname === 'biskakenauto.rpnmore.com';
 
   return (
     <Router>
@@ -132,9 +131,13 @@ const App: React.FC = () => {
           )
         } />
         
-        {/* Root: always show landing page. Admin goes to /login */}
+        {/* Root: domain-based routing */}
         <Route path="/" element={
-          user ? <Navigate to="/dashboard" /> : <LandingPage />
+          isPublicDomain
+            ? <LandingPage />
+            : isAdminDomain
+              ? (user ? <Navigate to="/dashboard" /> : <Navigate to="/login" />)
+              : <LandingPage />
         } />
       </Routes>
     </Router>
