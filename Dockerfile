@@ -8,13 +8,17 @@ WORKDIR /app
 COPY package.json package-lock.json ./
 
 # Install dependencies
-RUN npm ci --production
+# Install ALL deps (including vite/typescript needed for build)
+RUN npm ci
 
 # Copy all source files
 COPY . .
 
 # Build the React application
 RUN npm run build
+
+# Remove dev deps after build to slim the image
+RUN npm prune --production
 
 # Install serve for static hosting
 RUN npm install -g serve

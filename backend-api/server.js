@@ -43,6 +43,12 @@ app.use(express.json({ limit: '10mb' }));
 // Serve uploaded files publicly
 app.use('/uploads', express.static(uploadsDir));
 
+app.get('/', (req, res) => res.json({
+  status: 'OK',
+  name: 'Biskaken Auto API',
+  version: '5.0.0'
+}));
+
 app.get('/health', (req, res) => res.json({
   status: 'OK',
   version: '5.0.0',
