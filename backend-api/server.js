@@ -40,8 +40,11 @@ app.use(cors({
 
 app.use(express.json({ limit: '10mb' }));
 
-// Serve uploaded files publicly
-app.use('/uploads', express.static(uploadsDir));
+// Serve uploaded files publicly — allow cross-origin so biskakenauto.rpnmore.com can load images from apibisken.rpnmore.com
+app.use('/uploads', (req, res, next) => {
+  res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  next();
+}, express.static(uploadsDir));
 
 app.get('/', (req, res) => res.json({
   status: 'OK',
