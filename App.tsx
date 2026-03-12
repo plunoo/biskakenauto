@@ -132,11 +132,9 @@ const App: React.FC = () => {
           )
         } />
         
-        {/* Default redirect - route based on domain */}
+        {/* Root: always show landing page. Admin goes to /login */}
         <Route path="/" element={
-          isAdminDomain() 
-            ? (user ? <Navigate to="/dashboard" /> : <Navigate to="/login" />)
-            : <Navigate to="/landing" />
+          user ? <Navigate to="/dashboard" /> : <LandingPage />
         } />
       </Routes>
     </Router>

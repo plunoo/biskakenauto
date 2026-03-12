@@ -15,7 +15,7 @@ const getApiBaseUrl = () => {
   
   // Production fallback
   if (import.meta.env.PROD) {
-    return 'https://apibiskaken.rpnmore.com';
+    return 'https://biskakenauto.rpnmore.com';
   }
   
   // Development fallback - use demo data
