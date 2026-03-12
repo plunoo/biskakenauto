@@ -27,7 +27,8 @@ exports.uploadHeroImage = async (req, res, next) => {
 
     fs.renameSync(req.file.path, dest);
 
-    const imageUrl = `/uploads/${filename}?t=${Date.now()}`;
+    const apiBase = process.env.API_URL || `http://localhost:${process.env.PORT || 5000}`;
+    const imageUrl = `${apiBase}/uploads/${filename}?t=${Date.now()}`;
 
     // Save URL to settings
     await getService('settings').updateLandingSettings({ heroImageUrl: imageUrl });
