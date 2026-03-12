@@ -1,23 +1,23 @@
 FROM node:18-alpine
 
-# Set working directory
+RUN apk add --no-cache curl
+
 WORKDIR /app
 
-# Copy package files
 COPY package*.json ./
-
-# Install dependencies
 RUN npm ci --only=production
 
-# Copy application files
+# Copy all source files
 COPY server.js ./
+COPY src/ ./src/
+COPY models/ ./models/
 
-# Expose port
+# Uploads directory (persisted via volume in production)
+RUN mkdir -p public/uploads/tmp
+
 EXPOSE 5000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
-  CMD node -e "require('http').get('http://localhost:5000/health', (res) => { process.exit(res.statusCode === 200 ? 0 : 1) })"
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+  CMD curl -f http://localhost:5000/health || exit 1
 
-# Start the application
-CMD ["npm", "start"]
+CMD ["node", "server.js"]
