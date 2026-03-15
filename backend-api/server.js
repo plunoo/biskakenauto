@@ -1,3 +1,13 @@
+process.on('uncaughtException', (err) => {
+  console.error('UNCAUGHT EXCEPTION:', err);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason) => {
+  console.error('UNHANDLED REJECTION:', reason);
+  process.exit(1);
+});
+
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -6,6 +16,12 @@ const jwt = require('jsonwebtoken');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+
+console.log('Starting server with config:', {
+  PORT,
+  NODE_ENV: process.env.NODE_ENV,
+  ALLOWED_ORIGINS: process.env.ALLOWED_ORIGINS,
+});
 
 // Security middleware
 app.use(helmet({
