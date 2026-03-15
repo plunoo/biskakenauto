@@ -38,7 +38,8 @@ jobs-test.html
 deploy*.sh
 docker-compose*.yml
 dokploy*.yml
-Dockerfile.*
+Dockerfile.admin
+Dockerfile.backend
 # package.*.json  # Commented out - we need package.frontend.json for build
 check-dashboard.js
 
