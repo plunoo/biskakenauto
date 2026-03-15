@@ -14,14 +14,12 @@ app.use(helmet({
 }));
 
 // CORS configuration
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',').map(o => o.trim())
+  : ['https://biskakenauto.rpnmore.com', 'https://bisadmin.rpnmore.com', 'http://localhost:3000', 'http://localhost:5173'];
+
 const corsOptions = {
   origin: (origin, callback) => {
-    const allowedOrigins = [
-      'https://biskakenauto.rpnmore.com',
-      'http://localhost:3000',
-      'http://localhost:5173'
-    ];
-    
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
