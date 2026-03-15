@@ -3,21 +3,15 @@ import React, { useEffect, useState } from 'react';
 import { Card, Badge, Button } from '../components/UI';
 import { useStore } from '../store/useStore';
 import { 
-  TrendingUp, 
-  Car, 
-  CreditCard, 
-  Activity, 
-  Sparkles, 
+  TrendingUp,
+  Car,
+  CreditCard,
+  Activity,
+  Sparkles,
   RefreshCcw,
   Clock,
   CheckCircle2,
   AlertCircle,
-  Edit3,
-  Brain,
-  FileText,
-  Image,
-  Upload,
-  Video
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 import { getAIInsights } from '../services/gemini';
@@ -164,7 +158,7 @@ const DashboardPage: React.FC = () => {
           <div className="flex items-center gap-4">
             <p className="text-gray-500">Welcome back! Here's what's happening today.</p>
             <div className="bg-gradient-to-r from-purple-500 to-pink-500 text-white px-3 py-1 rounded-full text-xs font-bold animate-pulse">
-              V4.0 AI Features Active! 🚀🤖
+              V4.0 AI Features Active!
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-4 mt-2">
@@ -226,10 +220,8 @@ const DashboardPage: React.FC = () => {
       {/* AI Assistant Section - Prominent for Non-Tech Users */}
       <div className="bg-gradient-to-br from-purple-600 via-blue-600 to-teal-500 p-8 rounded-2xl text-white shadow-xl border border-purple-200">
         <div className="text-center mb-6">
-          <h2 className="text-3xl font-bold mb-2 flex items-center justify-center gap-3">
-            <Sparkles size={32} className="text-yellow-300" />
-            🚀 V4 AI Assistant - Let AI Help Your Business!
-            <Sparkles size={32} className="text-yellow-300" />
+          <h2 className="text-3xl font-bold mb-2">
+            AI Assistant - Let AI Help Your Business!
           </h2>
           <p className="text-purple-100 text-lg">Perfect for non-technical users - Just click and AI does the work!</p>
         </div>
@@ -240,8 +232,7 @@ const DashboardPage: React.FC = () => {
             onClick={() => window.location.href = '/blog'}
           >
             <div className="text-center">
-              <Edit3 size={24} className="mx-auto mb-1" />
-              <div className="text-sm font-bold">✨ Create Title</div>
+              <div className="text-sm font-bold">Create Title</div>
               <div className="text-xs opacity-90">AI writes titles</div>
             </div>
           </Button>
@@ -251,8 +242,7 @@ const DashboardPage: React.FC = () => {
             onClick={() => window.location.href = '/blog'}
           >
             <div className="text-center">
-              <Brain size={24} className="mx-auto mb-1" />
-              <div className="text-sm font-bold">🧠 Create Summary</div>
+              <div className="text-sm font-bold">Create Summary</div>
               <div className="text-xs opacity-90">AI writes excerpts</div>
             </div>
           </Button>
@@ -262,8 +252,7 @@ const DashboardPage: React.FC = () => {
             onClick={() => window.location.href = '/blog'}
           >
             <div className="text-center">
-              <FileText size={24} className="mx-auto mb-1" />
-              <div className="text-sm font-bold">📝 Write Article</div>
+              <div className="text-sm font-bold">Write Article</div>
               <div className="text-xs opacity-90">AI writes full posts</div>
             </div>
           </Button>
@@ -273,8 +262,7 @@ const DashboardPage: React.FC = () => {
             onClick={() => window.location.href = '/blog'}
           >
             <div className="text-center">
-              <Image size={24} className="mx-auto mb-1" />
-              <div className="text-sm font-bold">🖼️ Create Image</div>
+              <div className="text-sm font-bold">Create Image</div>
               <div className="text-xs opacity-90">AI generates photos</div>
             </div>
           </Button>
@@ -284,8 +272,7 @@ const DashboardPage: React.FC = () => {
             onClick={() => window.location.href = '/blog'}
           >
             <div className="text-center">
-              <Upload size={24} className="mx-auto mb-1" />
-              <div className="text-sm font-bold">📷 Upload Image</div>
+              <div className="text-sm font-bold">Upload Image</div>
               <div className="text-xs opacity-90">Add your photos</div>
             </div>
           </Button>
@@ -295,8 +282,7 @@ const DashboardPage: React.FC = () => {
             onClick={() => window.location.href = '/blog'}
           >
             <div className="text-center">
-              <Video size={24} className="mx-auto mb-1" />
-              <div className="text-sm font-bold">🎥 Upload Video</div>
+              <div className="text-sm font-bold">Upload Video</div>
               <div className="text-xs opacity-90">Add your videos</div>
             </div>
           </Button>
@@ -304,7 +290,7 @@ const DashboardPage: React.FC = () => {
         
         <div className="text-center mt-6">
           <p className="text-purple-100 text-sm">
-            💡 <strong>No technical skills needed!</strong> Just click any button above and AI will help you create amazing content for your auto shop.
+            <strong>No technical skills needed!</strong> Just click any button above and AI will help you create amazing content for your auto shop.
           </p>
         </div>
       </div>
@@ -331,7 +317,7 @@ const DashboardPage: React.FC = () => {
           </div>
         </Card>
 
-        <Card title="🤖 AI Shop Insights" className="relative">
+        <Card title="AI Shop Insights" className="relative">
           <button 
             onClick={fetchInsights}
             className="absolute top-4 right-4 p-2 text-blue-600 hover:bg-blue-50 rounded-full"

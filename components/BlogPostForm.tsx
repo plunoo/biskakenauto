@@ -1,18 +1,14 @@
 import React, { useState } from 'react';
-import { 
-  X, 
-  Save, 
-  Eye, 
-  Upload,
+import {
+  X,
+  Save,
+  Eye,
   Tag,
   Calendar,
   FileText,
   AlertCircle,
   CheckCircle,
   Loader,
-  Sparkles,
-  Brain,
-  Wand2
 } from 'lucide-react';
 import { Button, Input, Card } from './UI';
 import { apiService } from '../services/apiService';
@@ -287,7 +283,7 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
         <div className="flex items-center justify-between p-8 bg-gradient-to-r from-purple-50 to-blue-50 border-b border-slate-200">
           <div>
             <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-700 to-blue-700 bg-clip-text text-transparent">
-              {initialData?.id ? '✏️ Edit Blog Post' : '✨ Create New Blog Post'}
+              {initialData?.id ? 'Edit Blog Post' : 'Create New Blog Post'}
             </h2>
             <div className="flex items-center gap-4 mt-2">
               <p className="text-sm text-slate-600 font-medium">
@@ -363,51 +359,47 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
               {/* AI HELP SECTION - PROMINENT FOR NON-TECH USERS */}
               <div className="bg-gradient-to-r from-purple-50 to-blue-50 p-6 rounded-2xl border-2 border-purple-200 mb-8">
                 <div className="text-center mb-4">
-                  <h3 className="text-xl font-bold text-purple-800 mb-2">🤖 AI Assistant - Let AI Write Your Blog Post!</h3>
+                  <h3 className="text-xl font-bold text-purple-800 mb-2">AI Assistant - Let AI Write Your Blog Post!</h3>
                   <p className="text-purple-600">No writing experience needed! Choose what you want AI to create for you:</p>
                 </div>
-                
+
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                   <Button
                     onClick={() => generateAIContentHandler('title')}
                     disabled={aiGenerating === 'title'}
                     className="h-16 bg-gradient-to-r from-pink-500 to-purple-600 hover:from-pink-600 hover:to-purple-700 text-white font-bold text-lg shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300"
-                    icon={aiGenerating === 'title' ? Loader : Sparkles}
                   >
-                    {aiGenerating === 'title' ? 'Creating...' : '✨ Create Title'}
+                    {aiGenerating === 'title' ? 'Creating...' : 'Create Title'}
                   </Button>
-                  
+
                   <Button
                     onClick={() => generateAIContentHandler('excerpt')}
                     disabled={aiGenerating === 'excerpt' || !formData.title}
                     className="h-16 bg-gradient-to-r from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white font-bold text-lg shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300"
-                    icon={aiGenerating === 'excerpt' ? Loader : Brain}
                   >
-                    {aiGenerating === 'excerpt' ? 'Creating...' : '🧠 Create Summary'}
+                    {aiGenerating === 'excerpt' ? 'Creating...' : 'Create Summary'}
                   </Button>
-                  
+
                   <Button
                     onClick={() => generateAIContentHandler('content')}
                     disabled={aiGenerating === 'content' || !formData.title}
                     className="h-16 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold text-lg shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300"
-                    icon={aiGenerating === 'content' ? Loader : Wand2}
                   >
-                    {aiGenerating === 'content' ? 'Writing...' : '📝 Write Full Article'}
+                    {aiGenerating === 'content' ? 'Writing...' : 'Write Full Article'}
                   </Button>
-                  
+
                   <Button
                     onClick={generateAIImageHandler}
                     disabled={imageGenerating || !formData.title}
                     className="h-16 bg-gradient-to-r from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-bold text-lg shadow-xl hover:shadow-2xl transform hover:-translate-y-1 transition-all duration-300"
-                    icon={imageGenerating ? Loader : Sparkles}
                   >
-                    {imageGenerating ? 'Creating...' : '🖼️ Create Image'}
+                    {imageGenerating ? 'Creating...' : 'Create Image'}
                   </Button>
                 </div>
-                
+
                 <div className="text-center mt-4">
                   <p className="text-sm text-purple-600 font-medium">
-                    💡 Tip: Start with "Create Title" then use other buttons. AI will create professional content for you!
+                    Tip: Start with "Create Title" then use other buttons. AI will create professional content for you!
                   </p>
                 </div>
               </div>
@@ -524,14 +516,13 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
               {/* Media Upload Section - Images and Videos */}
               <div className="space-y-6">
                 <div className="bg-gradient-to-r from-green-50 to-blue-50 p-6 rounded-2xl border-2 border-green-200">
-                  <h3 className="text-xl font-bold text-green-800 mb-4 text-center">📸 Add Images & Videos to Your Blog Post</h3>
-                  
+                  <h3 className="text-xl font-bold text-green-800 mb-4 text-center">Add Images & Videos to Your Blog Post</h3>
+
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                     {/* Upload Image */}
                     <label className="cursor-pointer group">
                       <div className="h-32 bg-gradient-to-br from-blue-500 to-cyan-600 hover:from-blue-600 hover:to-cyan-700 text-white rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 flex flex-col items-center justify-center">
-                        <Upload size={32} className="mb-2" />
-                        <span className="font-bold text-lg">📷 Upload Image</span>
+                        <span className="font-bold text-lg">Upload Image</span>
                         <span className="text-xs opacity-90">JPG, PNG, WebP</span>
                       </div>
                       <input
@@ -548,10 +539,7 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
                     {/* Upload Video */}
                     <label className="cursor-pointer group">
                       <div className="h-32 bg-gradient-to-br from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 flex flex-col items-center justify-center">
-                        <svg className="w-8 h-8 mb-2" fill="currentColor" viewBox="0 0 20 20">
-                          <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clipRule="evenodd"/>
-                        </svg>
-                        <span className="font-bold text-lg">🎥 Upload Video</span>
+                        <span className="font-bold text-lg">Upload Video</span>
                         <span className="text-xs opacity-90">MP4, WebM, MOV</span>
                       </div>
                       <input
@@ -570,17 +558,15 @@ export const BlogPostForm: React.FC<BlogPostFormProps> = ({
                       onClick={generateAIImageHandler}
                       disabled={imageGenerating || !formData.title}
                       className="h-32 bg-gradient-to-br from-orange-500 to-red-600 hover:from-orange-600 hover:to-red-700 text-white font-bold shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 flex flex-col items-center justify-center"
-                      icon={imageGenerating ? Loader : Sparkles}
                     >
-                      <Sparkles size={32} className="mb-2" />
-                      <span className="text-lg">{imageGenerating ? 'Creating...' : '🖼️ AI Create Image'}</span>
+                      <span className="text-lg">{imageGenerating ? 'Creating...' : 'AI Create Image'}</span>
                       <span className="text-xs opacity-90">Let AI make it</span>
                     </Button>
                   </div>
                   
                   <div className="text-center">
                     <p className="text-green-600 font-medium">
-                      💡 Add professional images and videos to make your blog post more engaging!
+                      Add professional images and videos to make your blog post more engaging.
                     </p>
                   </div>
                 </div>
